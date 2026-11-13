@@ -18,97 +18,123 @@ html, body {
   height: 100%;
   overflow: hidden;
   font-family: Arial, sans-serif;
-  background: #8acb65;
+  background: #163b57;
   color: white;
 }
 
+#background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: url("lobby-bg.png");
+  background-size: cover;
+  background-position: center;
+}
+
+#background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(5,20,40,.12),
+    transparent 55%,
+    rgba(5,20,40,.2)
+  );
+}
+
 canvas {
-  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 1;
   width: 100%;
   height: 100%;
+  pointer-events: none;
 }
 
 #lobby {
   position: fixed;
   inset: 0;
-  z-index: 5;
+  z-index: 3;
   pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    rgba(9,35,55,.38),
-    transparent 45%,
-    rgba(8,30,48,.55)
-  );
-}
-
-#topbar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 65px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 14px;
-  background: linear-gradient(90deg,#173b58dd,#245b6ddd);
 }
 
 #logo {
-  font-size: 21px;
-  font-weight: 1000;
-  text-shadow: 2px 3px #173044;
-  letter-spacing: 1px;
-}
-
-#currency {
-  font-size: 14px;
-  font-weight: bold;
-  background: #173b58cc;
-  padding: 9px 12px;
-  border-radius: 20px;
-}
-
-#profile {
   position: absolute;
-  top: 78px;
-  left: 12px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  background: #173b58dd;
-  font-size: 13px;
-  font-weight: bold;
+  top: 3%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(22px, 4vw, 43px);
+  font-weight: 1000;
+  color: #ffdb38;
+  text-shadow:
+    3px 4px 0 #753b13,
+    -2px -2px 0 #ffffff,
+    2px 3px 8px #142b49;
+  white-space: nowrap;
+  letter-spacing: 1px;
 }
 
 #playArea {
   position: absolute;
-  top: 145px;
-  left: 12px;
+  top: 4%;
+  left: 2%;
   pointer-events: auto;
 }
 
 #playButton {
-  width: 135px;
-  border: 3px solid #fff3a0;
-  border-radius: 14px;
-  padding: 14px 8px;
-  background: linear-gradient(#ffe65b,#ff9e22);
-  color: #663500;
-  font-size: 19px;
+  width: clamp(125px, 22vw, 230px);
+  padding: 13px 8px;
+  border: 3px solid #fff2a0;
+  border-radius: 16px;
+  background: linear-gradient(#ffe95c,#ff9e19);
+  color: #663300;
+  font-size: clamp(17px, 2.5vw, 27px);
   font-weight: 1000;
-  box-shadow: 0 5px 0 #a85a12, 0 8px 15px #0005;
+  box-shadow: 0 6px 0 #a85a12, 0 9px 15px #0007;
   cursor: pointer;
 }
 
 #playButton:active {
-  transform: translateY(3px);
+  transform: translateY(4px);
   box-shadow: 0 2px 0 #a85a12;
+}
+
+#profile {
+  position: absolute;
+  top: 19%;
+  left: 2%;
+  width: clamp(125px, 20vw, 205px);
+  padding: 10px;
+  border: 2px solid #9bcfff;
+  border-radius: 13px;
+  background: #102f50e8;
+  font-size: clamp(11px, 1.5vw, 15px);
+  font-weight: bold;
+}
+
+#profile small {
+  display: block;
+  margin-top: 5px;
+  color: #ffdc51;
+}
+
+#currency {
+  position: absolute;
+  top: 4%;
+  right: 3%;
+  padding: 10px 15px;
+  border: 2px solid #9bcfff;
+  border-radius: 13px;
+  background: #102f50e8;
+  font-size: clamp(12px, 1.8vw, 18px);
+  font-weight: bold;
 }
 
 #sideButtons {
   position: absolute;
-  top: 145px;
-  right: 10px;
+  right: 2%;
+  top: 34%;
   display: flex;
   flex-direction: column;
   gap: 9px;
@@ -116,47 +142,55 @@ canvas {
 }
 
 .menuButton {
-  width: 105px;
+  width: clamp(115px, 19vw, 195px);
   padding: 11px 5px;
-  border: 2px solid #ffffffaa;
-  border-radius: 11px;
+  border: 2px solid #b6ddff;
+  border-radius: 12px;
+  background: linear-gradient(135deg,#205d91,#102d52);
   color: white;
-  background: #174566e8;
-  font-size: 13px;
-  font-weight: bold;
-  text-shadow: 1px 2px #123;
-  box-shadow: 0 3px 0 #102d45;
+  font-size: clamp(11px, 1.6vw, 16px);
+  font-weight: 900;
+  text-shadow: 1px 2px #10243b;
+  box-shadow: 0 4px 0 #0b2037;
   cursor: pointer;
+}
+
+.menuButton:active {
+  transform: translateY(3px);
 }
 
 #subtitle {
   position: absolute;
-  bottom: 25px;
-  width: 100%;
+  bottom: 4%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 9px 20px;
+  border: 2px solid #ffffffaa;
+  border-radius: 12px;
+  background: #102f50d9;
+  font-size: clamp(11px, 1.6vw, 17px);
+  font-weight: 1000;
   text-align: center;
-  font-size: 13px;
-  font-weight: 900;
-  letter-spacing: 1px;
-  text-shadow: 2px 2px 3px #123;
+  white-space: nowrap;
+  text-shadow: 2px 2px #142b49;
 }
 
 #popup {
   display: none;
   position: absolute;
-  left: 50%;
   top: 50%;
+  left: 50%;
   transform: translate(-50%,-50%);
-  width: min(300px,85%);
-  padding: 22px;
-  border: 3px solid #ffe16b;
-  border-radius: 17px;
-  background: #173b58f5;
+  width: min(300px, 75%);
+  padding: 20px;
+  border: 3px solid #ffdc51;
+  border-radius: 16px;
+  background: #123858f5;
   text-align: center;
   pointer-events: auto;
 }
 
 #popup button {
-  margin-top: 15px;
   padding: 10px 25px;
   border: 0;
   border-radius: 9px;
@@ -176,13 +210,13 @@ canvas {
 #health {
   position: absolute;
   top: 15px;
-  left: 12px;
+  left: 15px;
   width: 145px;
-  padding: 9px;
+  padding: 10px;
   border-radius: 10px;
   background: #173b58dd;
-  font-weight: bold;
   font-size: 13px;
+  font-weight: bold;
 }
 
 #healthBar {
@@ -195,7 +229,7 @@ canvas {
 #backButton {
   position: absolute;
   top: 15px;
-  right: 12px;
+  right: 15px;
   padding: 10px 14px;
   border: 2px solid white;
   border-radius: 10px;
@@ -207,11 +241,11 @@ canvas {
 
 #joystick {
   position: absolute;
-  bottom: 25px;
+  bottom: 20px;
   left: 22px;
-  width: 115px;
-  height: 115px;
-  border: 3px solid #ffffff88;
+  width: 110px;
+  height: 110px;
+  border: 3px solid #ffffff99;
   border-radius: 50%;
   background: #173b5877;
   pointer-events: auto;
@@ -222,56 +256,96 @@ canvas {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 48px;
-  height: 48px;
-  margin-left: -24px;
-  margin-top: -24px;
+  width: 46px;
+  height: 46px;
+  margin: -23px;
+  border: 2px solid white;
   border-radius: 50%;
   background: #ffffffbb;
-  border: 2px solid white;
 }
 
 #actionButton {
   position: absolute;
   right: 25px;
-  bottom: 38px;
+  bottom: 30px;
   width: 75px;
   height: 75px;
-  border-radius: 50%;
   border: 3px solid white;
+  border-radius: 50%;
   background: #ef9b27dd;
   color: white;
-  font-size: 14px;
   font-weight: bold;
   pointer-events: auto;
 }
 
-@media (max-height: 500px) {
-  #sideButtons { top: 95px; }
-  #playArea { top: 95px; }
-  #joystick { width: 90px; height: 90px; }
+#rotateMessage {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: linear-gradient(145deg,#102d4a,#2472a3);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 25px;
+}
+
+#rotateMessage .phone {
+  font-size: 75px;
+  animation: turn 2s infinite ease-in-out;
+}
+
+#rotateMessage h2 {
+  font-size: 25px;
+}
+
+#rotateMessage p {
+  color: #d8edff;
+}
+
+@keyframes turn {
+  0%,100% { transform: rotate(0deg); }
+  50% { transform: rotate(90deg); }
+}
+
+@media (orientation: portrait) {
+  #rotateMessage {
+    display: flex;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div id="lobby">
-  <div id="topbar">
-    <div id="logo">MINI SKY BATTLE</div>
-    <div id="currency">🪙 0 &nbsp; 💎 0</div>
-  </div>
+<div id="background"></div>
 
-  <div id="profile">👤 JOGADOR</div>
+<div id="rotateMessage">
+  <div class="phone">📱</div>
+  <h2>MINI SKY BATTLE</h2>
+  <p>Gire o celular para jogar na horizontal!</p>
+</div>
+
+<div id="lobby">
+
+  <div id="logo">👑 MINI SKY BATTLE</div>
 
   <div id="playArea">
     <button id="playButton">▶ JOGAR</button>
   </div>
 
+  <div id="profile">
+    👤 JOGADOR
+    <small>NÍVEL 1</small>
+  </div>
+
+  <div id="currency">🪙 0 &nbsp; 💎 0</div>
+
   <div id="sideButtons">
     <button class="menuButton" onclick="openMenu('PERSONAGENS')">👤 PERSONAGENS</button>
     <button class="menuButton" onclick="openMenu('LOJA')">🛒 LOJA</button>
-    <button class="menuButton" onclick="openMenu('EVENTOS')">🎯 EVENTOS</button>
+    <button class="menuButton" onclick="openMenu('EVENTOS')">🏆 EVENTOS</button>
     <button class="menuButton" onclick="openMenu('AJUSTES')">⚙️ AJUSTES</button>
   </div>
 
@@ -282,9 +356,11 @@ canvas {
     <p>Em breve, novidades por aqui!</p>
     <button onclick="closeMenu()">FECHAR</button>
   </div>
+
 </div>
 
 <div id="gameHUD">
+
   <div id="health">
     VIDA
     <div id="healthBar"></div>
@@ -298,14 +374,13 @@ canvas {
   </div>
 
   <button id="actionButton">AÇÃO</button>
+
 </div>
 
 <script type="module">
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x8bcf75);
-scene.fog = new THREE.Fog(0x8bcf75, 35, 90);
 
 const camera = new THREE.PerspectiveCamera(
   55,
@@ -315,265 +390,206 @@ const camera = new THREE.PerspectiveCamera(
 );
 
 const renderer = new THREE.WebGLRenderer({
-  antialias: true
+  antialias: true,
+  alpha: true
 });
 
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.setClearColor(0x000000, 0);
+
 document.body.appendChild(renderer.domElement);
 
-const ambient = new THREE.HemisphereLight(0xffffff, 0x557044, 2);
+const ambient = new THREE.HemisphereLight(0xffffff,0x557044,2);
 scene.add(ambient);
 
-const sun = new THREE.DirectionalLight(0xffffff, 2.2);
-sun.position.set(-10, 20, 10);
+const sun = new THREE.DirectionalLight(0xffffff,2);
+sun.position.set(-10,20,10);
 sun.castShadow = true;
 scene.add(sun);
 
-function material(color) {
+function mat(color) {
   return new THREE.MeshStandardMaterial({
     color,
     roughness: 0.9
   });
 }
 
-const green = material(0x65b94e);
-const darkGreen = material(0x367d3b);
-const brown = material(0x80502d);
-const roofMaterial = material(0xd45b3c);
-const wallMaterial = material(0xf0d49b);
-const crateMaterial = material(0xb77a39);
+// Grupo do cenário de batalha
+const environment = new THREE.Group();
+scene.add(environment);
 
 const ground = new THREE.Mesh(
-  new THREE.PlaneGeometry(120, 120),
-  green
+  new THREE.PlaneGeometry(100,100),
+  mat(0x65b94e)
 );
-ground.rotation.x = -Math.PI / 2;
-ground.receiveShadow = true;
-scene.add(ground);
 
-function makeBox(x, y, z, sx, sy, sz, mat) {
+ground.rotation.x = -Math.PI/2;
+ground.receiveShadow = true;
+environment.add(ground);
+
+function box(x,y,z,sx,sy,sz,material) {
   const mesh = new THREE.Mesh(
-    new THREE.BoxGeometry(sx, sy, sz),
-    mat
+    new THREE.BoxGeometry(sx,sy,sz),
+    material
   );
-  mesh.position.set(x, y, z);
+
+  mesh.position.set(x,y,z);
   mesh.castShadow = true;
   mesh.receiveShadow = true;
-  scene.add(mesh);
+  environment.add(mesh);
   return mesh;
 }
 
-function makeTree(x, z, scale = 1) {
+function tree(x,z,scale=1) {
   const trunk = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.22*scale, 0.3*scale, 1.5*scale, 7),
-    brown
+    new THREE.CylinderGeometry(.22*scale,.3*scale,1.5*scale,7),
+    mat(0x80502d)
   );
-  trunk.position.set(x, 0.75*scale, z);
+
+  trunk.position.set(x,.75*scale,z);
   trunk.castShadow = true;
-  scene.add(trunk);
+  environment.add(trunk);
 
   const leaves = new THREE.Mesh(
-    new THREE.IcosahedronGeometry(1.05*scale, 1),
-    darkGreen
+    new THREE.IcosahedronGeometry(1.05*scale,1),
+    mat(0x367d3b)
   );
-  leaves.position.set(x, 1.85*scale, z);
-  leaves.castShadow = true;
-  scene.add(leaves);
 
-  const top = new THREE.Mesh(
-    new THREE.IcosahedronGeometry(0.68*scale, 1),
-    material(0x4b9c42)
-  );
-  top.position.set(x, 2.35*scale, z);
-  top.castShadow = true;
-  scene.add(top);
+  leaves.position.set(x,1.85*scale,z);
+  leaves.castShadow = true;
+  environment.add(leaves);
 }
 
-function makeHouse(x, z) {
-  const house = new THREE.Group();
-
-  const walls = new THREE.Mesh(
-    new THREE.BoxGeometry(4, 2.6, 3.5),
-    wallMaterial
-  );
-  walls.position.y = 1.3;
-  walls.castShadow = true;
-  house.add(walls);
+function house(x,z) {
+  box(x,1.3,z,4,2.6,3.5,mat(0xf0d49b));
 
   const roof = new THREE.Mesh(
-    new THREE.ConeGeometry(3.1, 1.8, 4),
-    roofMaterial
+    new THREE.ConeGeometry(3.1,1.8,4),
+    mat(0xd45b3c)
   );
-  roof.position.y = 3.45;
-  roof.rotation.y = Math.PI / 4;
+
+  roof.position.set(x,3.45,z);
+  roof.rotation.y = Math.PI/4;
   roof.castShadow = true;
-  house.add(roof);
-
-  const door = new THREE.Mesh(
-    new THREE.BoxGeometry(0.8, 1.5, 0.12),
-    brown
-  );
-  door.position.set(0, 0.75, 1.81);
-  house.add(door);
-
-  house.position.set(x, 0, z);
-  scene.add(house);
+  environment.add(roof);
 }
 
-function makeCrate(x, z) {
-  const crate = new THREE.Mesh(
-    new THREE.BoxGeometry(1.2, 1.2, 1.2),
-    crateMaterial
-  );
-  crate.position.set(x, 0.6, z);
-  crate.castShadow = true;
-  crate.receiveShadow = true;
-  scene.add(crate);
+tree(-9,-8,1.2);
+tree(10,-9,1.1);
+tree(-13,9,1);
+tree(13,10,1.2);
+tree(-17,-1,1);
+tree(18,2,1);
+tree(-5,17,1.1);
+tree(7,18,1);
 
-  const line = new THREE.Mesh(
-    new THREE.BoxGeometry(1.25, 0.12, 0.12),
-    brown
-  );
-  line.position.set(x, 0.6, z + 0.62);
-  scene.add(line);
-}
+house(-9,-15);
+house(11,-16);
+house(-17,13);
+house(18,14);
 
-// Estradas
-const roadMaterial = material(0x777b70);
+box(-3,.6,-5,1.2,1.2,1.2,mat(0xb77a39));
+box(4,.6,-7,1.2,1.2,1.2,mat(0xb77a39));
+box(8,.6,5,1.2,1.2,1.2,mat(0xb77a39));
 
-const road1 = new THREE.Mesh(
-  new THREE.BoxGeometry(12, 0.04, 120),
-  roadMaterial
-);
-road1.position.y = 0.025;
-scene.add(road1);
-
-const road2 = new THREE.Mesh(
-  new THREE.BoxGeometry(120, 0.04, 10),
-  roadMaterial
-);
-road2.position.y = 0.03;
-scene.add(road2);
-
-// Cenário
-makeTree(-9, -8, 1.2);
-makeTree(10, -9, 1.1);
-makeTree(-13, 9, 1);
-makeTree(13, 10, 1.2);
-makeTree(-17, -1, 1);
-makeTree(18, 2, 1);
-makeTree(-5, 17, 1.1);
-makeTree(7, 18, 1);
-
-makeHouse(-9, -15);
-makeHouse(11, -16);
-makeHouse(-17, 13);
-makeHouse(18, 14);
-
-makeCrate(-3, -5);
-makeCrate(4, -7);
-makeCrate(8, 5);
-makeCrate(-8, 7);
-
-// Plataforma de apresentação do personagem
-const platform = new THREE.Mesh(
-  new THREE.CylinderGeometry(1.35, 1.5, 0.18, 32),
-  material(0x4b8b43)
-);
-platform.position.set(0, 0.09, 4);
-platform.receiveShadow = true;
-scene.add(platform);
-
-// Personagem
+// Personagem 3D
 const player = new THREE.Group();
 scene.add(player);
 
-const skin = material(0xffc58c);
-const shirt = material(0x267bc1);
-const pants = material(0x263b56);
-const hair = material(0x493022);
-const shoes = material(0x303030);
+const skin = mat(0xffc58c);
+const shirt = mat(0x267bc1);
+const pants = mat(0x263b56);
+const hair = mat(0x493022);
+const shoes = mat(0x303030);
 
-function addPlayerPart(geometry, mat, x, y, z, parent = player) {
-  const mesh = new THREE.Mesh(geometry, mat);
-  mesh.position.set(x, y, z);
+function part(geometry,material,x,y,z) {
+  const mesh = new THREE.Mesh(geometry,material);
+  mesh.position.set(x,y,z);
   mesh.castShadow = true;
   mesh.receiveShadow = true;
-  parent.add(mesh);
+  player.add(mesh);
   return mesh;
 }
 
 // Corpo
-addPlayerPart(
-  new THREE.CapsuleGeometry(0.48, 0.8, 5, 10),
-  shirt, 0, 1.55, 0
+part(
+  new THREE.CapsuleGeometry(.48,.8,5,10),
+  shirt,0,1.55,0
 );
 
 // Cabeça
-addPlayerPart(
-  new THREE.SphereGeometry(0.48, 18, 14),
-  skin, 0, 2.65, 0
+part(
+  new THREE.SphereGeometry(.48,18,14),
+  skin,0,2.65,0
 );
 
 // Cabelo
-addPlayerPart(
-  new THREE.SphereGeometry(0.49, 16, 10, 0, Math.PI*2, 0, Math.PI/2),
-  hair, 0, 2.82, 0
+part(
+  new THREE.SphereGeometry(.49,16,10,0,Math.PI*2,0,Math.PI/2),
+  hair,0,2.82,0
 );
 
 // Olhos
-addPlayerPart(
-  new THREE.SphereGeometry(0.055, 8, 8),
-  material(0x202020), -0.16, 2.68, 0.43
+part(
+  new THREE.SphereGeometry(.055,8,8),
+  mat(0x202020),-.16,2.68,.43
 );
 
-addPlayerPart(
-  new THREE.SphereGeometry(0.055, 8, 8),
-  material(0x202020), 0.16, 2.68, 0.43
+part(
+  new THREE.SphereGeometry(.055,8,8),
+  mat(0x202020),.16,2.68,.43
 );
 
 // Pernas
-addPlayerPart(
-  new THREE.BoxGeometry(0.32, 0.8, 0.35),
-  pants, -0.23, 0.65, 0
+part(
+  new THREE.BoxGeometry(.32,.8,.35),
+  pants,-.23,.65,0
 );
 
-addPlayerPart(
-  new THREE.BoxGeometry(0.32, 0.8, 0.35),
-  pants, 0.23, 0.65, 0
+part(
+  new THREE.BoxGeometry(.32,.8,.35),
+  pants,.23,.65,0
 );
 
 // Sapatos
-addPlayerPart(
-  new THREE.BoxGeometry(0.38, 0.2, 0.55),
-  shoes, -0.23, 0.18, 0.08
+part(
+  new THREE.BoxGeometry(.38,.2,.55),
+  shoes,-.23,.18,.08
 );
 
-addPlayerPart(
-  new THREE.BoxGeometry(0.38, 0.2, 0.55),
-  shoes, 0.23, 0.18, 0.08
+part(
+  new THREE.BoxGeometry(.38,.2,.55),
+  shoes,.23,.18,.08
 );
 
 // Braços
-const leftArm = addPlayerPart(
-  new THREE.CapsuleGeometry(0.14, 0.65, 4, 8),
-  shirt, -0.57, 1.55, 0
+part(
+  new THREE.CapsuleGeometry(.14,.65,4,8),
+  shirt,-.57,1.55,0
 );
 
-const rightArm = addPlayerPart(
-  new THREE.CapsuleGeometry(0.14, 0.65, 4, 8),
-  shirt, 0.57, 1.55, 0
+part(
+  new THREE.CapsuleGeometry(.14,.65,4,8),
+  shirt,.57,1.55,0
 );
 
-player.position.set(0, 0, 4);
-player.scale.setScalar(1.45);
+// Plataforma do personagem
+const platform = new THREE.Mesh(
+  new THREE.CylinderGeometry(1.35,1.5,.18,32),
+  mat(0x4b8b43)
+);
 
-// Câmera inicial do lobby
-camera.position.set(0, 7, 15);
-camera.lookAt(0, 1.2, 4);
+platform.position.y = .09;
+platform.receiveShadow = true;
+scene.add(platform);
+
+player.position.set(0,0,0);
+player.scale.setScalar(1.15);
+
+camera.position.set(0,4.5,9);
+camera.lookAt(0,1.5,0);
 
 let gameStarted = false;
 let moveX = 0;
@@ -581,11 +597,13 @@ let moveZ = 0;
 
 const lobby = document.getElementById("lobby");
 const hud = document.getElementById("gameHUD");
+const background = document.getElementById("background");
 const popup = document.getElementById("popup");
-const popupTitle = document.getElementById("popupTitle");
+const stick = document.getElementById("stick");
+const joystick = document.getElementById("joystick");
 
 window.openMenu = function(name) {
-  popupTitle.textContent = name;
+  document.getElementById("popupTitle").textContent = name;
   popup.style.display = "block";
 };
 
@@ -593,73 +611,97 @@ window.closeMenu = function() {
   popup.style.display = "none";
 };
 
+async function requestLandscape() {
+  try {
+    if (screen.orientation && screen.orientation.lock) {
+      await screen.orientation.lock("landscape");
+    }
+  } catch(error) {
+    // Alguns navegadores não permitem travar a orientação.
+    // A mensagem de rotação continua funcionando.
+  }
+}
+
 // Iniciar partida
-document.getElementById("playButton").addEventListener("click", () => {
+document.getElementById("playButton").addEventListener("click", async () => {
+  await requestLandscape();
+
   gameStarted = true;
+
   lobby.style.display = "none";
   hud.style.display = "block";
+  background.style.display = "none";
+
+  environment.visible = true;
+  platform.visible = false;
 
   player.scale.setScalar(1);
-  player.position.set(0, 0, 5);
+  player.position.set(0,0,0);
 
-  camera.position.set(0, 17, 25);
-  camera.lookAt(0, 1, 5);
+  scene.background = new THREE.Color(0x8bcf75);
+
+  camera.position.set(0,17,20);
+  camera.lookAt(0,1,0);
 });
 
 // Voltar ao lobby
 document.getElementById("backButton").addEventListener("click", () => {
   gameStarted = false;
+
   lobby.style.display = "block";
   hud.style.display = "none";
+  background.style.display = "block";
 
-  player.scale.setScalar(1.45);
-  player.position.set(0, 0, 4);
+  environment.visible = false;
+  platform.visible = true;
 
-  camera.position.set(0, 7, 15);
-  camera.lookAt(0, 1.2, 4);
+  scene.background = null;
 
-  moveX = 0;
-  moveZ = 0;
-  stick.style.transform = "translate(0px,0px)";
+  player.scale.setScalar(1.15);
+  player.position.set(0,0,0);
+  player.rotation.y = 0;
+
+  camera.position.set(0,4.5,9);
+  camera.lookAt(0,1.5,0);
+
+  stopJoystick();
 });
 
 // Joystick
-const joystick = document.getElementById("joystick");
-const stick = document.getElementById("stick");
-
 let joystickActive = false;
-let joystickCenter = {x:0, y:0};
+let center = {x:0,y:0};
 
-joystick.addEventListener("pointerdown", (event) => {
+joystick.addEventListener("pointerdown", event => {
   if (!gameStarted) return;
 
   joystickActive = true;
   joystick.setPointerCapture(event.pointerId);
 
   const rect = joystick.getBoundingClientRect();
-  joystickCenter.x = rect.left + rect.width / 2;
-  joystickCenter.y = rect.top + rect.height / 2;
+
+  center.x = rect.left + rect.width/2;
+  center.y = rect.top + rect.height/2;
 
   updateJoystick(event);
 });
 
-joystick.addEventListener("pointermove", (event) => {
+joystick.addEventListener("pointermove", event => {
   if (joystickActive) updateJoystick(event);
 });
 
 function updateJoystick(event) {
-  const dx = event.clientX - joystickCenter.x;
-  const dy = event.clientY - joystickCenter.y;
+  const dx = event.clientX - center.x;
+  const dy = event.clientY - center.y;
+
   const max = 35;
-
   const distance = Math.sqrt(dx*dx + dy*dy);
-  const scale = distance > max ? max / distance : 1;
+  const factor = distance > max ? max/distance : 1;
 
-  const x = dx * scale;
-  const y = dy * scale;
+  const x = dx*factor;
+  const y = dy*factor;
 
-  moveX = x / max;
-  moveZ = y / max;
+  moveX = x/max;
+  moveZ = y/max;
 
   stick.style.transform = `translate(${x}px,${y}px)`;
 }
@@ -671,18 +713,18 @@ function stopJoystick() {
   stick.style.transform = "translate(0px,0px)";
 }
 
-joystick.addEventListener("pointerup", stopJoystick);
-joystick.addEventListener("pointercancel", stopJoystick);
-joystick.addEventListener("lostpointercapture", stopJoystick);
+joystick.addEventListener("pointerup",stopJoystick);
+joystick.addEventListener("pointercancel",stopJoystick);
+joystick.addEventListener("lostpointercapture",stopJoystick);
 
 // Teclado
 const keys = {};
 
-window.addEventListener("keydown", (event) => {
+window.addEventListener("keydown",event => {
   keys[event.key.toLowerCase()] = true;
 });
 
-window.addEventListener("keyup", (event) => {
+window.addEventListener("keyup",event => {
   keys[event.key.toLowerCase()] = false;
 });
 
@@ -692,13 +734,13 @@ const clock = new THREE.Clock();
 function animate() {
   requestAnimationFrame(animate);
 
-  const delta = Math.min(clock.getDelta(), 0.05);
+  const delta = Math.min(clock.getDelta(),.05);
   const time = performance.now();
 
   if (!gameStarted) {
-    // Personagem em destaque no lobby
-    player.rotation.y = Math.sin(time * 0.0005) * 0.12;
-    camera.lookAt(0, 1.2, 4);
+    player.rotation.y = Math.sin(time*.0005)*.12;
+    player.position.y = Math.sin(time*.002)*.04;
+    camera.lookAt(0,1.5,0);
   } else {
     let x = moveX;
     let z = moveZ;
@@ -708,7 +750,8 @@ function animate() {
     if (keys["a"] || keys["arrowleft"]) x -= 1;
     if (keys["d"] || keys["arrowright"]) x += 1;
 
-    const length = Math.sqrt(x*x + z*z);
+    const length = Math.sqrt(x*x+z*z);
+
     if (length > 1) {
       x /= length;
       z /= length;
@@ -716,11 +759,11 @@ function animate() {
 
     const speed = 6;
 
-    player.position.x += x * speed * delta;
-    player.position.z += z * speed * delta;
+    player.position.x += x*speed*delta;
+    player.position.z += z*speed*delta;
 
-    if (length > 0.05) {
-      player.rotation.y = Math.atan2(x, z);
+    if (length > .05) {
+      player.rotation.y = Math.atan2(x,z);
     }
 
     const target = new THREE.Vector3(
@@ -732,23 +775,23 @@ function animate() {
     const desiredCamera = new THREE.Vector3(
       player.position.x,
       17,
-      player.position.z + 20
+      player.position.z+20
     );
 
-    camera.position.lerp(desiredCamera, 0.06);
+    camera.position.lerp(desiredCamera,.06);
     camera.lookAt(target);
   }
 
-  renderer.render(scene, camera);
+  renderer.render(scene,camera);
 }
 
 animate();
 
-// Redimensionamento da tela
-window.addEventListener("resize", () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
+// Ajustar a tela
+window.addEventListener("resize",() => {
+  camera.aspect = window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(window.innerWidth,window.innerHeight);
 });
 </script>
 
