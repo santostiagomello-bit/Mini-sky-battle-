@@ -3,640 +3,564 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>MINI SKY BATTLE</title>
-
 <style>
-*{box-sizing:border-box;touch-action:manipulation}
-html,body{
- margin:0;width:100%;height:100%;overflow:hidden;
- font-family:Arial,sans-serif;background:#101522;color:white;
-}
-button{cursor:pointer;color:white;font-weight:bold}
-button:active{transform:scale(.95)}
-.hidden{display:none!important}
-
-/* LOBBY */
-#lobby{
- position:fixed;inset:0;overflow:hidden;
- background:
- radial-gradient(ellipse at 55% 65%,#54416f 0%,transparent 45%),
- linear-gradient(115deg,#101827,#28334a 60%,#111725);
-}
-#lobby:before{
- content:"";position:absolute;inset:0;
- background:linear-gradient(90deg,#101827ed,transparent 85%);
-}
-.logo{
- position:absolute;top:5%;left:5%;z-index:5;
- font-size:clamp(25px,4vw,43px);
- font-weight:1000;letter-spacing:2px;
- text-shadow:0 0 15px #8e4cff;
-}
-.logo span{color:#ae79ff}
-.subtitle{
- position:absolute;top:14%;left:5%;z-index:5;
- font-size:11px;letter-spacing:2px;color:#c4c8d5;
-}
-#character{
- position:absolute;z-index:2;left:50%;bottom:-5%;
- width:clamp(160px,27vw,280px);height:82%;
- transform:translateX(-50%);
- filter:drop-shadow(0 0 20px #9b4dff55);
-}
-.glow{
- position:absolute;bottom:0;left:-25%;width:150%;height:30%;
- background:radial-gradient(ellipse,var(--glow,#9b4dff66),transparent 70%);
-}
-.body{
- position:absolute;left:16%;bottom:0;width:68%;height:65%;
- border-radius:35% 35% 12% 12%;
- background:linear-gradient(100deg,#10111a,#292636,#10111a);
- border:3px solid var(--accent,#8e43ef);
-}
-.body:after{
- content:"";position:absolute;top:25%;left:-9%;width:118%;
- height:12%;background:#171521;border:2px solid var(--accent);
- border-radius:14px;box-shadow:0 0 12px var(--accent);
-}
-.head{
- position:absolute;z-index:3;left:24%;top:7%;
- width:52%;height:34%;border-radius:48% 48% 42% 42%;
- background:#17151f;border:4px solid var(--accent);
- box-shadow:0 0 20px var(--accent);
-}
-.hood{
- position:absolute;z-index:2;left:15%;top:0;width:70%;height:40%;
- border:9px solid #292131;border-radius:50% 50% 35% 35%;
-}
-.face{
- position:absolute;z-index:4;left:12%;top:48%;width:76%;height:20%;
- border-radius:50%;
- background:linear-gradient(90deg,var(--accent),#eee,var(--accent));
- box-shadow:0 0 14px var(--accent);
-}
-.arm{
- position:absolute;top:42%;width:25%;height:42%;
- background:#17151f;border:3px solid #55406d;border-radius:30px;
-}
-.arm.left{left:0;transform:rotate(12deg)}
-.arm.right{right:0;transform:rotate(-12deg)}
-.leg{
- position:absolute;bottom:-2%;width:29%;height:31%;
- background:#17151f;border:3px solid #44334f;border-radius:10px;
-}
-.leg.left{left:18%}
-.leg.right{right:18%}
-.stripe{
- position:absolute;z-index:5;left:15%;top:46%;width:70%;
- height:5px;background:var(--accent);
- box-shadow:0 0 12px var(--accent);
-}
-.info{
- position:absolute;z-index:4;right:5%;bottom:23%;
- width:27%;text-align:right;
-}
-.info h2{font-size:clamp(16px,3vw,28px);margin:8px 0}
-.info p{font-size:12px;color:#c3c5d0;line-height:1.5}
-.tag{
- display:inline-block;padding:7px 12px;border:1px solid var(--accent);
- color:#dfcaff;border-radius:5px;font-size:10px;
-}
-#play{
- position:absolute;z-index:6;top:23%;left:5%;
- padding:14px 32px;border:2px solid #d6baff;border-radius:7px;
- background:linear-gradient(100deg,#7138cf,#a34bff);
- font-size:17px;box-shadow:0 0 22px #8d43ff88;
-}
-.menu{
- position:absolute;z-index:7;left:5%;top:43%;
- display:flex;flex-direction:column;gap:9px;width:155px;
-}
-.menu button{
- padding:10px;background:#171e30dd;
- border:1px solid #8650c9;border-radius:7px;text-align:left;
-}
-.bottom{
- position:absolute;z-index:5;bottom:3%;left:5%;right:5%;
- display:flex;justify-content:space-between;color:#aaa;font-size:10px;
-}
-
-/* PAINÉIS */
-.panel{
- position:fixed;z-index:15;inset:0;
- display:none;align-items:center;justify-content:center;
- background:#090e1beF;padding:15px;
-}
-.panel.open{display:flex}
-.panel-box{
- width:min(650px,95vw);max-height:90vh;overflow:auto;
- padding:20px;border:1px solid #9054d5;
- border-radius:15px;background:linear-gradient(140deg,#20283e,#111827);
- box-shadow:0 0 35px #8742c955;
-}
-.panel h2{margin-top:0}
-.panel-grid{
- display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
-}
-.option{
- min-width:0;padding:8px;border:2px solid #444c60;
- border-radius:9px;background:#20283a;text-align:center;
-}
-.option.selected{border-color:#ba7aff;box-shadow:0 0 12px #9c4aff88}
-.option img{width:100%;height:65px;object-fit:cover}
-.preview{
- height:65px;border-radius:7px;margin-bottom:7px;
- background:linear-gradient(130deg,#242c40,#4a3764);
- display:flex;align-items:center;justify-content:center;
- font-size:30px;
-}
-.panel-actions{display:flex;gap:10px;margin-top:18px}
-.action{
- padding:11px 18px;border:0;border-radius:7px;
- background:#793ed0;
-}
-.secondary{background:#384257}
-input{
- width:100%;padding:12px;margin:8px 0;
- background:#101827;color:white;border:1px solid #7952a8;
- border-radius:7px;font-size:16px;
-}
-.room-code{font-size:27px;color:#c99bff;letter-spacing:5px;text-align:center}
-
-/* PARTIDA */
-#match{
- display:none;position:fixed;inset:0;overflow:hidden;
- background:linear-gradient(#83c9ed,#c5e5d9 55%,#477a48);
-}
-#sky{
- position:absolute;inset:0;
- background:linear-gradient(#65b4e2 0%,#b7e2ed 60%,#8cc18c 100%);
-}
-#island{
- position:absolute;width:75vw;height:70vh;
- left:50%;top:58%;transform:translate(-50%,-50%);
- border-radius:48%;
- background:radial-gradient(ellipse,#8bc45b,#39763d 72%);
- box-shadow:inset 0 0 55px #285c31,0 20px 45px #294c55;
- overflow:hidden;
-}
-#island.desert{
- background:radial-gradient(ellipse,#d5b16b,#9b713c 72%);
-}
-#island.snow{
- background:radial-gradient(ellipse,#e5eff1,#8baeb9 72%);
-}
-.tree{
- position:absolute;width:24px;height:34px;border-radius:50%;
- background:#205b31;box-shadow:0 0 5px #174b29;
-}
-.tree:after{
- content:"";position:absolute;left:8px;top:23px;
- width:8px;height:15px;background:#68452c;
-}
-.building{
- position:absolute;width:45px;height:35px;
- background:#b7a18a;border:3px solid #655448;
- box-shadow:3px 4px 0 #273b27;
-}
-#plane{
- position:absolute;left:-20%;top:35%;width:130px;height:38px;
- border-radius:45%;background:#343e52;
- border:2px solid #a6aabb;transform:rotate(8deg);
- box-shadow:0 0 12px #2228;
-}
-#plane:before{
- content:"";position:absolute;left:-20px;top:12px;
- width:170px;height:12px;background:#b5bac8;border-radius:50%;
-}
-#plane:after{
- content:"";position:absolute;right:5px;top:-13px;
- width:35px;height:28px;background:#7545c6;
- clip-path:polygon(0 50%,100% 0,100% 100%);
-}
-#match-top{
- position:absolute;top:15px;left:15px;right:15px;
- display:flex;justify-content:space-between;align-items:center;
-}
-.hud{
- padding:9px 13px;background:#111827bb;border-radius:8px;
- font-size:12px;border:1px solid #ffffff33;
-}
-#return{
- padding:10px 15px;background:#7138cf;border:0;border-radius:7px;
-}
-#status{
- position:absolute;bottom:10%;width:100%;text-align:center;
- font-weight:bold;text-shadow:0 2px 5px black;
-}
-#jump{
- position:absolute;bottom:18%;left:50%;transform:translateX(-50%);
- padding:14px 25px;border:0;border-radius:10px;
- background:#783ce0;font-size:17px;
-}
-#player{
- display:none;position:absolute;left:50%;top:48%;
- width:35px;height:48px;transform:translate(-50%,-50%);
- border-radius:12px 12px 5px 5px;
- background:#17151f;border:2px solid var(--accent,#9d4cff);
- box-shadow:0 0 15px var(--accent,#a64cff);
- z-index:4;
-}
-#player:before{
- content:"";position:absolute;width:23px;height:23px;
- border-radius:50%;background:#292131;
- border:2px solid var(--accent,#a64cff);
- left:4px;top:-18px;
-}
-#controls{
- display:none;position:absolute;bottom:3%;left:3%;right:3%;
- justify-content:space-between;align-items:end;
- pointer-events:none;
-}
-.control-group{display:flex;gap:7px;pointer-events:auto}
-.ctrl{
- width:48px;height:48px;border:1px solid #ffffff66;
- background:#171d2dcc;border-radius:12px;font-size:20px;
-}
-#rotate{
- display:none;position:fixed;inset:0;z-index:30;
- background:#101622;align-items:center;justify-content:center;
- text-align:center;font-size:20px;font-weight:bold;padding:25px;
-}
-@media(orientation:portrait){#rotate{display:flex}}
-@media(max-height:430px){
- .logo{top:3%}.subtitle{top:13%}
- #play{top:21%;padding:10px 24px}
- .menu{top:39%;gap:6px}
- .menu button{padding:7px}
- .info{bottom:15%}
- .panel-box{padding:13px}
-}
+*{box-sizing:border-box;touch-action:none}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101522;color:white;font-family:Arial}
+button{color:white;border:0;border-radius:9px;background:#7138cf;font-weight:bold;padding:12px}
+#lobby{position:fixed;inset:0;background:radial-gradient(ellipse at 55% 60%,#604477,#172034 65%,#101522)}
+.logo{position:absolute;top:7%;left:6%;font-size:clamp(25px,4vw,44px);font-weight:1000}
+.logo span{color:#bd8aff}
+.subtitle{position:absolute;top:16%;left:6%;color:#c8c6d4;letter-spacing:2px;font-size:11px}
+#hero{position:absolute;left:50%;bottom:7%;width:190px;height:270px;transform:translateX(-50%)}
+#hero .head{position:absolute;left:55px;top:15px;width:80px;height:80px;border:5px solid var(--accent,#a64cff);background:#191722;border-radius:45%}
+#hero .hood{position:absolute;left:42px;top:0;width:105px;height:110px;border:13px solid #342a40;border-radius:50%}
+#hero .face{position:absolute;left:66px;top:57px;width:58px;height:12px;background:var(--accent,#a64cff);border-radius:50%}
+#hero .body{position:absolute;left:35px;top:100px;width:120px;height:130px;border:4px solid var(--accent,#a64cff);border-radius:30px;background:#191722}
+#hero .arm{position:absolute;top:115px;width:35px;height:100px;background:#191722;border:3px solid #57426b;border-radius:20px}
+#hero .arm.a{left:10px;transform:rotate(10deg)}
+#hero .arm.b{right:10px;transform:rotate(-10deg)}
+#hero .leg{position:absolute;top:220px;width:43px;height:45px;background:#191722;border:3px solid #57426b;border-radius:12px}
+#hero .leg.a{left:43px}#hero .leg.b{right:43px}
+#heroInfo{position:absolute;right:7%;bottom:25%;text-align:right}
+#heroInfo h2{font-size:clamp(17px,3vw,28px)}
+#play{position:absolute;left:6%;top:25%;font-size:18px;padding:15px 35px}
+#choose{position:absolute;left:6%;top:43%;display:flex;flex-direction:column;gap:8px}
+#choose button{background:#202a40;border:1px solid #9260d0}
+#lobby small{position:absolute;bottom:3%;left:6%;color:#aaa}
+#game{display:none;position:fixed;inset:0;background:#75b9d0}
+canvas{width:100%;height:100%;display:block}
+#hud{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;pointer-events:none;gap:5px}
+.hudbox{background:#111827d9;border:1px solid #ffffff44;border-radius:8px;padding:8px 11px;font-size:12px;text-shadow:0 1px 3px black}
+#healthbar{height:8px;width:100px;background:#555;border-radius:5px;margin-top:5px;overflow:hidden}
+#healthfill{height:100%;width:100%;background:#47db79}
+#message{position:absolute;top:18%;left:50%;transform:translateX(-50%);font-weight:bold;text-shadow:0 2px 5px black;text-align:center;pointer-events:none}
+#controls{position:absolute;bottom:10px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:end}
+.pad{display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(2,48px);gap:4px}
+.pad button,.actions button{background:#182236d9;border:1px solid #ffffff66;font-size:19px;padding:0}
+.pad .up{grid-column:2}.pad .left{grid-column:1;grid-row:2}.pad .down{grid-column:2;grid-row:2}.pad .right{grid-column:3;grid-row:2}
+.actions{display:flex;gap:7px;align-items:end}
+.actions button{width:53px;height:53px;border-radius:50%}
+.actions .fire{background:#a52d35;font-size:22px}
+#inventory{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);display:flex;gap:5px}
+.slot{min-width:65px;text-align:center;background:#101827dc;border:1px solid #ffffff66;border-radius:7px;padding:6px;font-size:10px}
+.slot.active{border:2px solid #c18aff}
+#lootPanel{display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(330px,85vw);background:#182236f5;border:2px solid #a66aff;border-radius:12px;padding:15px;text-align:center}
+#lootItems{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:12px 0}
+#lootItems button{background:#39445b}
+#end{display:none;position:absolute;inset:0;background:#101522eF;align-items:center;justify-content:center;text-align:center;z-index:10}
+#end h1{font-size:35px}
+#end button{margin:8px}
+@media(orientation:portrait){#lobby:after{content:"GIRE O CELULAR PARA JOGAR";position:absolute;inset:0;background:#101522;display:grid;place-items:center;font-weight:bold;font-size:20px;z-index:20}}
 </style>
 </head>
-
 <body>
-
-<div id="rotate">GIRE O CELULAR PARA JOGAR MINI SKY BATTLE</div>
 
 <section id="lobby">
  <div class="logo">MINI <span>SKY</span> BATTLE</div>
  <div class="subtitle">UMA PEQUENA IDEIA, UM GRANDE MUNDO.</div>
-
  <button id="play">JOGAR ▶</button>
-
- <div class="menu">
-  <button onclick="openPanel('characters')">👤 PERSONAGENS</button>
-  <button onclick="openPanel('maps')">🌍 ESCOLHER MAPA</button>
-  <button onclick="openPanel('rooms')">🚪 SALAS</button>
+ <div id="choose">
+  <button onclick="changeCharacter(-1)">◀ PERSONAGEM</button>
+  <button onclick="changeCharacter(1)">PERSONAGEM ▶</button>
+  <button onclick="changeMap()">🌍 MAPA: <span id="mapName">ILHA VERDE</span></button>
  </div>
-
- <div id="character">
-  <div class="glow"></div>
+ <div id="hero">
+  <div class="hood"></div><div class="head"></div><div class="face"></div>
   <div class="body"></div>
-  <div class="arm left"></div>
-  <div class="arm right"></div>
-  <div class="leg left"></div>
-  <div class="leg right"></div>
-  <div class="hood"></div>
-  <div class="head"></div>
-  <div class="face"></div>
-  <div class="stripe"></div>
+  <div class="arm a"></div><div class="arm b"></div>
+  <div class="leg a"></div><div class="leg b"></div>
  </div>
-
- <div class="info">
-  <span class="tag">PERSONAGEM SELECIONADO</span>
-  <h2 id="characterName">SHADOW ROXO</h2>
-  <p id="characterDescription">Prepare-se para entrar na batalha!</p>
- </div>
-
- <div class="bottom">
-  <span>MINI SKY BATTLE</span>
-  <span>PROTÓTIPO V2</span>
- </div>
+ <div id="heroInfo"><small>PERSONAGEM SELECIONADO</small><h2 id="heroName">SHADOW ROXO</h2></div>
+ <small>MINI SKY BATTLE — PROTÓTIPO BATTLE ROYALE</small>
 </section>
 
-<!-- PERSONAGENS -->
-<div class="panel" id="characters">
- <div class="panel-box">
-  <h2>👤 ESCOLHA SEU PERSONAGEM</h2>
-  <div class="panel-grid">
-   <button class="option selected" onclick="selectCharacter(0,this)">
-    <div class="preview">🥷</div>
-    <b>Shadow Roxo</b>
-   </button>
-   <button class="option" onclick="selectCharacter(1,this)">
-    <div class="preview">🟢</div>
-    <b>Shadow Verde</b>
-   </button>
-   <button class="option" onclick="selectCharacter(2,this)">
-    <div class="preview">🔴</div>
-    <b>Shadow Vermelho</b>
-   </button>
+<section id="game">
+ <canvas id="world"></canvas>
+ <div id="hud">
+  <div class="hudbox">
+   <div>❤️ <span id="hp">100</span> HP</div>
+   <div id="healthbar"><div id="healthfill"></div></div>
   </div>
-  <div class="panel-actions">
-   <button class="action" onclick="closePanels()">CONFIRMAR</button>
-  </div>
+  <div class="hudbox">👥 RESTANTES: <span id="remaining">15</span></div>
+  <div class="hudbox">☠ ELIMINAÇÕES: <span id="kills">0</span></div>
+  <div class="hudbox">⏱ <span id="clock">00:00</span></div>
  </div>
-</div>
-
-<!-- MAPAS -->
-<div class="panel" id="maps">
- <div class="panel-box">
-  <h2>🌍 ESCOLHA SEU MAPA</h2>
-  <div class="panel-grid">
-   <button class="option selected" onclick="selectMap(0,this)">
-    <div class="preview">🌴</div>
-    <b>Ilha Verde</b>
-   </button>
-   <button class="option" onclick="selectMap(1,this)">
-    <div class="preview">🏜️</div>
-    <b>Deserto</b>
-   </button>
-   <button class="option" onclick="selectMap(2,this)">
-    <div class="preview">❄️</div>
-    <b>Nevasca</b>
-   </button>
-  </div>
-  <div class="panel-actions">
-   <button class="action" onclick="closePanels()">CONFIRMAR MAPA</button>
-  </div>
+ <div id="message">PROCURE ARMAS E EQUIPAMENTOS!</div>
+ <div id="inventory">
+  <div class="slot active" id="weaponSlot">🔫<br>PISTOLA</div>
+  <div class="slot" id="ammoSlot">📦<br>30 BALAS</div>
+  <div class="slot" id="healSlot">💚<br>0 CURAS</div>
  </div>
-</div>
-
-<!-- SALAS -->
-<div class="panel" id="rooms">
- <div class="panel-box">
-  <h2>🚪 SALAS PERSONALIZADAS</h2>
-  <p>Crie uma sala de demonstração ou informe um código.</p>
-  <button class="action" onclick="createRoom()">＋ CRIAR SALA</button>
-  <div id="createdRoom" class="hidden">
-   <p>CÓDIGO DA SALA:</p>
-   <div class="room-code" id="roomCode">000000</div>
-   <p>Compartilhe este código com seus amigos.</p>
-  </div>
-  <hr style="border-color:#444;margin:18px 0">
-  <b>ENTRAR COM CÓDIGO</b>
-  <input id="joinCode" maxlength="6" inputmode="numeric" placeholder="Digite o código">
-  <button class="action" onclick="joinRoom()">ENTRAR</button>
-  <p id="roomMessage"></p>
-  <div class="panel-actions">
-   <button class="action secondary" onclick="closePanels()">VOLTAR</button>
-  </div>
- </div>
-</div>
-
-<!-- PARTIDA -->
-<section id="match">
- <div id="sky"></div>
- <div id="island"></div>
- <div id="plane"></div>
- <div id="player"></div>
-
- <div id="match-top">
-  <button id="return">← LOBBY</button>
-  <div class="hud" id="mapLabel">🌴 ILHA VERDE</div>
-  <div class="hud">👥 MODO TESTE</div>
- </div>
-
- <button id="jump">🪂 SALTAR</button>
- <div id="status">AVIÃO EM PREPARAÇÃO...</div>
-
  <div id="controls">
-  <div class="control-group">
-   <button class="ctrl" data-move="left">◀</button>
-   <button class="ctrl" data-move="right">▶</button>
-   <button class="ctrl" data-move="up">▲</button>
-   <button class="ctrl" data-move="down">▼</button>
+  <div class="pad">
+   <button class="up" data-dir="up">▲</button>
+   <button class="left" data-dir="left">◀</button>
+   <button class="down" data-dir="down">▼</button>
+   <button class="right" data-dir="right">▶</button>
   </div>
-  <div class="control-group">
-   <button class="ctrl" id="jumpAgain">🪂</button>
+  <div class="actions">
+   <button id="interact">📦</button>
+   <button id="heal">💚</button>
+   <button class="fire" id="fire">●</button>
+  </div>
+ </div>
+ <div id="lootPanel">
+  <h3>📦 BAÚ DE LOOT</h3>
+  <div id="lootItems"></div>
+  <button onclick="closeLoot()">FECHAR</button>
+ </div>
+ <div id="end">
+  <div><h1 id="endTitle">FIM DE PARTIDA</h1><p id="endText"></p>
+   <button onclick="location.reload()">VOLTAR AO LOBBY</button>
   </div>
  </div>
 </section>
 
 <script>
+const canvas=document.getElementById("world");
+const ctx=canvas.getContext("2d");
 const lobby=document.getElementById("lobby");
-const match=document.getElementById("match");
-const plane=document.getElementById("plane");
-const island=document.getElementById("island");
-const player=document.getElementById("player");
-const jump=document.getElementById("jump");
-const statusText=document.getElementById("status");
+const game=document.getElementById("game");
 
-let started=false;
-let jumped=false;
-let planePosition=-20;
-let selectedCharacter=0;
-let selectedMap=0;
-let playerX=50;
-let playerY=48;
-let roomCode="";
-let animationFrame=0;
+let W=0,H=0;
+function resize(){
+ W=canvas.width=innerWidth*devicePixelRatio;
+ H=canvas.height=innerHeight*devicePixelRatio;
+ ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+ W=innerWidth;H=innerHeight;
+}
+addEventListener("resize",resize);resize();
 
-const characters=[
- {name:"SHADOW ROXO",accent:"#a64cff",glow:"#9b4dff66"},
- {name:"SHADOW VERDE",accent:"#45e58a",glow:"#45e58a66"},
- {name:"SHADOW VERMELHO",accent:"#ff505d",glow:"#ff505d66"}
-];
-
-const maps=[
- {name:"🌴 ILHA VERDE",type:"green"},
- {name:"🏜️ DESERTO",type:"desert"},
- {name:"❄️ NEVASCA",type:"snow"}
-];
-
-function openPanel(id){
- document.getElementById(id).classList.add("open");
+const names=["SHADOW ROXO","TOXIC","INFERNO","GLACIER","VOLT","PHANTOM","RAVEN","BLAZE"];
+const colors=["#a64cff","#40df85","#ff505d","#70d9ff","#f4c342","#eeeeee","#344b91","#ff923b"];
+let character=0,mapIndex=0;
+const mapNames=["ILHA VERDE","DESERTO","NEVASCA"];
+function changeCharacter(d){
+ character=(character+d+names.length)%names.length;
+ document.getElementById("heroName").textContent=names[character];
+ document.documentElement.style.setProperty("--accent",colors[character]);
+}
+function changeMap(){
+ mapIndex=(mapIndex+1)%3;
+ document.getElementById("mapName").textContent=mapNames[mapIndex];
 }
 
-function closePanels(){
- document.querySelectorAll(".panel").forEach(p=>p.classList.remove("open"));
-}
+const MAP={w:2400,h:1800};
+let player,bots=[],buildings=[],chests=[],drops=[],bullets=[];
+let running=false,openedChest=null,elapsed=0,kills=0;
+let safe={x:1200,y:900,r:1000};
+let keys={};
+let moveTouch={};
+let fireHeld=false;
+let lastShot=0;
+let weapon="PISTOLA",ammo=30,medkits=0;
+let startTime=0;
 
-function selectCharacter(index,button){
- selectedCharacter=index;
- document.querySelectorAll("#characters .option").forEach(x=>x.classList.remove("selected"));
- button.classList.add("selected");
+const rand=(a,b)=>a+Math.random()*(b-a);
+const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
- const c=characters[index];
- document.documentElement.style.setProperty("--accent",c.accent);
- document.documentElement.style.setProperty("--glow",c.glow);
- document.getElementById("characterName").textContent=c.name;
- document.getElementById("characterDescription").textContent=
- "Este é seu personagem selecionado para a batalha.";
-}
-
-function selectMap(index,button){
- selectedMap=index;
- document.querySelectorAll("#maps .option").forEach(x=>x.classList.remove("selected"));
- button.classList.add("selected");
-}
-
-function generateIsland(){
- island.innerHTML="";
- island.className="";
- island.classList.add(maps[selectedMap].type);
-
- const treeCount=selectedMap===0?35:12;
-
- for(let i=0;i<treeCount;i++){
-  const tree=document.createElement("div");
-  tree.className="tree";
-  tree.style.left=(Math.random()*94+2)+"%";
-  tree.style.top=(Math.random()*85+5)+"%";
-
-  if(selectedMap===1)tree.style.background="#a57b3c";
-  if(selectedMap===2)tree.style.background="#8daeb7";
-
-  island.appendChild(tree);
- }
-
- for(let i=0;i<9;i++){
-  const building=document.createElement("div");
-  building.className="building";
-  building.style.left=(Math.random()*85+5)+"%";
-  building.style.top=(Math.random()*80+5)+"%";
-  island.appendChild(building);
- }
+function newPlayer(){
+ return {x:1200,y:900,hp:100,speed:3.1,r:17,
+ color:colors[character],alive:true};
 }
 
 function startGame(){
- if(started)return;
-
- started=true;
- jumped=false;
- planePosition=-20;
- playerX=50;
- playerY=48;
-
  lobby.style.display="none";
- match.style.display="block";
-
- plane.style.left=planePosition+"%";
- player.style.display="none";
- jump.style.display="block";
- document.getElementById("controls").style.display="none";
-
- document.getElementById("mapLabel").textContent=maps[selectedMap].name;
- player.style.setProperty("--accent",characters[selectedCharacter].accent);
-
- generateIsland();
- statusText.textContent="AVIÃO EM PREPARAÇÃO...";
+ game.style.display="block";
+ player=newPlayer();
+ bots=[];buildings=[];chests=[];drops=[];bullets=[];
+ elapsed=0;kills=0;ammo=30;medkits=0;weapon="PISTOLA";
+ safe={x:1200,y:900,r:1050};
+ openedChest=null;
+ createMap();
+ for(let i=0;i<14;i++){
+  let p=randomLand();
+  bots.push({x:p.x,y:p.y,hp:100,alive:true,
+   speed:rand(1.1,1.7),shot:0,color:colors[Math.floor(rand(1,8))],r:16});
+ }
+ startTime=performance.now();
+ running=true;
+ updateHUD();
+ requestAnimationFrame(loop);
 }
 
-function returnLobby(){
- started=false;
- jumped=false;
-
- match.style.display="none";
- lobby.style.display="block";
- jump.style.display="none";
- player.style.display="none";
-
- document.getElementById("controls").style.display="none";
- statusText.textContent="AVIÃO EM PREPARAÇÃO...";
+function randomLand(){
+ return {x:rand(100,MAP.w-100),y:rand(100,MAP.h-100)};
 }
 
-function jumpFromPlane(){
- if(!started||jumped)return;
-
- jumped=true;
- jump.style.display="none";
- player.style.display="block";
- document.getElementById("controls").style.display="flex";
-
- statusText.textContent="VOCÊ SALTOU!";
-
- setTimeout(()=>{
-  if(started&&jumped){
-   statusText.textContent="VOCÊ ESTÁ NA ILHA!";
+function createMap(){
+ // Construções distribuídas pelo mapa
+ const clusters=[
+  [350,350],[1050,330],[1800,400],[500,1050],
+  [1300,1150],[2050,1200],[1150,700],[750,1500]
+ ];
+ clusters.forEach(([cx,cy])=>{
+  for(let i=0;i<4;i++){
+   buildings.push({
+    x:cx+rand(-120,120),y:cy+rand(-90,90),
+    w:rand(65,105),h:rand(55,85),
+    color:["#b9a18a","#8c9aab","#a7a28c"][Math.floor(rand(0,3))]
+   });
   }
- },2000);
+ });
+ // Baús em diversos pontos
+ for(let i=0;i<30;i++){
+  const p=randomLand();
+  chests.push({x:p.x,y:p.y,open:false,items:makeLoot()});
+ }
+ // Árvores
 }
 
-function createRoom(){
- roomCode=String(Math.floor(100000+Math.random()*900000));
- document.getElementById("roomCode").textContent=roomCode;
- document.getElementById("createdRoom").classList.remove("hidden");
- document.getElementById("roomMessage").textContent="Sala criada nesta demonstração!";
+function makeLoot(){
+ const pool=[
+  {name:"RIFLE",icon:"🔫",type:"weapon",value:"RIFLE"},
+  {name:"SHOTGUN",icon:"💥",type:"weapon",value:"SHOTGUN"},
+  {name:"MUNIÇÃO",icon:"📦",type:"ammo",value:30},
+  {name:"KIT MÉDICO",icon:"💚",type:"heal",value:1},
+  {name:"COLETE",icon:"🛡️",type:"armor",value:20}
+ ];
+ let items=[];
+ for(let i=0;i<3;i++)items.push({...pool[Math.floor(rand(0,pool.length))]});
+ return items;
 }
 
-function joinRoom(){
- const code=document.getElementById("joinCode").value.trim();
- const message=document.getElementById("roomMessage");
+function drawCharacter(x,y,color,scale=1){
+ ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
+ // sombra
+ ctx.fillStyle="#14231b66";ctx.beginPath();ctx.ellipse(0,15,16,7,0,0,Math.PI*2);ctx.fill();
+ // pernas
+ ctx.fillStyle="#22212c";
+ ctx.fillRect(-12,2,10,17);ctx.fillRect(3,2,10,17);
+ // corpo
+ ctx.fillStyle="#22202b";ctx.strokeStyle=color;ctx.lineWidth=3;
+ roundRect(-14,-17,28,29,8,true,true);
+ // cabeça e capuz
+ ctx.fillStyle="#292331";ctx.beginPath();ctx.arc(0,-23,13,0,Math.PI*2);ctx.fill();
+ ctx.strokeStyle=color;ctx.lineWidth=3;ctx.stroke();
+ ctx.fillStyle=color;ctx.fillRect(-8,-24,16,4);
+ ctx.restore();
+}
+function roundRect(x,y,w,h,r,fill,stroke){
+ ctx.beginPath();ctx.roundRect(x,y,w,h,r);
+ if(fill)ctx.fill();if(stroke)ctx.stroke();
+}
 
- if(!/^[0-9]{6}$/.test(code)){
-  message.textContent="Digite um código válido de 6 números.";
+function drawBuilding(b){
+ ctx.fillStyle="#26332b";
+ ctx.fillRect(b.x+5,b.y+7,b.w,b.h);
+ ctx.fillStyle=b.color;ctx.fillRect(b.x,b.y,b.w,b.h);
+ ctx.fillStyle="#554b45";
+ ctx.fillRect(b.x-5,b.y-7,b.w+10,12);
+ ctx.fillStyle="#544b46";
+ ctx.fillRect(b.x+b.w*.42,b.y+b.h-24,b.w*.18,24);
+ ctx.fillStyle="#7fbdcf";
+ ctx.fillRect(b.x+9,b.y+15,15,13);
+ ctx.fillRect(b.x+b.w-24,b.y+15,15,13);
+}
+
+function drawChest(c){
+ ctx.fillStyle="#47301d";
+ ctx.fillRect(c.x-15,c.y-9,30,20);
+ ctx.fillStyle=c.open?"#6b655b":"#e3a532";
+ ctx.fillRect(c.x-15,c.y-15,30,11);
+ ctx.fillStyle="#fff0a0";
+ ctx.fillRect(c.x-3,c.y-11,6,8);
+ if(!c.open){
+  ctx.fillStyle="#fff3aa";
+  ctx.beginPath();ctx.arc(c.x,c.y-22,4,0,Math.PI*2);ctx.fill();
+ }
+}
+
+function draw(){
+ ctx.clearRect(0,0,W,H);
+ let camX=clamp(player.x-W/2,0,MAP.w-W);
+ let camY=clamp(player.y-H/2,0,MAP.h-H);
+ ctx.save();ctx.translate(-camX,-camY);
+
+ // chão
+ ctx.fillStyle=mapIndex===0?"#6da94e":mapIndex===1?"#b89558":"#b7d1d6";
+ ctx.fillRect(0,0,MAP.w,MAP.h);
+
+ // áreas de terreno
+ for(let i=0;i<120;i++){
+  let x=(i*197)%MAP.w,y=(i*283)%MAP.h;
+  ctx.fillStyle=mapIndex===0?"#588e43":mapIndex===1?"#c5a66c":"#d8e8e8";
+  ctx.beginPath();ctx.arc(x,y,rand(10,28),0,Math.PI*2);ctx.fill();
+ }
+ // estradas
+ ctx.strokeStyle=mapIndex===1?"#e0c58d":"#c1b79a";
+ ctx.lineWidth=45;ctx.beginPath();ctx.moveTo(0,850);
+ ctx.bezierCurveTo(700,700,1400,1100,MAP.w,650);ctx.stroke();
+ ctx.strokeStyle="#e8d9b5";ctx.lineWidth=2;ctx.stroke();
+
+ // árvores
+ for(let i=0;i<180;i++){
+  let x=(i*157+80)%MAP.w,y=(i*251+90)%MAP.h;
+  ctx.fillStyle="#68482c";ctx.fillRect(x-4,y,8,16);
+  ctx.fillStyle=mapIndex===2?"#d9eeee":mapIndex===1?"#92733d":"#246b37";
+  ctx.beginPath();ctx.arc(x,y-7,13,0,Math.PI*2);ctx.fill();
+ }
+ buildings.forEach(drawBuilding);
+ chests.forEach(c=>{if(!c.open)drawChest(c)});
+ drops.forEach(d=>{
+  ctx.fillStyle=d.type==="weapon"?"#e5c14b":d.type==="heal"?"#5be48d":"#ddd";
+  ctx.fillRect(d.x-9,d.y-9,18,18);
+  ctx.fillStyle="#222";ctx.font="12px Arial";ctx.fillText(d.icon,d.x-7,d.y+4);
+ });
+
+ bots.forEach(b=>{
+  if(!b.alive)return;
+  drawCharacter(b.x,b.y,b.color);
+ });
+ bullets.forEach(b=>{
+  ctx.fillStyle=b.color;ctx.beginPath();ctx.arc(b.x,b.y,5,0,Math.PI*2);ctx.fill();
+ });
+ drawCharacter(player.x,player.y,player.color,1.12);
+
+ // Zona segura
+ ctx.strokeStyle="#56dfff";ctx.lineWidth=8;
+ ctx.beginPath();ctx.arc(safe.x,safe.y,safe.r,0,Math.PI*2);ctx.stroke();
+ ctx.fillStyle="#3284c033";
+ ctx.beginPath();ctx.rect(0,0,MAP.w,MAP.h);
+ ctx.arc(safe.x,safe.y,safe.r,0,Math.PI*2,true);ctx.fill("evenodd");
+
+ ctx.restore();
+}
+
+function nearestChest(){
+ let best=null,bd=75;
+ chests.forEach(c=>{
+  let d=dist(player,c);
+  if(!c.open&&d<bd){best=c;bd=d}
+ });
+ return best;
+}
+function nearestDrop(){
+ let best=null,bd=65;
+ drops.forEach(d=>{
+  let distance=dist(player,d);
+  if(distance<bd){best=d;bd=distance}
+ });
+ return best;
+}
+function openNearby(){
+ let chest=nearestChest();
+ if(chest){
+  openedChest=chest;
+  showLoot(chest.items,chest);
   return;
  }
-
- if(code===roomCode&&roomCode!==""){
-  message.textContent="Você entrou na sua sala de demonstração!";
- }else{
-  message.textContent="Sala não encontrada nesta versão local.";
- }
+ let drop=nearestDrop();
+ if(drop){collectDrop(drop);return}
+ document.getElementById("message").textContent="NENHUM ITEM OU BAÚ PRÓXIMO";
 }
-
-/* Movimento do avião */
-function animate(){
- if(started&&!jumped){
-  planePosition+=0.09;
-  if(planePosition>110)planePosition=-20;
-  plane.style.left=planePosition+"%";
- }
-
- animationFrame=requestAnimationFrame(animate);
-}
-animate();
-
-/* Movimento do personagem */
-function movePlayer(direction){
- if(!started||!jumped)return;
-
- const step=3;
-
- if(direction==="left")playerX-=step;
- if(direction==="right")playerX+=step;
- if(direction==="up")playerY-=step;
- if(direction==="down")playerY+=step;
-
- playerX=Math.max(5,Math.min(95,playerX));
- playerY=Math.max(15,Math.min(85,playerY));
-
- player.style.left=playerX+"%";
- player.style.top=playerY+"%";
-}
-
-document.querySelectorAll("[data-move]").forEach(button=>{
- const direction=button.dataset.move;
-
- button.addEventListener("pointerdown",e=>{
-  e.preventDefault();
-  movePlayer(direction);
+function showLoot(items,chest){
+ const box=document.getElementById("lootPanel");
+ const list=document.getElementById("lootItems");
+ list.innerHTML="";
+ items.forEach((item,i)=>{
+  const b=document.createElement("button");
+  b.textContent=item.icon+" "+item.name;
+  b.onclick=()=>{
+   collectItem(item);
+   items.splice(i,1);
+   showLoot(items,chest);
+   if(items.length===0){chest.open=true;closeLoot()}
+  };
+  list.appendChild(b);
  });
-});
+ if(items.length===0){chest.open=true;closeLoot();return}
+ box.style.display="block";
+}
+function closeLoot(){
+ document.getElementById("lootPanel").style.display="none";
+ openedChest=null;
+}
+function collectItem(item){
+ if(item.type==="weapon"){weapon=item.value}
+ if(item.type==="ammo")ammo+=item.value;
+ if(item.type==="heal")medkits+=item.value;
+ if(item.type==="armor")player.hp=Math.min(100,player.hp+item.value);
+ updateHUD();
+}
+function collectDrop(d){
+ collectItem(d);
+ drops.splice(drops.indexOf(d),1);
+}
+function updateHUD(){
+ document.getElementById("hp").textContent=Math.ceil(player.hp);
+ document.getElementById("healthfill").style.width=player.hp+"%";
+ document.getElementById("remaining").textContent=1+bots.filter(b=>b.alive).length;
+ document.getElementById("kills").textContent=kills;
+ document.getElementById("weaponSlot").innerHTML="🔫<br>"+weapon;
+ document.getElementById("ammoSlot").innerHTML="📦<br>"+ammo+" BALAS";
+ document.getElementById("healSlot").innerHTML="💚<br>"+medkits+" CURAS";
+}
 
-document.getElementById("jumpAgain").addEventListener("click",()=>{
- if(started&&jumped){
-  statusText.textContent="PARAQUEDAS ATIVO!";
+function shoot(from,target,isBot=false){
+ if(!isBot&&ammo<=0)return;
+ const angle=Math.atan2(target.y-from.y,target.x-from.x);
+ bullets.push({
+  x:from.x,y:from.y,vx:Math.cos(angle)*9,vy:Math.sin(angle)*9,
+  owner:from,damage:weapon==="SHOTGUN"?24:16,color:isBot?"#ffb16b":"#fff2a5",life:55
+ });
+ if(!isBot)ammo--;
+}
+
+function playerShoot(){
+ if(!running||openedChest)return;
+ let target=null,bd=650;
+ bots.forEach(b=>{
+  if(!b.alive)return;
+  let d=dist(player,b);
+  if(d<bd){target=b;bd=d}
+ });
+ if(target)shoot(player,target);
+ updateHUD();
+}
+
+function useHeal(){
+ if(medkits>0&&player.hp<100){
+  player.hp=Math.min(100,player.hp+35);
+  medkits--;updateHUD();
  }
+}
+
+function movePlayer(dt){
+ let dx=0,dy=0;
+ if(keys.left||moveTouch.left)dx--;
+ if(keys.right||moveTouch.right)dx++;
+ if(keys.up||moveTouch.up)dy--;
+ if(keys.down||moveTouch.down)dy++;
+ if(dx||dy){
+  let l=Math.hypot(dx,dy);dx/=l;dy/=l;
+  let nx=player.x+dx*player.speed*dt;
+  let ny=player.y+dy*player.speed*dt;
+  if(!collides(nx,player.y))player.x=nx;
+  if(!collides(player.x,ny))player.y=ny;
+ }
+}
+function collides(x,y){
+ return buildings.some(b=>x+12>b.x&&x-12<b.x+b.w&&y+12>b.y&&y-12<b.y+b.h);
+}
+
+function updateBots(dt){
+ bots.forEach(b=>{
+  if(!b.alive)return;
+  let d=dist(b,player);
+  let target=player;
+  if(d>300){
+   let a=Math.atan2(player.y-b.y,player.x-b.x);
+   let nx=b.x+Math.cos(a)*b.speed*dt;
+   let ny=b.y+Math.sin(a)*b.speed*dt;
+   if(!collides(nx,b.y))b.x=nx;
+   if(!collides(b.x,ny))b.y=ny;
+  }
+  if(d<450&&performance.now()-b.shot>1200+Math.random()*900){
+   b.shot=performance.now();
+   const a=Math.atan2(player.y-b.y,player.x-b.x);
+   bullets.push({x:b.x,y:b.y,vx:Math.cos(a)*5,vy:Math.sin(a)*5,
+    owner:b,damage:5,color:"#ff9b72",life:70});
+  }
+ });
+}
+
+function updateBullets(dt){
+ bullets.forEach(b=>{
+  b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;
+  if(b.owner===player){
+   bots.forEach(enemy=>{
+    if(enemy.alive&&dist(b,enemy)<19){
+     enemy.hp-=b.damage;b.life=0;
+     if(enemy.hp<=0)eliminateBot(enemy);
+    }
+   });
+  }else if(dist(b,player)<20){
+   player.hp-=b.damage;b.life=0;
+   if(player.hp<=0)endGame(false);
+  }
+ });
+ bullets=bullets.filter(b=>b.life>0&&b.x>0&&b.y>0&&b.x<MAP.w&&b.y<MAP.h);
+}
+function eliminateBot(b){
+ b.alive=false;kills++;
+ drops.push({x:b.x,y:b.y,type:"ammo",value:20,name:"MUNIÇÃO",icon:"📦"});
+ drops.push({x:b.x+20,y:b.y,type:"heal",value:1,name:"KIT MÉDICO",icon:"💚"});
+ updateHUD();
+}
+
+function updateZone(dt){
+ elapsed+=dt/60;
+ let newRadius=Math.max(140,1050-elapsed*5);
+ safe.r=newRadius;
+ if(dist(player,safe)>safe.r){
+  player.hp-=0.08*dt;
+  document.getElementById("message").textContent="⚠️ VOCÊ ESTÁ FORA DA ZONA SEGURA!";
+ }else{
+  document.getElementById("message").textContent="PROCURE LOOT E SOBREVIVA!";
+ }
+ bots.forEach(b=>{
+  if(b.alive&&dist(b,safe)>safe.r)b.hp-=0.06*dt;
+  if(b.alive&&b.hp<=0)eliminateBot(b);
+ });
+}
+
+function endGame(win){
+ if(!running)return;
+ running=false;
+ document.getElementById("end").style.display="flex";
+ document.getElementById("endTitle").textContent=win?"🏆 VITÓRIA!":"FIM DE PARTIDA";
+ document.getElementById("endText").textContent=
+ "Eliminações: "+kills+" | "+(win?"Você foi o último sobrevivente!":"Tente novamente!");
+}
+
+let last=0;
+function loop(time){
+ if(!running)return;
+ let dt=Math.min((time-last)/16.67||1,2);last=time;
+ movePlayer(dt);
+ updateBots(dt);
+ updateBullets(dt);
+ updateZone(dt);
+ if(player.hp<=0)endGame(false);
+ if(bots.every(b=>!b.alive))endGame(true);
+ updateHUD();
+ document.getElementById("clock").textContent=
+  String(Math.floor(elapsed/60)).padStart(2,"0")+":"+
+  String(Math.floor(elapsed%60)).padStart(2,"0");
+ draw();
+ if(running)requestAnimationFrame(loop);
+}
+
+// Controles touch
+document.querySelectorAll("[data-dir]").forEach(btn=>{
+ const d=btn.dataset.dir;
+ btn.addEventListener("pointerdown",e=>{e.preventDefault();moveTouch[d]=true});
+ ["pointerup","pointercancel","pointerleave"].forEach(ev=>
+  btn.addEventListener(ev,()=>moveTouch[d]=false));
 });
+document.getElementById("fire").addEventListener("pointerdown",e=>{
+ e.preventDefault();fireHeld=true;playerShoot();
+});
+["pointerup","pointercancel","pointerleave"].forEach(ev=>
+ document.getElementById("fire").addEventListener(ev,()=>fireHeld=false));
+
+document.getElementById("interact").onclick=openNearby;
+document.getElementById("heal").onclick=useHeal;
+document.getElementById("play").onclick=startGame;
 
 document.addEventListener("keydown",e=>{
- if(e.key==="ArrowLeft"||e.key==="a")movePlayer("left");
- if(e.key==="ArrowRight"||e.key==="d")movePlayer("right");
- if(e.key==="ArrowUp"||e.key==="w")movePlayer("up");
- if(e.key==="ArrowDown"||e.key==="s")movePlayer("down");
+ const k=e.key.toLowerCase();
+ if(k==="w"||k==="arrowup")keys.up=true;
+ if(k==="s"||k==="arrowdown")keys.down=true;
+ if(k==="a"||k==="arrowleft")keys.left=true;
+ if(k==="d"||k==="arrowright")keys.right=true;
+ if(k==="e")openNearby();
+ if(k===" ")playerShoot();
 });
-
-document.getElementById("play").addEventListener("click",startGame);
-document.getElementById("return").addEventListener("click",returnLobby);
-jump.addEventListener("click",jumpFromPlane);
-
-selectCharacter(0,document.querySelector("#characters .option"));
-generateIsland();
-</script>
-
-</body>
-</html>
+document.addEventListener("keyup",e=>{
+ const k=e.key.toLowerCase();
+ if(k==="w"||k
