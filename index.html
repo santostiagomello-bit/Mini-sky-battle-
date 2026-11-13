@@ -1,0 +1,584 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MINI SKY BATTLE</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  touch-action: none;
+}
+
+body {
+  overflow: hidden;
+  background: #8bcf65;
+  font-family: Arial, sans-serif;
+}
+
+canvas {
+  display: block;
+}
+
+#hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  color: white;
+  text-shadow: 2px 2px 3px #333;
+}
+
+#logo {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  font-size: 21px;
+  font-weight: 900;
+}
+
+#health {
+  position: absolute;
+  top: 52px;
+  left: 15px;
+  width: 150px;
+  height: 15px;
+  background: #333;
+  border: 2px solid white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#healthBar {
+  height: 100%;
+  width: 100%;
+  background: #39df56;
+}
+
+#status {
+  position: absolute;
+  top: 75px;
+  left: 15px;
+  font-size: 12px;
+}
+
+#minimap {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 105px;
+  height: 105px;
+  border: 3px solid white;
+  border-radius: 12px;
+  background: #77b94c;
+  overflow: hidden;
+}
+
+#mapPlayer {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: red;
+  left: 48px;
+  top: 48px;
+}
+
+#joystick {
+  position: absolute;
+  bottom: 28px;
+  left: 25px;
+  width: 125px;
+  height: 125px;
+  border-radius: 50%;
+  background: #ffffff55;
+  border: 3px solid #ffffffaa;
+  pointer-events: auto;
+}
+
+#stick {
+  position: absolute;
+  width: 52px;
+  height: 52px;
+  left: 33px;
+  top: 33px;
+  border-radius: 50%;
+  background: #ffffffcc;
+  border: 3px solid white;
+}
+
+#action {
+  position: absolute;
+  bottom: 42px;
+  right: 28px;
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  border: 4px solid white;
+  background: #ed5946;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  pointer-events: auto;
+  box-shadow: 0 4px 0 #9e3027;
+}
+
+#message {
+  position: absolute;
+  top: 42%;
+  width: 100%;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  opacity: 0;
+  transition: opacity .2s;
+}
+</style>
+</head>
+
+<body>
+
+<div id="hud">
+  <div id="logo">MINI SKY BATTLE</div>
+  <div id="health"><div id="healthBar"></div></div>
+  <div id="status">VIDA 100%</div>
+
+  <div id="minimap">
+    <div id="mapPlayer"></div>
+  </div>
+
+  <div id="message">AÇÃO!</div>
+
+  <div id="joystick">
+    <div id="stick"></div>
+  </div>
+
+  <button id="action">AÇÃO</button>
+</div>
+
+<script type="module">
+import * as THREE from
+'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x9bd8f2);
+scene.fog = new THREE.Fog(0x9bd8f2, 45, 100);
+
+const camera = new THREE.PerspectiveCamera(
+  55,
+  innerWidth / innerHeight,
+  0.1,
+  200
+);
+
+const renderer = new THREE.WebGLRenderer({
+  antialias: true
+});
+
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.7));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x63834b, 2));
+
+const sun = new THREE.DirectionalLight(0xffffff, 2.2);
+sun.position.set(-20, 35, 20);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+scene.add(sun);
+
+// MATERIAIS
+function material(color) {
+  return new THREE.MeshStandardMaterial({
+    color,
+    roughness: 0.9
+  });
+}
+
+const grass = material(0x78c653);
+const darkGrass = material(0x68b647);
+const brown = material(0x80502e);
+const leaves = material(0x238c43);
+const leaves2 = material(0x35a94c);
+const white = material(0xffffff);
+const roadMat = material(0xb6aa8e);
+
+// CHÃO
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(90, 90),
+  grass
+);
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+// MANCHAS DE GRAMA
+for (let i = 0; i < 65; i++) {
+  const patch = new THREE.Mesh(
+    new THREE.CircleGeometry(0.5 + Math.random() * 1.5, 8),
+    darkGrass
+  );
+  patch.rotation.x = -Math.PI / 2;
+  patch.position.set(
+    Math.random() * 75 - 37.5,
+    0.015,
+    Math.random() * 75 - 37.5
+  );
+  scene.add(patch);
+}
+
+// ESTRADAS
+function road(x, z, w, h) {
+  const obj = new THREE.Mesh(
+    new THREE.BoxGeometry(w, 0.08, h),
+    roadMat
+  );
+  obj.position.set(x, 0.045, z);
+  obj.receiveShadow = true;
+  scene.add(obj);
+}
+
+road(0, 0, 9, 90);
+road(0, 0, 90, 8);
+
+// ÁRVORES
+function tree(x, z, scale = 1) {
+  const group = new THREE.Group();
+
+  const trunk = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.22, 0.3, 1.5, 7),
+    brown
+  );
+  trunk.position.y = 0.75;
+  trunk.castShadow = true;
+  group.add(trunk);
+
+  const crown = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(1, 1),
+    leaves
+  );
+  crown.position.y = 2;
+  crown.scale.set(1.1, 1.15, 1.1);
+  crown.castShadow = true;
+  group.add(crown);
+
+  const crown2 = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(0.7, 1),
+    leaves2
+  );
+  crown2.position.set(0.45, 2.25, 0.1);
+  crown2.castShadow = true;
+  group.add(crown2);
+
+  group.position.set(x, 0, z);
+  group.scale.setScalar(scale);
+  scene.add(group);
+}
+
+// CASAS
+function house(x, z, color) {
+  const group = new THREE.Group();
+
+  const walls = new THREE.Mesh(
+    new THREE.BoxGeometry(3.5, 2.2, 3),
+    material(color)
+  );
+  walls.position.y = 1.1;
+  walls.castShadow = true;
+  walls.receiveShadow = true;
+  group.add(walls);
+
+  const roof = new THREE.Mesh(
+    new THREE.ConeGeometry(2.65, 1.7, 4),
+    material(0xa74632)
+  );
+  roof.position.y = 3;
+  roof.rotation.y = Math.PI / 4;
+  roof.castShadow = true;
+  group.add(roof);
+
+  const door = new THREE.Mesh(
+    new THREE.BoxGeometry(0.7, 1.3, 0.1),
+    material(0x65402a)
+  );
+  door.position.set(0, 0.65, 1.56);
+  group.add(door);
+
+  const windowMat = material(0x8bdcf4);
+
+  for (const side of [-1, 1]) {
+    const window = new THREE.Mesh(
+      new THREE.BoxGeometry(0.65, 0.65, 0.1),
+      windowMat
+    );
+    window.position.set(side * 1.05, 1.35, 1.56);
+    group.add(window);
+  }
+
+  group.position.set(x, 0, z);
+  scene.add(group);
+}
+
+// CAIXAS
+function crate(x, z) {
+  const box = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 1, 1),
+    material(0xb77a36)
+  );
+  box.position.set(x, 0.5, z);
+  box.castShadow = true;
+  scene.add(box);
+
+  const stripe = new THREE.Mesh(
+    new THREE.BoxGeometry(1.03, 0.15, 1.03),
+    material(0x68421f)
+  );
+  stripe.position.set(x, 0.5, z);
+  scene.add(stripe);
+}
+
+// DISTRIBUIÇÃO DO MAPA
+const trees = [
+  [-13,-12],[-17,-5],[-14,7],[-19,15],
+  [13,-15],[18,-8],[15,8],[20,16],
+  [-27,-22],[-25,20],[27,22],[28,-23],
+  [-8,28],[9,29],[-30,0],[31,0]
+];
+
+trees.forEach((p, i) =>
+  tree(p[0], p[1], 0.85 + (i % 3) * 0.12)
+);
+
+house(-12, 2, 0xf1d5a0);
+house(12, -3, 0xe8b7a0);
+house(-23, -12, 0xd5e3ef);
+house(23, 13, 0xf2d48b);
+
+crate(-5, -7);
+crate(6, 8);
+crate(16, -13);
+crate(-17, 12);
+
+// PERSONAGEM
+const player = new THREE.Group();
+
+const skin = material(0xffc28c);
+const shirt = material(0x2678df);
+const pants = material(0x303d59);
+const shoes = material(0x242424);
+
+const body = new THREE.Mesh(
+  new THREE.CapsuleGeometry(0.42, 0.55, 4, 8),
+  shirt
+);
+body.position.y = 1.05;
+body.castShadow = true;
+player.add(body);
+
+const head = new THREE.Mesh(
+  new THREE.SphereGeometry(0.38, 16, 12),
+  skin
+);
+head.position.y = 1.85;
+head.castShadow = true;
+player.add(head);
+
+const hair = new THREE.Mesh(
+  new THREE.SphereGeometry(0.39, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.5),
+  material(0x49301e)
+);
+hair.position.y = 2.02;
+player.add(hair);
+
+for (const side of [-1, 1]) {
+  const leg = new THREE.Mesh(
+    new THREE.BoxGeometry(0.25, 0.55, 0.3),
+    pants
+  );
+  leg.position.set(side * 0.2, 0.35, 0);
+  player.add(leg);
+
+  const shoe = new THREE.Mesh(
+    new THREE.BoxGeometry(0.3, 0.16, 0.4),
+    shoes
+  );
+  shoe.position.set(side * 0.2, 0.08, 0.04);
+  player.add(shoe);
+
+  const arm = new THREE.Mesh(
+    new THREE.CapsuleGeometry(0.13, 0.45, 4, 6),
+    skin
+  );
+  arm.position.set(side * 0.52, 1.1, 0);
+  arm.rotation.z = side * -0.15;
+  player.add(arm);
+}
+
+player.position.set(0, 0, 5);
+scene.add(player);
+
+// SOMBRA DO PERSONAGEM
+const shadow = new THREE.Mesh(
+  new THREE.CircleGeometry(0.65, 20),
+  new THREE.MeshBasicMaterial({
+    color: 0x31532c,
+    transparent: true,
+    opacity: 0.3
+  })
+);
+shadow.rotation.x = -Math.PI / 2;
+shadow.position.y = 0.035;
+player.add(shadow);
+
+// CONTROLES
+let moveX = 0;
+let moveY = 0;
+let joyActive = false;
+
+const joystick = document.getElementById("joystick");
+const stick = document.getElementById("stick");
+
+function updateJoystick(e) {
+  const rect = joystick.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+
+  let dx = e.clientX - cx;
+  let dy = e.clientY - cy;
+
+  const max = 38;
+  const length = Math.hypot(dx, dy);
+
+  if (length > max) {
+    dx = dx / length * max;
+    dy = dy / length * max;
+  }
+
+  stick.style.left = (33 + dx) + "px";
+  stick.style.top = (33 + dy) + "px";
+
+  moveX = dx / max;
+  moveY = dy / max;
+}
+
+joystick.addEventListener("pointerdown", e => {
+  joyActive = true;
+  joystick.setPointerCapture(e.pointerId);
+  updateJoystick(e);
+});
+
+joystick.addEventListener("pointermove", e => {
+  if (joyActive) updateJoystick(e);
+});
+
+function stopJoystick() {
+  joyActive = false;
+  moveX = 0;
+  moveY = 0;
+  stick.style.left = "33px";
+  stick.style.top = "33px";
+}
+
+joystick.addEventListener("pointerup", stopJoystick);
+joystick.addEventListener("pointercancel", stopJoystick);
+
+// TECLADO
+const keys = {};
+
+addEventListener("keydown", e => keys[e.key.toLowerCase()] = true);
+addEventListener("keyup", e => keys[e.key.toLowerCase()] = false);
+
+// BOTÃO DE AÇÃO
+const message = document.getElementById("message");
+
+document.getElementById("action").addEventListener("pointerdown", () => {
+  message.style.opacity = 1;
+  setTimeout(() => message.style.opacity = 0, 350);
+});
+
+// CÂMERA
+camera.position.set(0, 17, 20);
+camera.lookAt(0, 0, 0);
+
+// MOVIMENTAÇÃO
+const clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  const delta = Math.min(clock.getDelta(), 0.04);
+
+  let x = moveX;
+  let z = moveY;
+
+  if (keys["w"] || keys["arrowup"]) z -= 1;
+  if (keys["s"] || keys["arrowdown"]) z += 1;
+  if (keys["a"] || keys["arrowleft"]) x -= 1;
+  if (keys["d"] || keys["arrowright"]) x += 1;
+
+  const length = Math.hypot(x, z);
+
+  if (length > 0) {
+    x /= length;
+    z /= length;
+
+    player.position.x += x * 7 * delta;
+    player.position.z += z * 7 * delta;
+
+    player.rotation.y = Math.atan2(x, z);
+  }
+
+  // LIMITES DO MAPA
+  player.position.x = THREE.MathUtils.clamp(
+    player.position.x, -40, 40
+  );
+
+  player.position.z = THREE.MathUtils.clamp(
+    player.position.z, -40, 40
+  );
+
+  // CÂMERA SEGUE O JOGADOR
+  const targetCamera = new THREE.Vector3(
+    player.position.x,
+    player.position.y + 17,
+    player.position.z + 20
+  );
+
+  camera.position.lerp(targetCamera, 0.08);
+
+  camera.lookAt(
+    player.position.x,
+    0,
+    player.position.z
+  );
+
+  // MINIMAPA
+  const mapX = 48 + player.position.x * 1.05;
+  const mapY = 48 + player.position.z * 1.05;
+
+  document.getElementById("mapPlayer").style.left =
+    THREE.MathUtils.clamp(mapX, 3, 93) + "px";
+
+  document.getElementById("mapPlayer").style.top =
+    THREE.MathUtils.clamp(mapY, 3, 93) + "px";
+
+  renderer.render(scene, camera);
+}
+
+animate();
+
+// REDIMENSIONAMENTO
+addEventListener("resize", () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
