@@ -3,7 +3,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>MINI SKY BATTLE</title>
 
 <style>
@@ -16,33 +16,198 @@
 
 body {
   overflow: hidden;
-  background: #8bcf65;
   font-family: Arial, sans-serif;
+  background: #8bcf65;
 }
 
 canvas {
   display: block;
 }
 
-#hud {
+/* LOBBY */
+#lobby {
   position: fixed;
   inset: 0;
+  z-index: 5;
+  color: white;
+  background: linear-gradient(180deg, #123d5b88, transparent 45%, #102c3dcc);
+  text-shadow: 1px 2px 3px #173044;
+}
+
+#topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 65px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  background: #102b43aa;
+  border-bottom: 2px solid #ffffff33;
+}
+
+#logo {
+  font-size: clamp(15px, 4vw, 24px);
+  font-weight: 1000;
+  color: #ffe66a;
+  letter-spacing: 1px;
+}
+
+#currencies {
+  display: flex;
+  gap: 7px;
+}
+
+.currency {
+  background: #173b58dd;
+  border: 1px solid #ffffff77;
+  border-radius: 9px;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+#profile {
+  position: absolute;
+  top: 82px;
+  left: 12px;
+  background: #173b58dd;
+  border: 1px solid #ffffff66;
+  border-radius: 12px;
+  padding: 10px 13px;
+  font-size: 12px;
+}
+
+#profile strong {
+  display: block;
+  font-size: 15px;
+  color: #ffe66a;
+  margin-bottom: 4px;
+}
+
+#sideButtons {
+  position: absolute;
+  top: 145px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menuButton {
+  width: 112px;
+  padding: 12px 5px;
+  border: 2px solid #ffffff99;
+  border-radius: 12px;
+  color: white;
+  background: #194c6be8;
+  font-weight: bold;
+  font-size: 13px;
+  box-shadow: 0 4px 0 #102e45;
+}
+
+.menuButton:active {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+#bottomLobby {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 14px 14px 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(transparent, #102b43cc);
+}
+
+#playButton {
+  width: min(330px, 75%);
+  padding: 17px;
+  border: 3px solid #fff2a0;
+  border-radius: 15px;
+  background: linear-gradient(#ffe66a, #f39b22);
+  color: #55320c;
+  font-size: 24px;
+  font-weight: 1000;
+  letter-spacing: 2px;
+  box-shadow: 0 6px 0 #9c5817;
+}
+
+#playButton:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #9c5817;
+}
+
+#subtitle {
+  position: absolute;
+  bottom: 95px;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  font-size: 12px;
+  color: #fff;
+}
+
+/* JANELA DOS MENUS */
+#popup {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: #071b2acc;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+#popupBox {
+  width: min(340px, 95%);
+  padding: 22px;
+  text-align: center;
+  border: 2px solid #ffffff99;
+  border-radius: 18px;
+  background: #194b68;
+}
+
+#popupTitle {
+  font-size: 23px;
+  color: #ffe66a;
+  margin-bottom: 15px;
+}
+
+#popupText {
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+#closePopup {
+  margin-top: 20px;
+  padding: 11px 25px;
+  border: 0;
+  border-radius: 9px;
+  background: #ffe66a;
+  color: #38280b;
+  font-weight: bold;
+}
+
+/* HUD DA PARTIDA */
+#gameHUD {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 4;
   pointer-events: none;
   color: white;
   text-shadow: 2px 2px 3px #333;
 }
 
-#logo {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  font-size: 21px;
-  font-weight: 900;
-}
-
 #health {
   position: absolute;
-  top: 52px;
+  top: 18px;
   left: 15px;
   width: 150px;
   height: 15px;
@@ -60,7 +225,7 @@ canvas {
 
 #status {
   position: absolute;
-  top: 75px;
+  top: 42px;
   left: 15px;
   font-size: 12px;
 }
@@ -69,8 +234,8 @@ canvas {
   position: absolute;
   top: 15px;
   right: 15px;
-  width: 105px;
-  height: 105px;
+  width: 100px;
+  height: 100px;
   border: 3px solid white;
   border-radius: 12px;
   background: #77b94c;
@@ -83,14 +248,14 @@ canvas {
   height: 9px;
   border-radius: 50%;
   background: red;
-  left: 48px;
-  top: 48px;
+  left: 45px;
+  top: 45px;
 }
 
 #joystick {
   position: absolute;
-  bottom: 28px;
-  left: 25px;
+  bottom: 25px;
+  left: 22px;
   width: 125px;
   height: 125px;
   border-radius: 50%;
@@ -112,8 +277,8 @@ canvas {
 
 #action {
   position: absolute;
-  bottom: 42px;
-  right: 28px;
+  bottom: 40px;
+  right: 25px;
   width: 82px;
   height: 82px;
   border-radius: 50%;
@@ -121,9 +286,19 @@ canvas {
   background: #ed5946;
   color: white;
   font-weight: bold;
-  font-size: 14px;
   pointer-events: auto;
-  box-shadow: 0 4px 0 #9e3027;
+}
+
+#backLobby {
+  position: absolute;
+  top: 15px;
+  left: 175px;
+  padding: 9px;
+  border: 1px solid white;
+  border-radius: 8px;
+  background: #173b58dd;
+  color: white;
+  pointer-events: auto;
 }
 
 #message {
@@ -134,22 +309,61 @@ canvas {
   font-size: 20px;
   font-weight: bold;
   opacity: 0;
-  transition: opacity .2s;
+}
+
+@media (max-width: 420px) {
+  #logo { font-size: 14px; }
+  .currency { font-size: 10px; padding: 7px 5px; }
+  .menuButton { width: 100px; }
 }
 </style>
 </head>
 
 <body>
 
-<div id="hud">
-  <div id="logo">MINI SKY BATTLE</div>
-  <div id="health"><div id="healthBar"></div></div>
-  <div id="status">VIDA 100%</div>
-
-  <div id="minimap">
-    <div id="mapPlayer"></div>
+<!-- LOBBY -->
+<div id="lobby">
+  <div id="topbar">
+    <div id="logo">MINI SKY BATTLE</div>
+    <div id="currencies">
+      <div class="currency">🪙 1.000</div>
+      <div class="currency">💎 250</div>
+    </div>
   </div>
 
+  <div id="profile">
+    <strong>👤 JOGADOR</strong>
+    Nível 1 · Recruta
+  </div>
+
+  <div id="sideButtons">
+    <button class="menuButton" data-menu="PERSONAGENS">👤 PERSONAGENS</button>
+    <button class="menuButton" data-menu="LOJA">🛒 LOJA</button>
+    <button class="menuButton" data-menu="EVENTOS">🎁 EVENTOS</button>
+    <button class="menuButton" data-menu="CONFIGURAÇÕES">⚙️ AJUSTES</button>
+  </div>
+
+  <div id="subtitle">PREPARE-SE PARA A BATALHA!</div>
+
+  <div id="bottomLobby">
+    <button id="playButton">▶ JOGAR</button>
+  </div>
+
+  <div id="popup">
+    <div id="popupBox">
+      <div id="popupTitle">MENU</div>
+      <div id="popupText">Em breve!</div>
+      <button id="closePopup">VOLTAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- INTERFACE DA PARTIDA -->
+<div id="gameHUD">
+  <div id="health"><div id="healthBar"></div></div>
+  <div id="status">VIDA 100%</div>
+  <div id="minimap"><div id="mapPlayer"></div></div>
+  <button id="backLobby">← LOBBY</button>
   <div id="message">AÇÃO!</div>
 
   <div id="joystick">
@@ -168,20 +382,13 @@ scene.background = new THREE.Color(0x9bd8f2);
 scene.fog = new THREE.Fog(0x9bd8f2, 45, 100);
 
 const camera = new THREE.PerspectiveCamera(
-  55,
-  innerWidth / innerHeight,
-  0.1,
-  200
+  55, innerWidth / innerHeight, 0.1, 200
 );
 
-const renderer = new THREE.WebGLRenderer({
-  antialias: true
-});
-
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(innerWidth, innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1.7));
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 document.body.appendChild(renderer.domElement);
 
@@ -193,54 +400,30 @@ sun.castShadow = true;
 sun.shadow.mapSize.set(1024, 1024);
 scene.add(sun);
 
-// MATERIAIS
-function material(color) {
-  return new THREE.MeshStandardMaterial({
-    color,
-    roughness: 0.9
-  });
+function mat(color) {
+  return new THREE.MeshStandardMaterial({ color, roughness: 0.9 });
 }
 
-const grass = material(0x78c653);
-const darkGrass = material(0x68b647);
-const brown = material(0x80502e);
-const leaves = material(0x238c43);
-const leaves2 = material(0x35a94c);
-const white = material(0xffffff);
-const roadMat = material(0xb6aa8e);
+const grass = mat(0x78c653);
+const brown = mat(0x80502e);
+const leaves = mat(0x238c43);
+const leaves2 = mat(0x35a94c);
 
-// CHÃO
+// TERRENO
 const ground = new THREE.Mesh(
-  new THREE.PlaneGeometry(90, 90),
-  grass
+  new THREE.PlaneGeometry(90, 90), grass
 );
 ground.rotation.x = -Math.PI / 2;
 ground.receiveShadow = true;
 scene.add(ground);
 
-// MANCHAS DE GRAMA
-for (let i = 0; i < 65; i++) {
-  const patch = new THREE.Mesh(
-    new THREE.CircleGeometry(0.5 + Math.random() * 1.5, 8),
-    darkGrass
-  );
-  patch.rotation.x = -Math.PI / 2;
-  patch.position.set(
-    Math.random() * 75 - 37.5,
-    0.015,
-    Math.random() * 75 - 37.5
-  );
-  scene.add(patch);
-}
-
 // ESTRADAS
 function road(x, z, w, h) {
   const obj = new THREE.Mesh(
     new THREE.BoxGeometry(w, 0.08, h),
-    roadMat
+    mat(0xb6aa8e)
   );
   obj.position.set(x, 0.045, z);
-  obj.receiveShadow = true;
   scene.add(obj);
 }
 
@@ -260,8 +443,7 @@ function tree(x, z, scale = 1) {
   group.add(trunk);
 
   const crown = new THREE.Mesh(
-    new THREE.IcosahedronGeometry(1, 1),
-    leaves
+    new THREE.IcosahedronGeometry(1, 1), leaves
   );
   crown.position.y = 2;
   crown.scale.set(1.1, 1.15, 1.1);
@@ -269,11 +451,9 @@ function tree(x, z, scale = 1) {
   group.add(crown);
 
   const crown2 = new THREE.Mesh(
-    new THREE.IcosahedronGeometry(0.7, 1),
-    leaves2
+    new THREE.IcosahedronGeometry(0.7, 1), leaves2
   );
   crown2.position.set(0.45, 2.25, 0.1);
-  crown2.castShadow = true;
   group.add(crown2);
 
   group.position.set(x, 0, z);
@@ -287,79 +467,52 @@ function house(x, z, color) {
 
   const walls = new THREE.Mesh(
     new THREE.BoxGeometry(3.5, 2.2, 3),
-    material(color)
+    mat(color)
   );
   walls.position.y = 1.1;
   walls.castShadow = true;
-  walls.receiveShadow = true;
   group.add(walls);
 
   const roof = new THREE.Mesh(
     new THREE.ConeGeometry(2.65, 1.7, 4),
-    material(0xa74632)
+    mat(0xa74632)
   );
   roof.position.y = 3;
   roof.rotation.y = Math.PI / 4;
-  roof.castShadow = true;
   group.add(roof);
 
   const door = new THREE.Mesh(
     new THREE.BoxGeometry(0.7, 1.3, 0.1),
-    material(0x65402a)
+    mat(0x65402a)
   );
   door.position.set(0, 0.65, 1.56);
   group.add(door);
-
-  const windowMat = material(0x8bdcf4);
-
-  for (const side of [-1, 1]) {
-    const window = new THREE.Mesh(
-      new THREE.BoxGeometry(0.65, 0.65, 0.1),
-      windowMat
-    );
-    window.position.set(side * 1.05, 1.35, 1.56);
-    group.add(window);
-  }
 
   group.position.set(x, 0, z);
   scene.add(group);
 }
 
-// CAIXAS
-function crate(x, z) {
-  const box = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 1, 1),
-    material(0xb77a36)
-  );
-  box.position.set(x, 0.5, z);
-  box.castShadow = true;
-  scene.add(box);
-
-  const stripe = new THREE.Mesh(
-    new THREE.BoxGeometry(1.03, 0.15, 1.03),
-    material(0x68421f)
-  );
-  stripe.position.set(x, 0.5, z);
-  scene.add(stripe);
-}
-
-// DISTRIBUIÇÃO DO MAPA
-const trees = [
+[
   [-13,-12],[-17,-5],[-14,7],[-19,15],
   [13,-15],[18,-8],[15,8],[20,16],
   [-27,-22],[-25,20],[27,22],[28,-23],
   [-8,28],[9,29],[-30,0],[31,0]
-];
-
-trees.forEach((p, i) =>
-  tree(p[0], p[1], 0.85 + (i % 3) * 0.12)
-);
+].forEach((p, i) => tree(p[0], p[1], 0.9 + (i % 3) * 0.1));
 
 house(-12, 2, 0xf1d5a0);
 house(12, -3, 0xe8b7a0);
 house(-23, -12, 0xd5e3ef);
 house(23, 13, 0xf2d48b);
 
+// CAIXAS
+function crate(x, z) {
+  const box = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 1, 1), mat(0xb77a36)
+  );
+  box.position.set(x, 0.5, z);
+  box.castShadow = true;
+  scene.add(box);
+}
 crate(-5, -7);
 crate(6, 8);
 crate(16, -13);
@@ -367,90 +520,111 @@ crate(-17, 12);
 
 // PERSONAGEM
 const player = new THREE.Group();
-
-const skin = material(0xffc28c);
-const shirt = material(0x2678df);
-const pants = material(0x303d59);
-const shoes = material(0x242424);
+const skin = mat(0xffc28c);
+const shirt = mat(0x2678df);
+const pants = mat(0x303d59);
 
 const body = new THREE.Mesh(
-  new THREE.CapsuleGeometry(0.42, 0.55, 4, 8),
-  shirt
+  new THREE.CapsuleGeometry(0.42, 0.55, 4, 8), shirt
 );
 body.position.y = 1.05;
 body.castShadow = true;
 player.add(body);
 
 const head = new THREE.Mesh(
-  new THREE.SphereGeometry(0.38, 16, 12),
-  skin
+  new THREE.SphereGeometry(0.38, 16, 12), skin
 );
 head.position.y = 1.85;
-head.castShadow = true;
 player.add(head);
 
 const hair = new THREE.Mesh(
   new THREE.SphereGeometry(0.39, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.5),
-  material(0x49301e)
+  mat(0x49301e)
 );
 hair.position.y = 2.02;
 player.add(hair);
 
 for (const side of [-1, 1]) {
   const leg = new THREE.Mesh(
-    new THREE.BoxGeometry(0.25, 0.55, 0.3),
-    pants
+    new THREE.BoxGeometry(0.25, 0.55, 0.3), pants
   );
   leg.position.set(side * 0.2, 0.35, 0);
   player.add(leg);
 
-  const shoe = new THREE.Mesh(
-    new THREE.BoxGeometry(0.3, 0.16, 0.4),
-    shoes
-  );
-  shoe.position.set(side * 0.2, 0.08, 0.04);
-  player.add(shoe);
-
   const arm = new THREE.Mesh(
-    new THREE.CapsuleGeometry(0.13, 0.45, 4, 6),
-    skin
+    new THREE.CapsuleGeometry(0.13, 0.45, 4, 6), skin
   );
   arm.position.set(side * 0.52, 1.1, 0);
-  arm.rotation.z = side * -0.15;
   player.add(arm);
 }
 
 player.position.set(0, 0, 5);
 scene.add(player);
 
-// SOMBRA DO PERSONAGEM
-const shadow = new THREE.Mesh(
-  new THREE.CircleGeometry(0.65, 20),
-  new THREE.MeshBasicMaterial({
-    color: 0x31532c,
-    transparent: true,
-    opacity: 0.3
-  })
-);
-shadow.rotation.x = -Math.PI / 2;
-shadow.position.y = 0.035;
-player.add(shadow);
+// CÂMERA
+camera.position.set(0, 17, 20);
+camera.lookAt(0, 1, 0);
 
-// CONTROLES
+// ESTADO DO JOGO
+let gameStarted = false;
 let moveX = 0;
 let moveY = 0;
 let joyActive = false;
 
+const lobby = document.getElementById("lobby");
+const hud = document.getElementById("gameHUD");
+
+document.getElementById("playButton").addEventListener("click", () => {
+  gameStarted = true;
+  lobby.style.display = "none";
+  hud.style.display = "block";
+  player.position.set(0, 0, 5);
+});
+
+document.getElementById("backLobby").addEventListener("click", () => {
+  gameStarted = false;
+  lobby.style.display = "block";
+  hud.style.display = "none";
+  stopJoystick();
+  camera.position.set(
+    player.position.x,
+    17,
+    player.position.z + 20
+  );
+});
+
+// MENUS
+const popup = document.getElementById("popup");
+
+document.querySelectorAll(".menuButton").forEach(button => {
+  button.addEventListener("click", () => {
+    const name = button.dataset.menu;
+    document.getElementById("popupTitle").textContent = name;
+
+    const descriptions = {
+      PERSONAGENS: "Escolha seu personagem. Novos visuais chegarão em breve!",
+      LOJA: "A loja do MINI SKY BATTLE está em desenvolvimento.",
+      EVENTOS: "Em breve teremos eventos e recompensas!",
+      "CONFIGURAÇÕES": "Configurações de áudio e controles chegarão em breve."
+    };
+
+    document.getElementById("popupText").textContent = descriptions[name];
+    popup.style.display = "flex";
+  });
+});
+
+document.getElementById("closePopup").addEventListener("click", () => {
+  popup.style.display = "none";
+});
+
+// JOYSTICK
 const joystick = document.getElementById("joystick");
 const stick = document.getElementById("stick");
 
 function updateJoystick(e) {
   const rect = joystick.getBoundingClientRect();
-  const cx = rect.left + rect.width / 2;
-  const cy = rect.top + rect.height / 2;
-
-  let dx = e.clientX - cx;
-  let dy = e.clientY - cy;
+  let dx = e.clientX - (rect.left + rect.width / 2);
+  let dy = e.clientY - (rect.top + rect.height / 2);
 
   const max = 38;
   const length = Math.hypot(dx, dy);
@@ -490,23 +664,17 @@ joystick.addEventListener("pointercancel", stopJoystick);
 
 // TECLADO
 const keys = {};
-
 addEventListener("keydown", e => keys[e.key.toLowerCase()] = true);
 addEventListener("keyup", e => keys[e.key.toLowerCase()] = false);
 
-// BOTÃO DE AÇÃO
-const message = document.getElementById("message");
-
+// AÇÃO
 document.getElementById("action").addEventListener("pointerdown", () => {
+  const message = document.getElementById("message");
   message.style.opacity = 1;
   setTimeout(() => message.style.opacity = 0, 350);
 });
 
-// CÂMERA
-camera.position.set(0, 17, 20);
-camera.lookAt(0, 0, 0);
-
-// MOVIMENTAÇÃO
+// ANIMAÇÃO
 const clock = new THREE.Clock();
 
 function animate() {
@@ -514,66 +682,55 @@ function animate() {
 
   const delta = Math.min(clock.getDelta(), 0.04);
 
-  let x = moveX;
-  let z = moveY;
+  if (gameStarted) {
+    let x = moveX;
+    let z = moveY;
 
-  if (keys["w"] || keys["arrowup"]) z -= 1;
-  if (keys["s"] || keys["arrowdown"]) z += 1;
-  if (keys["a"] || keys["arrowleft"]) x -= 1;
-  if (keys["d"] || keys["arrowright"]) x += 1;
+    if (keys["w"] || keys["arrowup"]) z -= 1;
+    if (keys["s"] || keys["arrowdown"]) z += 1;
+    if (keys["a"] || keys["arrowleft"]) x -= 1;
+    if (keys["d"] || keys["arrowright"]) x += 1;
 
-  const length = Math.hypot(x, z);
+    const length = Math.hypot(x, z);
 
-  if (length > 0) {
-    x /= length;
-    z /= length;
+    if (length > 0) {
+      x /= length;
+      z /= length;
 
-    player.position.x += x * 7 * delta;
-    player.position.z += z * 7 * delta;
+      player.position.x += x * 7 * delta;
+      player.position.z += z * 7 * delta;
+      player.rotation.y = Math.atan2(x, z);
+    }
 
-    player.rotation.y = Math.atan2(x, z);
+    player.position.x = THREE.MathUtils.clamp(player.position.x, -40, 40);
+    player.position.z = THREE.MathUtils.clamp(player.position.z, -40, 40);
+
+    camera.position.lerp(
+      new THREE.Vector3(
+        player.position.x,
+        17,
+        player.position.z + 20
+      ), 0.08
+    );
+
+    camera.lookAt(player.position.x, 0, player.position.z);
+
+    document.getElementById("mapPlayer").style.left =
+      THREE.MathUtils.clamp(45 + player.position.x, 2, 90) + "px";
+
+    document.getElementById("mapPlayer").style.top =
+      THREE.MathUtils.clamp(45 + player.position.z, 2, 90) + "px";
+  } else {
+    // Personagem em destaque no lobby
+    player.rotation.y = Math.sin(performance.now() * 0.0005) * 0.12;
+    camera.lookAt(0, 1, 0);
   }
-
-  // LIMITES DO MAPA
-  player.position.x = THREE.MathUtils.clamp(
-    player.position.x, -40, 40
-  );
-
-  player.position.z = THREE.MathUtils.clamp(
-    player.position.z, -40, 40
-  );
-
-  // CÂMERA SEGUE O JOGADOR
-  const targetCamera = new THREE.Vector3(
-    player.position.x,
-    player.position.y + 17,
-    player.position.z + 20
-  );
-
-  camera.position.lerp(targetCamera, 0.08);
-
-  camera.lookAt(
-    player.position.x,
-    0,
-    player.position.z
-  );
-
-  // MINIMAPA
-  const mapX = 48 + player.position.x * 1.05;
-  const mapY = 48 + player.position.z * 1.05;
-
-  document.getElementById("mapPlayer").style.left =
-    THREE.MathUtils.clamp(mapX, 3, 93) + "px";
-
-  document.getElementById("mapPlayer").style.top =
-    THREE.MathUtils.clamp(mapY, 3, 93) + "px";
 
   renderer.render(scene, camera);
 }
 
 animate();
 
-// REDIMENSIONAMENTO
 addEventListener("resize", () => {
   camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();
