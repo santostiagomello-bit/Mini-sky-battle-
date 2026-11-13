@@ -5,524 +5,526 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>MINI SKY BATTLE</title>
+
 <style>
-*{box-sizing:border-box;touch-action:none}
-body{margin:0;overflow:hidden;background:#111;font-family:Arial;color:white}
-canvas{display:block}
-#lobby,#gameover{position:fixed;inset:0;background:linear-gradient(#172b49,#263d52,#101820);z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-h1{font-size:34px;color:#a77cff;text-shadow:0 0 15px #7c35ff}
-button{border:0;border-radius:12px;padding:13px 20px;background:#713cff;color:white;font-weight:bold;font-size:15px}
-#start{font-size:20px;padding:17px 45px;margin-top:25px}
-#hud{display:none;position:fixed;inset:0;pointer-events:none}
-.panel{background:#111b;color:white;border:1px solid #ffffff55;border-radius:9px;padding:7px}
-#top{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;align-items:flex-start}
-#map{width:105px;height:105px;background:#1e392a;border:2px solid white;border-radius:8px}
-#controls{position:absolute;bottom:15px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:end}
-#stick{width:120px;height:120px;border:2px solid #ffffff77;background:#ffffff20;border-radius:50%;pointer-events:auto;position:relative}
-#knob{width:45px;height:45px;background:#a77cff;border-radius:50%;position:absolute;left:36px;top:36px}
-#rightControls{display:flex;gap:9px;align-items:end;pointer-events:auto}
-.control{width:65px;height:65px;border-radius:50%;background:#6334c9;border:2px solid #ffffff77;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold}
-#fire{width:78px;height:78px;background:#d94b43}
-#aim{width:85px;height:85px;border:2px dashed #ffffff99;border-radius:50%;pointer-events:auto;position:absolute;right:105px;bottom:105px}
-#aim:after{content:"MIRA";position:absolute;inset:0;display:grid;place-items:center;font-size:11px}
-#jump{position:absolute;top:48%;left:50%;transform:translate(-50%,-50%);pointer-events:auto;display:none}
-#pickup{position:absolute;bottom:155px;left:50%;transform:translateX(-50%);pointer-events:auto;display:none}
-#heal{pointer-events:auto}
-#slots{position:absolute;top:125px;left:8px;display:flex;gap:5px;pointer-events:auto}
-.slot{background:#171717dd;border:1px solid #aaa;border-radius:7px;padding:8px;font-size:11px}
-#loot{display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:85%;max-width:310px;background:#17202bee;border:2px solid #a77cff;border-radius:12px;padding:14px;pointer-events:auto}
-.lootrow{display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #ffffff33}
-#message{position:absolute;top:43%;width:100%;text-align:center;text-shadow:0 2px 5px black;font-weight:bold}
-#gameover{display:none}
-@media(orientation:portrait){#rotate{display:flex}}
-#rotate{display:none;position:fixed;inset:0;background:#101820;z-index:30;align-items:center;justify-content:center;text-align:center;padding:30px}
+*{
+ box-sizing:border-box;
+ touch-action:manipulation;
+}
+html,body{
+ margin:0;
+ width:100%;
+ height:100%;
+ overflow:hidden;
+ font-family:Arial,sans-serif;
+ background:#101522;
+ color:white;
+}
+button{cursor:pointer}
+
+/* LOBBY */
+#lobby{
+ position:fixed;
+ inset:0;
+ overflow:hidden;
+ background:
+ radial-gradient(ellipse at 60% 55%,#49516b 0%,transparent 48%),
+ linear-gradient(115deg,#101827,#28334a 60%,#111725);
+}
+#lobby:before{
+ content:"";
+ position:absolute;
+ inset:0;
+ background:linear-gradient(90deg,#101827dd 0%,transparent 75%);
+}
+.logo{
+ position:absolute;
+ top:7%;
+ left:5%;
+ z-index:3;
+ font-size:clamp(23px,4vw,43px);
+ font-weight:1000;
+ letter-spacing:2px;
+ text-shadow:0 0 15px #8e4cff;
+}
+.logo span{color:#ae79ff}
+.subtitle{
+ position:absolute;
+ top:17%;
+ left:5%;
+ z-index:3;
+ font-size:clamp(9px,1.5vw,14px);
+ letter-spacing:3px;
+ color:#c4c8d5;
+}
+#play{
+ position:absolute;
+ z-index:5;
+ top:5%;
+ left:5%;
+ margin-top:65px;
+ padding:14px 35px;
+ border:2px solid #d6baff;
+ border-radius:7px;
+ background:linear-gradient(100deg,#7138cf,#a34bff);
+ color:white;
+ font-size:17px;
+ font-weight:bold;
+ box-shadow:0 0 22px #8d43ff88;
+}
+#play:active{transform:scale(.95)}
+
+#character{
+ position:absolute;
+ z-index:2;
+ left:52%;
+ bottom:-5%;
+ width:clamp(180px,32vw,330px);
+ height:88%;
+ transform:translateX(-50%);
+ filter:drop-shadow(0 0 20px #9b4dff33);
+}
+.glow{
+ position:absolute;
+ bottom:0;
+ left:-25%;
+ width:150%;
+ height:30%;
+ background:radial-gradient(ellipse,#9b4dff55,transparent 70%);
+}
+.body{
+ position:absolute;
+ left:16%;
+ bottom:0;
+ width:68%;
+ height:65%;
+ border-radius:35% 35% 12% 12%;
+ background:linear-gradient(100deg,#10111a,#292636,#10111a);
+ border:3px solid #393046;
+}
+.body:after{
+ content:"";
+ position:absolute;
+ top:25%;
+ left:-9%;
+ width:118%;
+ height:12%;
+ background:#171521;
+ border:2px solid #8b43ed;
+ border-radius:14px;
+ box-shadow:0 0 12px #9d4cff;
+}
+.head{
+ position:absolute;
+ z-index:3;
+ left:24%;
+ top:7%;
+ width:52%;
+ height:34%;
+ border-radius:48% 48% 42% 42%;
+ background:#17151f;
+ border:4px solid #8e43ef;
+ box-shadow:0 0 20px #8e43ef;
+}
+.hood{
+ position:absolute;
+ z-index:2;
+ left:15%;
+ top:0;
+ width:70%;
+ height:40%;
+ border:9px solid #292131;
+ border-radius:50% 50% 35% 35%;
+}
+.face{
+ position:absolute;
+ z-index:4;
+ left:12%;
+ top:48%;
+ width:76%;
+ height:20%;
+ border-radius:50%;
+ background:linear-gradient(90deg,#6e31bd,#d0a4ff,#6e31bd);
+ box-shadow:0 0 14px #a95aff;
+}
+.arm{
+ position:absolute;
+ top:42%;
+ width:25%;
+ height:42%;
+ background:#17151f;
+ border:3px solid #55406d;
+ border-radius:30px;
+}
+.arm.left{left:0;transform:rotate(12deg)}
+.arm.right{right:0;transform:rotate(-12deg)}
+.leg{
+ position:absolute;
+ bottom:-2%;
+ width:29%;
+ height:31%;
+ background:#17151f;
+ border:3px solid #44334f;
+ border-radius:10px;
+}
+.leg.left{left:18%}
+.leg.right{right:18%}
+.stripe{
+ position:absolute;
+ z-index:5;
+ left:15%;
+ top:46%;
+ width:70%;
+ height:5px;
+ background:#a64cff;
+ box-shadow:0 0 12px #a64cff;
+}
+.info{
+ position:absolute;
+ z-index:3;
+ right:6%;
+ bottom:17%;
+ width:28%;
+ text-align:right;
+}
+.info h2{
+ font-size:clamp(17px,3vw,30px);
+ margin:0 0 8px;
+}
+.info p{
+ color:#c3c5d0;
+ font-size:clamp(10px,1.5vw,15px);
+ line-height:1.5;
+}
+.tag{
+ display:inline-block;
+ padding:7px 12px;
+ border:1px solid #a56aff;
+ color:#d9bdff;
+ border-radius:5px;
+ font-size:11px;
+}
+.bottom{
+ position:absolute;
+ z-index:3;
+ bottom:4%;
+ left:5%;
+ right:5%;
+ display:flex;
+ justify-content:space-between;
+ color:#aaa;
+ font-size:11px;
+}
+
+/* PARTIDA */
+#match{
+ display:none;
+ position:fixed;
+ inset:0;
+ overflow:hidden;
+ background:linear-gradient(#83c9ed,#c5e5d9 55%,#477a48);
+}
+#match h1{
+ position:absolute;
+ top:5%;
+ width:100%;
+ text-align:center;
+ text-shadow:0 2px 8px #333;
+ font-size:clamp(20px,3vw,30px);
+}
+#island{
+ position:absolute;
+ width:70vw;
+ height:65vh;
+ left:50%;
+ top:57%;
+ transform:translate(-50%,-50%);
+ border-radius:48%;
+ background:radial-gradient(ellipse,#6eaa50,#39763d 70%);
+ box-shadow:inset 0 0 45px #285c31,0 20px 45px #294c55;
+}
+.tree{
+ position:absolute;
+ width:24px;
+ height:35px;
+ border-radius:50%;
+ background:#205b31;
+ box-shadow:0 0 5px #174b29;
+}
+#plane{
+ position:absolute;
+ left:-20%;
+ top:35%;
+ width:130px;
+ height:38px;
+ border-radius:45%;
+ background:#343e52;
+ border:2px solid #a6aabb;
+ transform:rotate(8deg);
+ box-shadow:0 0 12px #2228;
+}
+#plane:before{
+ content:"";
+ position:absolute;
+ left:-20px;
+ top:12px;
+ width:170px;
+ height:12px;
+ background:#b5bac8;
+ border-radius:50%;
+}
+#plane:after{
+ content:"";
+ position:absolute;
+ right:5px;
+ top:-13px;
+ width:35px;
+ height:28px;
+ background:#7545c6;
+ clip-path:polygon(0 50%,100% 0,100% 100%);
+}
+#return{
+ position:absolute;
+ top:18px;
+ left:18px;
+ padding:12px 20px;
+ background:#7138cf;
+ color:white;
+ border:0;
+ border-radius:8px;
+ font-weight:bold;
+}
+#status{
+ position:absolute;
+ bottom:8%;
+ width:100%;
+ text-align:center;
+ font-weight:bold;
+ text-shadow:0 2px 5px black;
+}
+#jump{
+ display:none;
+ position:absolute;
+ bottom:18%;
+ left:50%;
+ transform:translateX(-50%);
+ padding:15px 30px;
+ border:0;
+ border-radius:10px;
+ background:#783ce0;
+ color:white;
+ font-weight:bold;
+ font-size:18px;
+}
+#player{
+ display:none;
+ position:absolute;
+ left:50%;
+ top:45%;
+ width:35px;
+ height:55px;
+ transform:translate(-50%,-50%);
+ border-radius:12px 12px 5px 5px;
+ background:#17151f;
+ border:2px solid #9d4cff;
+ box-shadow:0 0 15px #a64cff;
+}
+#player:before{
+ content:"";
+ position:absolute;
+ width:23px;
+ height:23px;
+ border-radius:50%;
+ background:#292131;
+ border:2px solid #a64cff;
+ left:4px;
+ top:-17px;
+}
+#rotate{
+ display:none;
+ position:fixed;
+ inset:0;
+ z-index:20;
+ background:#101622;
+ align-items:center;
+ justify-content:center;
+ text-align:center;
+ font-size:20px;
+ font-weight:bold;
+ padding:25px;
+}
+@media(orientation:portrait){
+ #rotate{display:flex}
+}
 </style>
 </head>
+
 <body>
 
-<div id="rotate">Gire o celular para jogar MINI SKY BATTLE na horizontal.</div>
-
-<div id="lobby">
-<h1>MINI SKY BATTLE</h1>
-<p>Uma pequena ideia, um grande mundo.</p>
-<div style="font-size:75px;margin:15px">🥷</div>
-<p>Prepare-se para saltar!</p>
-<button id="start">JOGAR</button>
-<p style="font-size:12px;color:#bbb">Versão de reconstrução</p>
+<div id="rotate">
+ GIRE O CELULAR PARA JOGAR MINI SKY BATTLE
 </div>
 
-<div id="gameover">
-<h1>FIM DE JOGO</h1>
-<p id="result">Você foi eliminado.</p>
-<button onclick="location.reload()">JOGAR NOVAMENTE</button>
-</div>
+<!-- LOBBY -->
+<section id="lobby">
 
-<div id="hud">
-<div id="top">
-<div class="panel">
-❤️ <span id="hp">100</span> |
-👥 <span id="alive">8</span> restantes
-<div id="phase">Preparando avião...</div>
-</div>
-<canvas id="map" width="105" height="105"></canvas>
-</div>
+ <div class="logo">
+  MINI <span>SKY</span> BATTLE
+ </div>
 
-<div id="slots">
-<div class="slot" id="slot0">🔫 Pistola<br>∞</div>
-<div class="slot" id="slot1">🔫 Rifle<br>0</div>
-<div class="slot" id="slot2">🩹 Kits: 0</div>
-</div>
+ <div class="subtitle">
+  UMA PEQUENA IDEIA, UM GRANDE MUNDO.
+ </div>
 
-<div id="message"></div>
-<button id="jump">🪂 SALTAR</button>
-<button id="pickup">PEGAR ITEM</button>
+ <button id="play">
+  JOGAR ▶
+ </button>
 
-<div id="controls">
-<div id="stick"><div id="knob"></div></div>
-<div id="rightControls">
-<button class="control" id="heal">CURA</button>
-<button class="control" id="fire">ATIRAR</button>
-</div>
-</div>
-<div id="aim"></div>
+ <div id="character">
+  <div class="glow"></div>
+  <div class="body"></div>
+  <div class="arm left"></div>
+  <div class="arm right"></div>
+  <div class="leg left"></div>
+  <div class="leg right"></div>
+  <div class="hood"></div>
+  <div class="head"></div>
+  <div class="face"></div>
+  <div class="stripe"></div>
+ </div>
 
-<div id="loot">
-<h3>🎒 LOOT DO INIMIGO</h3>
-<div id="lootitems"></div>
-<button onclick="closeLoot()" style="width:100%;margin-top:10px">FECHAR</button>
-</div>
-</div>
+ <div class="info">
+  <span class="tag">PERSONAGEM PRINCIPAL</span>
+  <h2>SHADOW ROXO</h2>
+  <p>
+   Prepare-se para entrar na batalha.
+   Explore a ilha e seja o último sobrevivente!
+  </p>
+ </div>
 
-<script type="module">
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+ <div class="bottom">
+  <span>MINI SKY BATTLE</span>
+  <span>VERSÃO DE TESTE</span>
+ </div>
 
-const $=id=>document.getElementById(id);
-const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x83c9ed);
-scene.fog=new THREE.Fog(0x83c9ed,45,115);
+</section>
 
-const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,300);
-const renderer=new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(innerWidth,innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
-renderer.shadowMap.enabled=true;
-document.body.appendChild(renderer.domElement);
+<!-- PARTIDA -->
+<section id="match">
 
-scene.add(new THREE.HemisphereLight(0xffffff,0x536b43,2));
-const sun=new THREE.DirectionalLight(0xffffff,2);
-sun.position.set(20,35,15);
-sun.castShadow=true;
-scene.add(sun);
+ <button id="return">← LOBBY</button>
 
-const mat=(color,roughness=0.85)=>new THREE.MeshStandardMaterial({color,roughness});
-const green=mat(0x477c42),dark=mat(0x20232e),purple=mat(0x813cff);
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(120,120),green);
-ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+ <h1>MINI SKY BATTLE</h1>
 
-const world=[];
-function box(x,y,z,sx,sy,sz,color){
- const m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),mat(color));
- m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;
- scene.add(m);world.push(m);return m;
-}
-function tree(x,z){
- const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.25,.35,2,7),mat(0x68452c));
- trunk.position.set(x,1,z);scene.add(trunk);
- const top=new THREE.Mesh(new THREE.ConeGeometry(1.4,3,7),mat(0x205c32));
- top.position.set(x,3.2,z);scene.add(top);
-}
-for(let i=0;i<90;i++){
- let x=(Math.random()-.5)*105,z=(Math.random()-.5)*105;
- if(Math.abs(x)<7&&Math.abs(z)<7)continue;
- if(Math.random()<.7)tree(x,z);
- else box(x,0.7,z,3,1.4,3,0x92734d);
-}
-for(let i=0;i<9;i++){
- let x=(Math.random()-.5)*85,z=(Math.random()-.5)*85;
- box(x,.8,z,5,1.6,4,0x8c9a9e);
- box(x,1.7,z,2,.2,4,0x59646b);
-}
+ <div id="island"></div>
 
-// Personagem cartunesco robusto
-function makeCharacter(color=0x171725){
- const g=new THREE.Group();
- const body=new THREE.Mesh(new THREE.BoxGeometry(.9,1.2,.55),mat(color));
- body.position.y=1.15;g.add(body);
- const head=new THREE.Mesh(new THREE.SphereGeometry(.43,12,10),mat(0xc89c79));
- head.position.y=2;g.add(head);
- const hood=new THREE.Mesh(new THREE.SphereGeometry(.49,12,10),mat(color));
- hood.position.y=2.12;hood.scale.set(1,1,.95);g.add(hood);
- const face=new THREE.Mesh(new THREE.BoxGeometry(.48,.18,.08),mat(0x9a6cff));
- face.position.set(0,1.98,.39);g.add(face);
- const legmat=mat(0x292635);
- for(let x of [-.25,.25]){
-  const leg=new THREE.Mesh(new THREE.BoxGeometry(.3,.75,.35),legmat);
-  leg.position.set(x,.4,0);g.add(leg);
- }
- const stripe=new THREE.Mesh(new THREE.BoxGeometry(.95,.07,.59),mat(0x9c54ff));
- stripe.position.y=1.5;g.add(stripe);
- g.userData={body,head};
- g.traverse(o=>{if(o.isMesh)o.castShadow=true});
- return g;
-}
-const player=makeCharacter(0x171525);
-player.position.set(0,0,0);
-scene.add(player);
+ <div id="plane"></div>
 
-// Paraquedas decorativo
-function parachute(character){
- const canopy=new THREE.Mesh(new THREE.SphereGeometry(1.7,14,8,0,Math.PI*2,0,Math.PI/2),mat(0x8c42ec));
- canopy.scale.set(1.2,.65,1);
- canopy.position.y=4.1;
- character.add(canopy);
- const cordmat=new THREE.LineBasicMaterial({color:0xffffff});
- for(let x of [-.8,.8]){
-  const points=[new THREE.Vector3(x,3.9,-.4),new THREE.Vector3(0,2.4,0)];
-  character.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),cordmat));
- }
-}
+ <div id="player"></div>
 
-// Avião
-const plane=new THREE.Group();
-const fuselage=new THREE.Mesh(new THREE.BoxGeometry(2,1,8),mat(0x333d52));
-plane.add(fuselage);
-const wings=new THREE.Mesh(new THREE.BoxGeometry(12,.25,2),mat(0x9a9da8));
-plane.add(wings);
-const tail=new THREE.Mesh(new THREE.BoxGeometry(4,.2,1.5),mat(0x713cff));
-tail.position.z=3.3;plane.add(tail);
-plane.position.set(0,23,-45);scene.add(plane);
+ <button id="jump">🪂 SALTAR</button>
 
-let started=false,jumped=false,gameEnded=false;
-let planeTime=0,health=100,kits=0,ammo=0,weapon="Pistola";
-let playerSpeed=0,moveX=0,moveY=0,aimX=0,aimZ=1;
-let lastShot=0;
-const bots=[],items=[],crates=[],shots=[];
-const playerParachute=parachute(player);
-playerParachute.visible=false;
+ <div id="status">AVIÃO EM PREPARAÇÃO...</div>
 
-// Sons sintetizados
-let audio;
-function sound(freq=300,duration=.09,type="sine",volume=.08){
- try{
-  audio ||= new (window.AudioContext||window.webkitAudioContext)();
-  if(audio.state==="suspended")audio.resume();
-  const osc=audio.createOscillator(),gain=audio.createGain();
-  osc.type=type;osc.frequency.value=freq;
-  gain.gain.setValueAtTime(volume,audio.currentTime);
-  gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+duration);
-  osc.connect(gain);gain.connect(audio.destination);
-  osc.start();osc.stop(audio.currentTime+duration);
- }catch(e){}
-}
-function lobbyMusic(){
- sound(220,.25,"sine",.04);
- setTimeout(()=>sound(330,.25,"sine",.035),250);
-}
-function say(t){$("message").textContent=t;setTimeout(()=>{if($("message").textContent===t)$("message").textContent=""},1800)}
+</section>
 
-const weaponColors={Pistola:0x999999,Rifle:0x35b6a5,Shotgun:0xd99b38,Blaster:0x9d4cff};
-function weaponModel(type,x,z){
- const g=new THREE.Group();
- const color=weaponColors[type]||0xffffff;
- const base=new THREE.Mesh(new THREE.BoxGeometry(.35,.25,1.2),mat(color));
- g.add(base);
- const barrel=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,.65,8),mat(0x20202a));
- barrel.rotation.x=Math.PI/2;barrel.position.z=-.7;g.add(barrel);
- if(type==="Blaster"){
-  const glow=new THREE.Mesh(new THREE.SphereGeometry(.22,8,8),mat(0xb66bff));
-  glow.position.y=.2;g.add(glow);
- }
- g.position.set(x,.55,z);scene.add(g);
- return g;
-}
-function spawnItem(type,x,z){
- const mesh=weaponModel(type,x,z);
- mesh.userData={type};
- items.push({mesh,type,x,z});
-}
-for(let i=0;i<24;i++){
- const types=["Rifle","Shotgun","Blaster","Pistola","Munição","Kit médico"];
- const type=types[Math.floor(Math.random()*types.length)];
- spawnItem(type,(Math.random()-.5)*90,(Math.random()-.5)*90);
-}
+<script>
+const lobby=document.getElementById("lobby");
+const match=document.getElementById("match");
+const play=document.getElementById("play");
+const returnButton=document.getElementById("return");
+const plane=document.getElementById("plane");
+const jump=document.getElementById("jump");
+const statusText=document.getElementById("status");
+const player=document.getElementById("player");
 
-function spawnBot(i){
- const bot=makeCharacter([0x395b9c,0x9b4939,0x477b53,0xb18b35][i%4]);
- const x=(Math.random()-.5)*75,z=(Math.random()-.5)*75;
- bot.position.set(x,Math.random()*12+5,z);
- scene.add(bot);
- const chute=parachute(bot);
- bots.push({mesh:bot,chute,hp:100,alive:true,landed:false,
-  x,z,target:null,nextShot:Math.random()*3,loot:null});
-}
-for(let i=0;i<7;i++)spawnBot(i);
+let started=false;
+let jumped=false;
+let planePosition=-20;
 
-function makeLoot(bot){
- const loot=[
-  {type:"Munição",amount:Math.floor(Math.random()*35)+15},
-  {type:["Rifle","Shotgun","Blaster"][Math.floor(Math.random()*3)],amount:1},
-  {type:"Kit médico",amount:Math.random()<.6?1:2}
- ];
- const chest=box(bot.mesh.position.x,.35,bot.mesh.position.z,.9,.6,.9,0x9a6634);
- chest.material=mat(0xa66a37);
- crates.push({mesh:chest,loot});
- bot.loot=chest;
-}
-
-function landPlayer(){
- jumped=true;playerParachute.visible=true;
- $("jump").style.display="none";
- say("Pousando! Prepare-se!");
-}
-function dropBot(bot){
- bot.chute.visible=true;
- bot.landed=false;
- bot.target=new THREE.Vector3((Math.random()-.5)*80,0,(Math.random()-.5)*80);
-}
 function startGame(){
  if(started)return;
+
  started=true;
- $("lobby").style.display="none";
- $("hud").style.display="block";
- player.visible=false;
- planeTime=0;
- sound(180,.4,"sawtooth");
-}
-$("start").onclick=()=>{lobbyMusic();startGame()};
+ jumped=false;
 
-$("jump").onclick=()=>{if(!jumped)landPlayer()};
+ lobby.style.display="none";
+ match.style.display="block";
 
-// Controles
-const stick=$("stick"),knob=$("knob");
-let stickOn=false,stickId=null;
-function stickMove(e){
- const r=stick.getBoundingClientRect();
- let dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2;
- const len=Math.hypot(dx,dy),max=38;
- if(len>max){dx=dx/len*max;dy=dy/len*max}
- knob.style.left=(36+dx)+"px";knob.style.top=(36+dy)+"px";
- moveX=dx/max;moveY=dy/max;
-}
-stick.addEventListener("pointerdown",e=>{stickOn=true;stickId=e.pointerId;stick.setPointerCapture(e.pointerId);stickMove(e)});
-stick.addEventListener("pointermove",e=>{if(stickOn&&e.pointerId===stickId)stickMove(e)});
-function resetStick(){stickOn=false;moveX=moveY=0;knob.style.left="36px";knob.style.top="36px"}
-stick.addEventListener("pointerup",resetStick);
-stick.addEventListener("pointercancel",resetStick);
+ planePosition=-20;
+ plane.style.left=planePosition+"%";
 
-// Mira manual
-const aim=$("aim");
-let aiming=false;
-aim.addEventListener("pointerdown",e=>{aiming=true;aim.setPointerCapture(e.pointerId);updateAim(e)});
-aim.addEventListener("pointermove",e=>{if(aiming)updateAim(e)});
-aim.addEventListener("pointerup",()=>aiming=false);
-aim.addEventListener("pointercancel",()=>aiming=false);
-function updateAim(e){
- const r=aim.getBoundingClientRect();
- let dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2;
- if(Math.hypot(dx,dy)>8){aimX=dx;aimZ=dy;let l=Math.hypot(aimX,aimZ);aimX/=l;aimZ/=l}
+ jump.style.display="block";
+ player.style.display="none";
+
+ statusText.textContent="AVIÃO EM PREPARAÇÃO...";
 }
 
-function shoot(){
- if(!started||!jumped||!player.visible||gameEnded)return;
- const now=performance.now();
- if(now-lastShot<350)return;
- lastShot=now;
- sound(150,.12,"sawtooth",.08);
- const origin=player.position.clone();origin.y+=1.4;
- const direction=new THREE.Vector3(aimX,0,aimZ).normalize();
- const shot=new THREE.Mesh(new THREE.SphereGeometry(.13,7,7),mat(0xffe08a));
- shot.position.copy(origin);scene.add(shot);
- shots.push({mesh:shot,dir:direction,life:0});
-}
-$("fire").addEventListener("pointerdown",e=>{e.preventDefault();shoot()});
+function returnLobby(){
+ started=false;
+ jumped=false;
 
-$("heal").onclick=()=>{
- if(kits>0&&health<100){kits--;health=Math.min(100,health+35);sound(500,.25);updateHUD()}
- else say("Sem kits médicos!");
-};
+ match.style.display="none";
+ lobby.style.display="block";
 
-function updateHUD(){
- $("hp").textContent=Math.max(0,Math.floor(health));
- $("alive").textContent=1+bots.filter(b=>b.alive).length;
- $("slot0").innerHTML="🔫 "+weapon+"<br>"+(weapon==="Pistola"?"∞":ammo);
- $("slot1").innerHTML="🔫 "+(weapon==="Pistola"?"Rifle":"Blaster")+"<br>"+ammo;
- $("slot2").innerHTML="🩹 Kits: "+kits;
-}
-$("slot0").onclick=()=>{weapon="Pistola";updateHUD()};
-$("slot1").onclick=()=>{weapon="Rifle";updateHUD()};
+ jump.style.display="none";
+ player.style.display="none";
 
-// Coleta de item próximo
-function nearestPickup(){
- let best=null,dist=3.4;
- for(const item of items){
-  if(!item.mesh.visible)continue;
-  const d=player.position.distanceTo(item.mesh.position);
-  if(d<dist){dist=d;best=item}
- }
- for(const c of crates){
-  if(!c.mesh.visible)continue;
-  const d=player.position.distanceTo(c.mesh.position);
-  if(d<dist){dist=d;best=c}
- }
- return best;
-}
-$("pickup").onclick=()=>{
- const obj=nearestPickup();if(!obj)return;
- if(obj.loot){
-  openLoot(obj);return;
- }
- if(obj.type==="Munição")ammo+=25;
- else if(obj.type==="Kit médico")kits++;
- else {weapon=obj.type;ammo+=20}
- obj.mesh.visible=false;
- sound(650,.1,"sine");
- say("Item coletado!");
- updateHUD();
-};
-
-function openLoot(crate){
- $("loot").style.display="block";
- const list=$("lootitems");list.innerHTML="";
- crate.loot.forEach((item,index)=>{
-  const row=document.createElement("div");row.className="lootrow";
-  const name=document.createElement("span");
-  name.textContent=item.type+" x"+item.amount;
-  const btn=document.createElement("button");btn.textContent="PEGAR";
-  btn.onclick=()=>{
-   if(item.type==="Munição")ammo+=item.amount;
-   else if(item.type==="Kit médico")kits+=item.amount;
-   else weapon=item.type;
-   crate.loot.splice(index,1);
-   sound(650,.1);updateHUD();closeLoot();
-   if(crate.loot.length===0)crate.mesh.visible=false;
-  };
-  row.append(name,btn);list.append(row);
- });
-}
-function closeLoot(){$("loot").style.display="none"}
-window.closeLoot=closeLoot;
-
-// Mini mapa
-const map=$("map"),ctx=map.getContext("2d");
-function drawMap(){
- ctx.clearRect(0,0,105,105);
- ctx.fillStyle="#35643c";ctx.fillRect(0,0,105,105);
- function dot(x,z,color){
-  ctx.fillStyle=color;ctx.beginPath();
-  ctx.arc(52.5+x/120*105,52.5+z/120*105,3,0,Math.PI*2);ctx.fill();
- }
- for(const b of bots)if(b.alive)dot(b.mesh.position.x,b.mesh.position.z,"red");
- for(const item of items)if(item.mesh.visible)dot(item.x,item.z,"yellow");
- if(player.visible)dot(player.position.x,player.position.z,"white");
+ statusText.textContent="AVIÃO EM PREPARAÇÃO...";
 }
 
-// Loop
-const clock=new THREE.Clock();
-const cameraOffset=new THREE.Vector3(0,8,12);
-function update(dt){
- if(!started||gameEnded)return;
- if(!jumped){
-  planeTime+=dt;
-  plane.position.z+=dt*10;
-  camera.position.lerp(new THREE.Vector3(plane.position.x,plane.position.y+8,plane.position.z+16),.06);
-  camera.lookAt(plane.position);
-  player.visible=false;
-  $("phase").textContent="Dentro do avião";
-  $("jump").style.display="block";
-  bots.forEach((b,i)=>{
-   if(!b.landed&&planeTime>2+i*1.2){
-    b.landed=true;dropBot(b);
-   }
-  });
-  if(planeTime>12&&!jumped){say("Salte do avião!");}
- }else{
-  if(!player.visible){
-   player.visible=true;player.position.set(plane.position.x,7,plane.position.z);
-   playerParachute.visible=true;
-  }
-  $("phase").textContent=player.position.y>1?"Descendo de paraquedas":"No solo";
-  if(player.position.y>0){
-   player.position.y=Math.max(0,player.position.y-dt*2.8);
-  }else{
-   playerParachute.visible=false;
-   const v=new THREE.Vector3(moveX,0,moveY);
-   if(v.length()>1)v.normalize();
-   player.position.x+=v.x*dt*8;
-   player.position.z+=v.z*dt*8;
-   player.position.x=THREE.MathUtils.clamp(player.position.x,-55,55);
-   player.position.z=THREE.MathUtils.clamp(player.position.z,-55,55);
-   if(v.length()>.1)player.rotation.y=Math.atan2(v.x,v.z);
-  }
-  camera.position.lerp(new THREE.Vector3(player.position.x,player.position.y+8,player.position.z+12),.09);
-  camera.lookAt(player.position.x,player.position.y+1,player.position.z);
- }
- // bots descem em locais aleatórios e caminham
- bots.forEach(b=>{
-  if(!b.alive)return;
-  if(b.mesh.position.y>0){
-   b.mesh.position.y=Math.max(0,b.mesh.position.y-dt*2.4);
-  }else{
-   b.chute.visible=false;
-   b.landed=true;
-   if(b.target){
-    const dx=b.target.x-b.mesh.position.x,dz=b.target.z-b.mesh.position.z;
-    const d=Math.hypot(dx,dz);
-    if(d>2){b.mesh.position.x+=dx/d*dt*2;b.mesh.position.z+=dz/d*dt*2}
-    else b.target=null;
-   }
-   if(player.visible&&player.position.distanceTo(b.mesh.position)<17){
-    b.nextShot-=dt;
-    if(b.nextShot<=0){
-     b.nextShot=1.5+Math.random()*2;
-     if(Math.random()<.35){health-=4;updateHUD();sound(90,.1,"square",.04)}
-    }
-   }
-   // Bots também disputam entre si, com efeitos fictícios
-   const other=bots.find(o=>o!==b&&o.alive&&o.mesh.position.distanceTo(b.mesh.position)<12);
-   if(other){
-    b.nextShot-=dt;
-    if(b.nextShot<=0){
-     b.nextShot=2;
-     if(Math.random()<.2){
-      other.hp-=20;
-      if(other.hp<=0){other.alive=false;other.mesh.visible=false;makeLoot(other)}
-     }
-    }
-   }
-  }
- });
- // Projéteis de energia
- for(let i=shots.length-1;i>=0;i--){
-  const s=shots[i];s.mesh.position.addScaledVector(s.dir,dt*24);s.life+=dt;
-  let hit=false;
-  for(const b of bots){
-   if(b.alive&&s.mesh.position.distanceTo(b.mesh.position.clone().add(new THREE.Vector3(0,1,0)))<1.1){
-    b.hp-=35;hit=true;
-    if(b.hp<=0){b.alive=false;b.mesh.visible=false;makeLoot(b);say("Inimigo eliminado!")}
-    break;
-   }
-  }
-  if(hit||s.life>1.5){scene.remove(s.mesh);shots.splice(i,1)}
- }
- // Botão de coleta só aparece perto de algo
- const near=player.visible&&jumped&&nearestPickup();
- $("pickup").style.display=near?"block":"none";
- if(health<=0){gameEnded=true;$("gameover").style.display="flex";$("hud").style.display="none"}
- updateHUD();drawMap();
+function jumpFromPlane(){
+ if(!started||jumped)return;
+
+ jumped=true;
+ jump.style.display="none";
+ player.style.display="block";
+
+ statusText.textContent="VOCÊ SALTOU!";
+
+ setTimeout(()=>{
+  statusText.textContent="VOCÊ ESTÁ NA ILHA!";
+ },2500);
 }
 
-function animate(){
+play.addEventListener("click",startGame);
+returnButton.addEventListener("click",returnLobby);
+jump.addEventListener("click",jumpFromPlane);
+
+// Movimento visual do avião
+let lastTime=0;
+
+function animate(time){
  requestAnimationFrame(animate);
- const dt=Math.min(clock.getDelta(),.04);
- update(dt);
- renderer.render(scene,camera);
-}
-animate();
 
-addEventListener("resize",()=>{
- camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
- renderer.setSize(innerWidth,innerHeight);
-});
+ if(!started||jumped)return;
+
+ if(time-lastTime>35){
+  lastTime=time;
+
+  planePosition+=0.12;
+
+  if(planePosition>110){
+   planePosition=-20;
+  }
+
+  plane.style.left=planePosition+"%";
+ }
+}
+
+requestAnimationFrame(animate);
+
+// Árvores decorativas na ilha
+const island=document.getElementById("island");
+
+for(let i=0;i<25;i++){
+ const tree=document.createElement("div");
+ tree.className="tree";
+ tree.style.left=(Math.random()*90+5)+"%";
+ tree.style.top=(Math.random()*80+10)+"%";
+ island.appendChild(tree);
+}
 </script>
+
 </body>
 </html>
