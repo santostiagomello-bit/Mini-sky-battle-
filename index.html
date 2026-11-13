@@ -908,6 +908,15 @@ function animate(){
     player.position.x += x*speed*delta;
     player.position.z += z*speed*delta;
 
+    // Impede o personagem de sair do mapa
+player.position.x = THREE.MathUtils.clamp(
+  player.position.x,-145,145
+);
+
+player.position.z = THREE.MathUtils.clamp(
+  player.position.z,-145,145
+);
+    
     if(moving){
       player.rotation.y = Math.atan2(x,z);
     }
