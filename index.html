@@ -7,378 +7,289 @@
 <title>MINI SKY BATTLE</title>
 
 <style>
-*{
- box-sizing:border-box;
- touch-action:manipulation;
-}
+*{box-sizing:border-box;touch-action:manipulation}
 html,body{
- margin:0;
- width:100%;
- height:100%;
- overflow:hidden;
- font-family:Arial,sans-serif;
- background:#101522;
- color:white;
+ margin:0;width:100%;height:100%;overflow:hidden;
+ font-family:Arial,sans-serif;background:#101522;color:white;
 }
-button{cursor:pointer}
+button{cursor:pointer;color:white;font-weight:bold}
+button:active{transform:scale(.95)}
+.hidden{display:none!important}
 
 /* LOBBY */
 #lobby{
- position:fixed;
- inset:0;
- overflow:hidden;
+ position:fixed;inset:0;overflow:hidden;
  background:
- radial-gradient(ellipse at 60% 55%,#49516b 0%,transparent 48%),
+ radial-gradient(ellipse at 55% 65%,#54416f 0%,transparent 45%),
  linear-gradient(115deg,#101827,#28334a 60%,#111725);
 }
 #lobby:before{
- content:"";
- position:absolute;
- inset:0;
- background:linear-gradient(90deg,#101827dd 0%,transparent 75%);
+ content:"";position:absolute;inset:0;
+ background:linear-gradient(90deg,#101827ed,transparent 85%);
 }
 .logo{
- position:absolute;
- top:7%;
- left:5%;
- z-index:3;
- font-size:clamp(23px,4vw,43px);
- font-weight:1000;
- letter-spacing:2px;
+ position:absolute;top:5%;left:5%;z-index:5;
+ font-size:clamp(25px,4vw,43px);
+ font-weight:1000;letter-spacing:2px;
  text-shadow:0 0 15px #8e4cff;
 }
 .logo span{color:#ae79ff}
 .subtitle{
- position:absolute;
- top:17%;
- left:5%;
- z-index:3;
- font-size:clamp(9px,1.5vw,14px);
- letter-spacing:3px;
- color:#c4c8d5;
+ position:absolute;top:14%;left:5%;z-index:5;
+ font-size:11px;letter-spacing:2px;color:#c4c8d5;
 }
-#play{
- position:absolute;
- z-index:5;
- top:5%;
- left:5%;
- margin-top:65px;
- padding:14px 35px;
- border:2px solid #d6baff;
- border-radius:7px;
- background:linear-gradient(100deg,#7138cf,#a34bff);
- color:white;
- font-size:17px;
- font-weight:bold;
- box-shadow:0 0 22px #8d43ff88;
-}
-#play:active{transform:scale(.95)}
-
 #character{
- position:absolute;
- z-index:2;
- left:52%;
- bottom:-5%;
- width:clamp(180px,32vw,330px);
- height:88%;
+ position:absolute;z-index:2;left:50%;bottom:-5%;
+ width:clamp(160px,27vw,280px);height:82%;
  transform:translateX(-50%);
- filter:drop-shadow(0 0 20px #9b4dff33);
+ filter:drop-shadow(0 0 20px #9b4dff55);
 }
 .glow{
- position:absolute;
- bottom:0;
- left:-25%;
- width:150%;
- height:30%;
- background:radial-gradient(ellipse,#9b4dff55,transparent 70%);
+ position:absolute;bottom:0;left:-25%;width:150%;height:30%;
+ background:radial-gradient(ellipse,var(--glow,#9b4dff66),transparent 70%);
 }
 .body{
- position:absolute;
- left:16%;
- bottom:0;
- width:68%;
- height:65%;
+ position:absolute;left:16%;bottom:0;width:68%;height:65%;
  border-radius:35% 35% 12% 12%;
  background:linear-gradient(100deg,#10111a,#292636,#10111a);
- border:3px solid #393046;
+ border:3px solid var(--accent,#8e43ef);
 }
 .body:after{
- content:"";
- position:absolute;
- top:25%;
- left:-9%;
- width:118%;
- height:12%;
- background:#171521;
- border:2px solid #8b43ed;
- border-radius:14px;
- box-shadow:0 0 12px #9d4cff;
+ content:"";position:absolute;top:25%;left:-9%;width:118%;
+ height:12%;background:#171521;border:2px solid var(--accent);
+ border-radius:14px;box-shadow:0 0 12px var(--accent);
 }
 .head{
- position:absolute;
- z-index:3;
- left:24%;
- top:7%;
- width:52%;
- height:34%;
- border-radius:48% 48% 42% 42%;
- background:#17151f;
- border:4px solid #8e43ef;
- box-shadow:0 0 20px #8e43ef;
+ position:absolute;z-index:3;left:24%;top:7%;
+ width:52%;height:34%;border-radius:48% 48% 42% 42%;
+ background:#17151f;border:4px solid var(--accent);
+ box-shadow:0 0 20px var(--accent);
 }
 .hood{
- position:absolute;
- z-index:2;
- left:15%;
- top:0;
- width:70%;
- height:40%;
- border:9px solid #292131;
- border-radius:50% 50% 35% 35%;
+ position:absolute;z-index:2;left:15%;top:0;width:70%;height:40%;
+ border:9px solid #292131;border-radius:50% 50% 35% 35%;
 }
 .face{
- position:absolute;
- z-index:4;
- left:12%;
- top:48%;
- width:76%;
- height:20%;
+ position:absolute;z-index:4;left:12%;top:48%;width:76%;height:20%;
  border-radius:50%;
- background:linear-gradient(90deg,#6e31bd,#d0a4ff,#6e31bd);
- box-shadow:0 0 14px #a95aff;
+ background:linear-gradient(90deg,var(--accent),#eee,var(--accent));
+ box-shadow:0 0 14px var(--accent);
 }
 .arm{
- position:absolute;
- top:42%;
- width:25%;
- height:42%;
- background:#17151f;
- border:3px solid #55406d;
- border-radius:30px;
+ position:absolute;top:42%;width:25%;height:42%;
+ background:#17151f;border:3px solid #55406d;border-radius:30px;
 }
 .arm.left{left:0;transform:rotate(12deg)}
 .arm.right{right:0;transform:rotate(-12deg)}
 .leg{
- position:absolute;
- bottom:-2%;
- width:29%;
- height:31%;
- background:#17151f;
- border:3px solid #44334f;
- border-radius:10px;
+ position:absolute;bottom:-2%;width:29%;height:31%;
+ background:#17151f;border:3px solid #44334f;border-radius:10px;
 }
 .leg.left{left:18%}
 .leg.right{right:18%}
 .stripe{
- position:absolute;
- z-index:5;
- left:15%;
- top:46%;
- width:70%;
- height:5px;
- background:#a64cff;
- box-shadow:0 0 12px #a64cff;
+ position:absolute;z-index:5;left:15%;top:46%;width:70%;
+ height:5px;background:var(--accent);
+ box-shadow:0 0 12px var(--accent);
 }
 .info{
- position:absolute;
- z-index:3;
- right:6%;
- bottom:17%;
- width:28%;
- text-align:right;
+ position:absolute;z-index:4;right:5%;bottom:23%;
+ width:27%;text-align:right;
 }
-.info h2{
- font-size:clamp(17px,3vw,30px);
- margin:0 0 8px;
-}
-.info p{
- color:#c3c5d0;
- font-size:clamp(10px,1.5vw,15px);
- line-height:1.5;
-}
+.info h2{font-size:clamp(16px,3vw,28px);margin:8px 0}
+.info p{font-size:12px;color:#c3c5d0;line-height:1.5}
 .tag{
- display:inline-block;
- padding:7px 12px;
- border:1px solid #a56aff;
- color:#d9bdff;
- border-radius:5px;
- font-size:11px;
+ display:inline-block;padding:7px 12px;border:1px solid var(--accent);
+ color:#dfcaff;border-radius:5px;font-size:10px;
+}
+#play{
+ position:absolute;z-index:6;top:23%;left:5%;
+ padding:14px 32px;border:2px solid #d6baff;border-radius:7px;
+ background:linear-gradient(100deg,#7138cf,#a34bff);
+ font-size:17px;box-shadow:0 0 22px #8d43ff88;
+}
+.menu{
+ position:absolute;z-index:7;left:5%;top:43%;
+ display:flex;flex-direction:column;gap:9px;width:155px;
+}
+.menu button{
+ padding:10px;background:#171e30dd;
+ border:1px solid #8650c9;border-radius:7px;text-align:left;
 }
 .bottom{
- position:absolute;
- z-index:3;
- bottom:4%;
- left:5%;
- right:5%;
- display:flex;
- justify-content:space-between;
- color:#aaa;
- font-size:11px;
+ position:absolute;z-index:5;bottom:3%;left:5%;right:5%;
+ display:flex;justify-content:space-between;color:#aaa;font-size:10px;
 }
+
+/* PAINÉIS */
+.panel{
+ position:fixed;z-index:15;inset:0;
+ display:none;align-items:center;justify-content:center;
+ background:#090e1beF;padding:15px;
+}
+.panel.open{display:flex}
+.panel-box{
+ width:min(650px,95vw);max-height:90vh;overflow:auto;
+ padding:20px;border:1px solid #9054d5;
+ border-radius:15px;background:linear-gradient(140deg,#20283e,#111827);
+ box-shadow:0 0 35px #8742c955;
+}
+.panel h2{margin-top:0}
+.panel-grid{
+ display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+}
+.option{
+ min-width:0;padding:8px;border:2px solid #444c60;
+ border-radius:9px;background:#20283a;text-align:center;
+}
+.option.selected{border-color:#ba7aff;box-shadow:0 0 12px #9c4aff88}
+.option img{width:100%;height:65px;object-fit:cover}
+.preview{
+ height:65px;border-radius:7px;margin-bottom:7px;
+ background:linear-gradient(130deg,#242c40,#4a3764);
+ display:flex;align-items:center;justify-content:center;
+ font-size:30px;
+}
+.panel-actions{display:flex;gap:10px;margin-top:18px}
+.action{
+ padding:11px 18px;border:0;border-radius:7px;
+ background:#793ed0;
+}
+.secondary{background:#384257}
+input{
+ width:100%;padding:12px;margin:8px 0;
+ background:#101827;color:white;border:1px solid #7952a8;
+ border-radius:7px;font-size:16px;
+}
+.room-code{font-size:27px;color:#c99bff;letter-spacing:5px;text-align:center}
 
 /* PARTIDA */
 #match{
- display:none;
- position:fixed;
- inset:0;
- overflow:hidden;
+ display:none;position:fixed;inset:0;overflow:hidden;
  background:linear-gradient(#83c9ed,#c5e5d9 55%,#477a48);
 }
-#match h1{
- position:absolute;
- top:5%;
- width:100%;
- text-align:center;
- text-shadow:0 2px 8px #333;
- font-size:clamp(20px,3vw,30px);
+#sky{
+ position:absolute;inset:0;
+ background:linear-gradient(#65b4e2 0%,#b7e2ed 60%,#8cc18c 100%);
 }
 #island{
- position:absolute;
- width:70vw;
- height:65vh;
- left:50%;
- top:57%;
- transform:translate(-50%,-50%);
+ position:absolute;width:75vw;height:70vh;
+ left:50%;top:58%;transform:translate(-50%,-50%);
  border-radius:48%;
- background:radial-gradient(ellipse,#6eaa50,#39763d 70%);
- box-shadow:inset 0 0 45px #285c31,0 20px 45px #294c55;
+ background:radial-gradient(ellipse,#8bc45b,#39763d 72%);
+ box-shadow:inset 0 0 55px #285c31,0 20px 45px #294c55;
+ overflow:hidden;
+}
+#island.desert{
+ background:radial-gradient(ellipse,#d5b16b,#9b713c 72%);
+}
+#island.snow{
+ background:radial-gradient(ellipse,#e5eff1,#8baeb9 72%);
 }
 .tree{
- position:absolute;
- width:24px;
- height:35px;
- border-radius:50%;
- background:#205b31;
- box-shadow:0 0 5px #174b29;
+ position:absolute;width:24px;height:34px;border-radius:50%;
+ background:#205b31;box-shadow:0 0 5px #174b29;
+}
+.tree:after{
+ content:"";position:absolute;left:8px;top:23px;
+ width:8px;height:15px;background:#68452c;
+}
+.building{
+ position:absolute;width:45px;height:35px;
+ background:#b7a18a;border:3px solid #655448;
+ box-shadow:3px 4px 0 #273b27;
 }
 #plane{
- position:absolute;
- left:-20%;
- top:35%;
- width:130px;
- height:38px;
- border-radius:45%;
- background:#343e52;
- border:2px solid #a6aabb;
- transform:rotate(8deg);
+ position:absolute;left:-20%;top:35%;width:130px;height:38px;
+ border-radius:45%;background:#343e52;
+ border:2px solid #a6aabb;transform:rotate(8deg);
  box-shadow:0 0 12px #2228;
 }
 #plane:before{
- content:"";
- position:absolute;
- left:-20px;
- top:12px;
- width:170px;
- height:12px;
- background:#b5bac8;
- border-radius:50%;
+ content:"";position:absolute;left:-20px;top:12px;
+ width:170px;height:12px;background:#b5bac8;border-radius:50%;
 }
 #plane:after{
- content:"";
- position:absolute;
- right:5px;
- top:-13px;
- width:35px;
- height:28px;
- background:#7545c6;
+ content:"";position:absolute;right:5px;top:-13px;
+ width:35px;height:28px;background:#7545c6;
  clip-path:polygon(0 50%,100% 0,100% 100%);
 }
+#match-top{
+ position:absolute;top:15px;left:15px;right:15px;
+ display:flex;justify-content:space-between;align-items:center;
+}
+.hud{
+ padding:9px 13px;background:#111827bb;border-radius:8px;
+ font-size:12px;border:1px solid #ffffff33;
+}
 #return{
- position:absolute;
- top:18px;
- left:18px;
- padding:12px 20px;
- background:#7138cf;
- color:white;
- border:0;
- border-radius:8px;
- font-weight:bold;
+ padding:10px 15px;background:#7138cf;border:0;border-radius:7px;
 }
 #status{
- position:absolute;
- bottom:8%;
- width:100%;
- text-align:center;
- font-weight:bold;
- text-shadow:0 2px 5px black;
+ position:absolute;bottom:10%;width:100%;text-align:center;
+ font-weight:bold;text-shadow:0 2px 5px black;
 }
 #jump{
- display:none;
- position:absolute;
- bottom:18%;
- left:50%;
- transform:translateX(-50%);
- padding:15px 30px;
- border:0;
- border-radius:10px;
- background:#783ce0;
- color:white;
- font-weight:bold;
- font-size:18px;
+ position:absolute;bottom:18%;left:50%;transform:translateX(-50%);
+ padding:14px 25px;border:0;border-radius:10px;
+ background:#783ce0;font-size:17px;
 }
 #player{
- display:none;
- position:absolute;
- left:50%;
- top:45%;
- width:35px;
- height:55px;
- transform:translate(-50%,-50%);
+ display:none;position:absolute;left:50%;top:48%;
+ width:35px;height:48px;transform:translate(-50%,-50%);
  border-radius:12px 12px 5px 5px;
- background:#17151f;
- border:2px solid #9d4cff;
- box-shadow:0 0 15px #a64cff;
+ background:#17151f;border:2px solid var(--accent,#9d4cff);
+ box-shadow:0 0 15px var(--accent,#a64cff);
+ z-index:4;
 }
 #player:before{
- content:"";
- position:absolute;
- width:23px;
- height:23px;
- border-radius:50%;
- background:#292131;
- border:2px solid #a64cff;
- left:4px;
- top:-17px;
+ content:"";position:absolute;width:23px;height:23px;
+ border-radius:50%;background:#292131;
+ border:2px solid var(--accent,#a64cff);
+ left:4px;top:-18px;
+}
+#controls{
+ display:none;position:absolute;bottom:3%;left:3%;right:3%;
+ justify-content:space-between;align-items:end;
+ pointer-events:none;
+}
+.control-group{display:flex;gap:7px;pointer-events:auto}
+.ctrl{
+ width:48px;height:48px;border:1px solid #ffffff66;
+ background:#171d2dcc;border-radius:12px;font-size:20px;
 }
 #rotate{
- display:none;
- position:fixed;
- inset:0;
- z-index:20;
- background:#101622;
- align-items:center;
- justify-content:center;
- text-align:center;
- font-size:20px;
- font-weight:bold;
- padding:25px;
+ display:none;position:fixed;inset:0;z-index:30;
+ background:#101622;align-items:center;justify-content:center;
+ text-align:center;font-size:20px;font-weight:bold;padding:25px;
 }
-@media(orientation:portrait){
- #rotate{display:flex}
+@media(orientation:portrait){#rotate{display:flex}}
+@media(max-height:430px){
+ .logo{top:3%}.subtitle{top:13%}
+ #play{top:21%;padding:10px 24px}
+ .menu{top:39%;gap:6px}
+ .menu button{padding:7px}
+ .info{bottom:15%}
+ .panel-box{padding:13px}
 }
 </style>
 </head>
 
 <body>
 
-<div id="rotate">
- GIRE O CELULAR PARA JOGAR MINI SKY BATTLE
-</div>
+<div id="rotate">GIRE O CELULAR PARA JOGAR MINI SKY BATTLE</div>
 
-<!-- LOBBY -->
 <section id="lobby">
+ <div class="logo">MINI <span>SKY</span> BATTLE</div>
+ <div class="subtitle">UMA PEQUENA IDEIA, UM GRANDE MUNDO.</div>
 
- <div class="logo">
-  MINI <span>SKY</span> BATTLE
+ <button id="play">JOGAR ▶</button>
+
+ <div class="menu">
+  <button onclick="openPanel('characters')">👤 PERSONAGENS</button>
+  <button onclick="openPanel('maps')">🌍 ESCOLHER MAPA</button>
+  <button onclick="openPanel('rooms')">🚪 SALAS</button>
  </div>
-
- <div class="subtitle">
-  UMA PEQUENA IDEIA, UM GRANDE MUNDO.
- </div>
-
- <button id="play">
-  JOGAR ▶
- </button>
 
  <div id="character">
   <div class="glow"></div>
@@ -394,69 +305,223 @@ button{cursor:pointer}
  </div>
 
  <div class="info">
-  <span class="tag">PERSONAGEM PRINCIPAL</span>
-  <h2>SHADOW ROXO</h2>
-  <p>
-   Prepare-se para entrar na batalha.
-   Explore a ilha e seja o último sobrevivente!
-  </p>
+  <span class="tag">PERSONAGEM SELECIONADO</span>
+  <h2 id="characterName">SHADOW ROXO</h2>
+  <p id="characterDescription">Prepare-se para entrar na batalha!</p>
  </div>
 
  <div class="bottom">
   <span>MINI SKY BATTLE</span>
-  <span>VERSÃO DE TESTE</span>
+  <span>PROTÓTIPO V2</span>
  </div>
-
 </section>
+
+<!-- PERSONAGENS -->
+<div class="panel" id="characters">
+ <div class="panel-box">
+  <h2>👤 ESCOLHA SEU PERSONAGEM</h2>
+  <div class="panel-grid">
+   <button class="option selected" onclick="selectCharacter(0,this)">
+    <div class="preview">🥷</div>
+    <b>Shadow Roxo</b>
+   </button>
+   <button class="option" onclick="selectCharacter(1,this)">
+    <div class="preview">🟢</div>
+    <b>Shadow Verde</b>
+   </button>
+   <button class="option" onclick="selectCharacter(2,this)">
+    <div class="preview">🔴</div>
+    <b>Shadow Vermelho</b>
+   </button>
+  </div>
+  <div class="panel-actions">
+   <button class="action" onclick="closePanels()">CONFIRMAR</button>
+  </div>
+ </div>
+</div>
+
+<!-- MAPAS -->
+<div class="panel" id="maps">
+ <div class="panel-box">
+  <h2>🌍 ESCOLHA SEU MAPA</h2>
+  <div class="panel-grid">
+   <button class="option selected" onclick="selectMap(0,this)">
+    <div class="preview">🌴</div>
+    <b>Ilha Verde</b>
+   </button>
+   <button class="option" onclick="selectMap(1,this)">
+    <div class="preview">🏜️</div>
+    <b>Deserto</b>
+   </button>
+   <button class="option" onclick="selectMap(2,this)">
+    <div class="preview">❄️</div>
+    <b>Nevasca</b>
+   </button>
+  </div>
+  <div class="panel-actions">
+   <button class="action" onclick="closePanels()">CONFIRMAR MAPA</button>
+  </div>
+ </div>
+</div>
+
+<!-- SALAS -->
+<div class="panel" id="rooms">
+ <div class="panel-box">
+  <h2>🚪 SALAS PERSONALIZADAS</h2>
+  <p>Crie uma sala de demonstração ou informe um código.</p>
+  <button class="action" onclick="createRoom()">＋ CRIAR SALA</button>
+  <div id="createdRoom" class="hidden">
+   <p>CÓDIGO DA SALA:</p>
+   <div class="room-code" id="roomCode">000000</div>
+   <p>Compartilhe este código com seus amigos.</p>
+  </div>
+  <hr style="border-color:#444;margin:18px 0">
+  <b>ENTRAR COM CÓDIGO</b>
+  <input id="joinCode" maxlength="6" inputmode="numeric" placeholder="Digite o código">
+  <button class="action" onclick="joinRoom()">ENTRAR</button>
+  <p id="roomMessage"></p>
+  <div class="panel-actions">
+   <button class="action secondary" onclick="closePanels()">VOLTAR</button>
+  </div>
+ </div>
+</div>
 
 <!-- PARTIDA -->
 <section id="match">
-
- <button id="return">← LOBBY</button>
-
- <h1>MINI SKY BATTLE</h1>
-
+ <div id="sky"></div>
  <div id="island"></div>
-
  <div id="plane"></div>
-
  <div id="player"></div>
 
- <button id="jump">🪂 SALTAR</button>
+ <div id="match-top">
+  <button id="return">← LOBBY</button>
+  <div class="hud" id="mapLabel">🌴 ILHA VERDE</div>
+  <div class="hud">👥 MODO TESTE</div>
+ </div>
 
+ <button id="jump">🪂 SALTAR</button>
  <div id="status">AVIÃO EM PREPARAÇÃO...</div>
 
+ <div id="controls">
+  <div class="control-group">
+   <button class="ctrl" data-move="left">◀</button>
+   <button class="ctrl" data-move="right">▶</button>
+   <button class="ctrl" data-move="up">▲</button>
+   <button class="ctrl" data-move="down">▼</button>
+  </div>
+  <div class="control-group">
+   <button class="ctrl" id="jumpAgain">🪂</button>
+  </div>
+ </div>
 </section>
 
 <script>
 const lobby=document.getElementById("lobby");
 const match=document.getElementById("match");
-const play=document.getElementById("play");
-const returnButton=document.getElementById("return");
 const plane=document.getElementById("plane");
+const island=document.getElementById("island");
+const player=document.getElementById("player");
 const jump=document.getElementById("jump");
 const statusText=document.getElementById("status");
-const player=document.getElementById("player");
 
 let started=false;
 let jumped=false;
 let planePosition=-20;
+let selectedCharacter=0;
+let selectedMap=0;
+let playerX=50;
+let playerY=48;
+let roomCode="";
+let animationFrame=0;
+
+const characters=[
+ {name:"SHADOW ROXO",accent:"#a64cff",glow:"#9b4dff66"},
+ {name:"SHADOW VERDE",accent:"#45e58a",glow:"#45e58a66"},
+ {name:"SHADOW VERMELHO",accent:"#ff505d",glow:"#ff505d66"}
+];
+
+const maps=[
+ {name:"🌴 ILHA VERDE",type:"green"},
+ {name:"🏜️ DESERTO",type:"desert"},
+ {name:"❄️ NEVASCA",type:"snow"}
+];
+
+function openPanel(id){
+ document.getElementById(id).classList.add("open");
+}
+
+function closePanels(){
+ document.querySelectorAll(".panel").forEach(p=>p.classList.remove("open"));
+}
+
+function selectCharacter(index,button){
+ selectedCharacter=index;
+ document.querySelectorAll("#characters .option").forEach(x=>x.classList.remove("selected"));
+ button.classList.add("selected");
+
+ const c=characters[index];
+ document.documentElement.style.setProperty("--accent",c.accent);
+ document.documentElement.style.setProperty("--glow",c.glow);
+ document.getElementById("characterName").textContent=c.name;
+ document.getElementById("characterDescription").textContent=
+ "Este é seu personagem selecionado para a batalha.";
+}
+
+function selectMap(index,button){
+ selectedMap=index;
+ document.querySelectorAll("#maps .option").forEach(x=>x.classList.remove("selected"));
+ button.classList.add("selected");
+}
+
+function generateIsland(){
+ island.innerHTML="";
+ island.className="";
+ island.classList.add(maps[selectedMap].type);
+
+ const treeCount=selectedMap===0?35:12;
+
+ for(let i=0;i<treeCount;i++){
+  const tree=document.createElement("div");
+  tree.className="tree";
+  tree.style.left=(Math.random()*94+2)+"%";
+  tree.style.top=(Math.random()*85+5)+"%";
+
+  if(selectedMap===1)tree.style.background="#a57b3c";
+  if(selectedMap===2)tree.style.background="#8daeb7";
+
+  island.appendChild(tree);
+ }
+
+ for(let i=0;i<9;i++){
+  const building=document.createElement("div");
+  building.className="building";
+  building.style.left=(Math.random()*85+5)+"%";
+  building.style.top=(Math.random()*80+5)+"%";
+  island.appendChild(building);
+ }
+}
 
 function startGame(){
  if(started)return;
 
  started=true;
  jumped=false;
+ planePosition=-20;
+ playerX=50;
+ playerY=48;
 
  lobby.style.display="none";
  match.style.display="block";
 
- planePosition=-20;
  plane.style.left=planePosition+"%";
-
- jump.style.display="block";
  player.style.display="none";
+ jump.style.display="block";
+ document.getElementById("controls").style.display="none";
 
+ document.getElementById("mapLabel").textContent=maps[selectedMap].name;
+ player.style.setProperty("--accent",characters[selectedCharacter].accent);
+
+ generateIsland();
  statusText.textContent="AVIÃO EM PREPARAÇÃO...";
 }
 
@@ -466,10 +531,10 @@ function returnLobby(){
 
  match.style.display="none";
  lobby.style.display="block";
-
  jump.style.display="none";
  player.style.display="none";
 
+ document.getElementById("controls").style.display="none";
  statusText.textContent="AVIÃO EM PREPARAÇÃO...";
 }
 
@@ -479,51 +544,98 @@ function jumpFromPlane(){
  jumped=true;
  jump.style.display="none";
  player.style.display="block";
+ document.getElementById("controls").style.display="flex";
 
  statusText.textContent="VOCÊ SALTOU!";
 
  setTimeout(()=>{
-  statusText.textContent="VOCÊ ESTÁ NA ILHA!";
- },2500);
+  if(started&&jumped){
+   statusText.textContent="VOCÊ ESTÁ NA ILHA!";
+  }
+ },2000);
 }
 
-play.addEventListener("click",startGame);
-returnButton.addEventListener("click",returnLobby);
-jump.addEventListener("click",jumpFromPlane);
+function createRoom(){
+ roomCode=String(Math.floor(100000+Math.random()*900000));
+ document.getElementById("roomCode").textContent=roomCode;
+ document.getElementById("createdRoom").classList.remove("hidden");
+ document.getElementById("roomMessage").textContent="Sala criada nesta demonstração!";
+}
 
-// Movimento visual do avião
-let lastTime=0;
+function joinRoom(){
+ const code=document.getElementById("joinCode").value.trim();
+ const message=document.getElementById("roomMessage");
 
-function animate(time){
- requestAnimationFrame(animate);
+ if(!/^[0-9]{6}$/.test(code)){
+  message.textContent="Digite um código válido de 6 números.";
+  return;
+ }
 
- if(!started||jumped)return;
-
- if(time-lastTime>35){
-  lastTime=time;
-
-  planePosition+=0.12;
-
-  if(planePosition>110){
-   planePosition=-20;
-  }
-
-  plane.style.left=planePosition+"%";
+ if(code===roomCode&&roomCode!==""){
+  message.textContent="Você entrou na sua sala de demonstração!";
+ }else{
+  message.textContent="Sala não encontrada nesta versão local.";
  }
 }
 
-requestAnimationFrame(animate);
+/* Movimento do avião */
+function animate(){
+ if(started&&!jumped){
+  planePosition+=0.09;
+  if(planePosition>110)planePosition=-20;
+  plane.style.left=planePosition+"%";
+ }
 
-// Árvores decorativas na ilha
-const island=document.getElementById("island");
-
-for(let i=0;i<25;i++){
- const tree=document.createElement("div");
- tree.className="tree";
- tree.style.left=(Math.random()*90+5)+"%";
- tree.style.top=(Math.random()*80+10)+"%";
- island.appendChild(tree);
+ animationFrame=requestAnimationFrame(animate);
 }
+animate();
+
+/* Movimento do personagem */
+function movePlayer(direction){
+ if(!started||!jumped)return;
+
+ const step=3;
+
+ if(direction==="left")playerX-=step;
+ if(direction==="right")playerX+=step;
+ if(direction==="up")playerY-=step;
+ if(direction==="down")playerY+=step;
+
+ playerX=Math.max(5,Math.min(95,playerX));
+ playerY=Math.max(15,Math.min(85,playerY));
+
+ player.style.left=playerX+"%";
+ player.style.top=playerY+"%";
+}
+
+document.querySelectorAll("[data-move]").forEach(button=>{
+ const direction=button.dataset.move;
+
+ button.addEventListener("pointerdown",e=>{
+  e.preventDefault();
+  movePlayer(direction);
+ });
+});
+
+document.getElementById("jumpAgain").addEventListener("click",()=>{
+ if(started&&jumped){
+  statusText.textContent="PARAQUEDAS ATIVO!";
+ }
+});
+
+document.addEventListener("keydown",e=>{
+ if(e.key==="ArrowLeft"||e.key==="a")movePlayer("left");
+ if(e.key==="ArrowRight"||e.key==="d")movePlayer("right");
+ if(e.key==="ArrowUp"||e.key==="w")movePlayer("up");
+ if(e.key==="ArrowDown"||e.key==="s")movePlayer("down");
+});
+
+document.getElementById("play").addEventListener("click",startGame);
+document.getElementById("return").addEventListener("click",returnLobby);
+jump.addEventListener("click",jumpFromPlane);
+
+selectCharacter(0,document.querySelector("#characters .option"));
+generateIsland();
 </script>
 
 </body>
