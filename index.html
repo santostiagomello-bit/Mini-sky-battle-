@@ -3,28 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>BATTLELANDS 3D - MINI ROYALE</title>
+<title>BATTLELANDS 3D</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#2b6cb0;color:#fff;font-family:'Segoe UI',Arial,sans-serif;touch-action:none}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#2b6cb0;color:#fff;font-family:Arial,sans-serif;touch-action:none}
 canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
-#lobby{position:fixed;inset:0;z-index:5;pointer-events:none;background:radial-gradient(circle at 50% 30%,#4299e1 0%,#1a365d 100%)}
-#logo{position:absolute;top:6%;left:50%;transform:translateX(-50%);font-size:clamp(26px,5vw,46px);font-weight:900;color:#f6e05e;text-shadow:3px 3px 0 #9b2c2c,-2px -2px 0 #fff;white-space:nowrap}
-#playArea{position:absolute;top:16%;left:50%;transform:translateX(-50%);pointer-events:auto}
-#playButton{padding:16px 36px;border:4px solid #fef08a;border-radius:20px;background:linear-gradient(180deg,#facc15,#d97706);color:#422006;font-size:clamp(20px,3vw,30px);font-weight:900;box-shadow:0 8px 0 #92400e,0 12px 20px rgba(0,0,0,0.4);cursor:pointer}
+#lobby{position:fixed;inset:0;z-index:10;background:radial-gradient(circle at 50% 30%,#4299e1 0%,#1a365d 100%);display:flex;flex-direction:column;align-items:center;justify-content:center}
+#logo{font-size:clamp(26px,5vw,46px);font-weight:900;color:#f6e05e;text-shadow:3px 3px 0 #9b2c2c,-2px -2px 0 #fff;margin-bottom:30px;text-align:center}
+#playButton{padding:18px 40px;border:4px solid #fef08a;border-radius:20px;background:linear-gradient(180deg,#facc15,#d97706);color:#422006;font-size:24px;font-weight:900;box-shadow:0 8px 0 #92400e;cursor:pointer;pointer-events:auto}
 #playButton:active{transform:translateY(4px);box-shadow:0 4px 0 #92400e}
-#sideButtons{position:absolute;right:4%;top:25%;display:flex;flex-direction:column;gap:12px;pointer-events:auto}
-.menuButton{min-width:140px;padding:12px 14px;border:2px solid #90cdf4;border-radius:14px;background:linear-gradient(135deg,#3182ce,#2b6cb0);color:white;font-weight:800;box-shadow:0 4px 10px rgba(0,0,0,0.3)}
-#gameHUD{display:none;position:fixed;inset:0;z-index:4;pointer-events:none}
+#gameHUD{display:none;position:fixed;inset:0;z-index:5;pointer-events:none}
 #health{position:absolute;top:15px;left:15px;width:180px;padding:10px 12px;border-radius:12px;background:rgba(26,54,93,0.9);border:2px solid rgba(255,255,255,0.2);font-size:12px;font-weight:bold}
 #healthTrack{height:10px;margin-top:6px;border-radius:6px;background:#742a2a;overflow:hidden}
-#healthFill{height:100%;width:100%;background:#48bb78;transition:width .15s}
+#healthFill{height:100%;width:100%;background:#48bb78}
 #backButton{position:absolute;top:15px;right:15px;padding:10px 16px;border:2px solid white;border-radius:12px;background:rgba(43,108,176,0.9);color:white;font-weight:bold;pointer-events:auto}
 #joystick{position:absolute;bottom:20px;left:20px;width:120px;height:120px;border:3px solid rgba(255,255,255,0.4);border-radius:50%;background:rgba(26,54,93,0.3);pointer-events:auto;touch-action:none}
 #stick{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px;border:2px solid white;border-radius:50%;background:rgba(255,255,255,0.8)}
 #aimPad{position:absolute;right:20px;bottom:120px;width:130px;height:130px;border:2px dashed rgba(255,255,255,0.5);border-radius:50%;background:rgba(26,54,93,0.3);pointer-events:auto;touch-action:none}
 #aimDot{position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px;border:2px solid white;border-radius:50%;background:#f6e05e}
-#fireButton{position:absolute;right:20px;bottom:20px;width:85px;height:85px;border:3px solid white;border-radius:50%;background:linear-gradient(135deg,#f56565,#c53030);color:white;font-weight:900;font-size:15px;pointer-events:auto;box-shadow:0 6px 0 #742a2a}
+#fireButton{position:absolute;right:20px;bottom:20px;width:85px;height:85px;border:3px solid white;border-radius:50%;background:linear-gradient(135deg,#f56565,#c53030);color:white;font-weight:900;pointer-events:auto;box-shadow:0 6px 0 #742a2a}
 #actionButton{position:absolute;right:120px;bottom:35px;width:70px;height:70px;border:3px solid white;border-radius:50%;background:linear-gradient(135deg,#9f7aea,#6b46c1);color:white;font-weight:900;pointer-events:auto;box-shadow:0 5px 0 #44337a}
 #planeNotice{position:absolute;top:20%;left:50%;transform:translateX(-50%);padding:10px 18px;border-radius:12px;background:rgba(26,54,93,0.9);font-weight:bold;font-size:14px;border:2px solid #f6e05e;display:none;white-space:nowrap}
 #dropButton{position:absolute;left:50%;top:28%;transform:translateX(-50%);padding:14px 28px;border:3px solid #fef08a;border-radius:14px;background:linear-gradient(180deg,#facc15,#d97706);color:#422006;font-weight:900;font-size:18px;pointer-events:auto;display:none;box-shadow:0 6px 0 #92400e}
@@ -35,17 +32,15 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<div id="rotateMessage"><div class="phone">📱</div><h2>BATTLELANDS ROYALE 3D</h2><p>Gire o celular para a horizontal!</p></div>
+<div id="rotateMessage"><div class="phone">📱</div><h2>BATTLELANDS ROYALE</h2><p>Gire o celular para a horizontal!</p></div>
+
 <div id="lobby">
   <div id="logo">⭐ BATTLELANDS MINI ⭐</div>
-  <div id="playArea"><button id="playButton">JOGAR</button></div>
-  <div id="sideButtons">
-    <button class="menuButton" onclick="alert('Personagens personalizados estilo Battlelands!')">👤 HERÓIS</button>
-    <button class="menuButton" onclick="alert('Loja de itens em breve!')">🛒 LOJA</button>
-  </div>
+  <button id="playButton">JOGAR</button>
 </div>
+
 <div id="gameHUD">
-  <div id="health">VIDA<div id="healthTrack"><div id="healthFill"></div></div><span id="healthText">100 / 100</span></div>
+  <div id="health">VIDA<div id="healthTrack"><div id="healthFill"></div></div></div>
   <button id="backButton">SAIR</button>
   <div id="planeNotice">✈️ SOBREVÔO NA ILHA</div>
   <button id="dropButton">🪂 SALTAR</button>
@@ -54,6 +49,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
   <button id="fireButton">ATIRAR</button>
   <button id="actionButton">PULAR</button>
 </div>
+
 <script type="module">
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 
@@ -85,42 +81,28 @@ function addMesh(parent, geo, material, x, y, z) {
   return m;
 }
 
-// Chão Estilo Battlelands (Grama Verde Viva)
 const ground = addMesh(world, new THREE.PlaneGeometry(250, 250), mat(0x56ab2f), 0, 0, 0);
 ground.rotation.x = -Math.PI / 2;
 
-// Árvores Low-Poly Estilizadas
 function stylizedTree(x, z) {
   addMesh(world, new THREE.CylinderGeometry(0.3, 0.4, 1.8, 6), mat(0x8b5a2b), x, 0.9, z);
   addMesh(world, new THREE.DodecahedronGeometry(1.4), mat(0x38a169), x, 2.4, z);
 }
 for(let i = -80; i <= 80; i += 25) {
-  stylizedTree(i, -60);
-  stylizedTree(i, 60);
-  stylizedTree(-80, i);
-  stylizedTree(80, i);
+  stylizedTree(i, -60); stylizedTree(i, 60);
+  stylizedTree(-80, i); stylizedTree(80, i);
 }
 
-// Personagem Chibi / Cabeçudo (Estilo Personagens das Fotos)
 function createChibiHero() {
   const g = new THREE.Group();
-  
-  // Corpo compacto
   addMesh(g, new THREE.BoxGeometry(0.7, 0.8, 0.4), mat(0x1a202c), 0, 0.8, 0);
-  
-  // Cabeça grande estilo Chibi/Cartoon
   const head = addMesh(g, new THREE.SphereGeometry(0.65, 16, 16), mat(0xf6ad55), 0, 1.8, 0);
   head.scale.set(1, 1.1, 1);
-  
-  // Óculos / Máscara estilizada (lembrando a skin do ninja/gás das fotos)
   addMesh(g, new THREE.BoxGeometry(0.7, 0.3, 0.3), mat(0x2d3748), 0, 1.85, 0.35);
-  
-  // Braços e Pernas
   addMesh(g, new THREE.BoxGeometry(0.25, 0.6, 0.25), mat(0x2d3748), -0.5, 0.8, 0);
   addMesh(g, new THREE.BoxGeometry(0.25, 0.6, 0.25), mat(0x2d3748), 0.5, 0.8, 0);
   addMesh(g, new THREE.BoxGeometry(0.28, 0.6, 0.28), mat(0x1a202c), -0.2, 0.3, 0);
   addMesh(g, new THREE.BoxGeometry(0.28, 0.6, 0.28), mat(0x1a202c), 0.2, 0.3, 0);
-
   return g;
 }
 
@@ -134,7 +116,7 @@ let dropPhase = false, playerDropped = false, planeTime = 0, aimX = 0, aimZ = -1
 const plane = addMesh(scene, new THREE.BoxGeometry(4, 1, 1.5), mat(0x4a5568), 0, 35, 0);
 plane.visible = false;
 
-// Controles de Tela (Joystick)
+// Joystick
 const joystick = document.getElementById("joystick"), stick = document.getElementById("stick");
 let joyId = null, joyCenter = { x: 0, y: 0 };
 joystick.addEventListener("pointerdown", e => { joyId = e.pointerId; const r = joystick.getBoundingClientRect(); joyCenter = { x: r.left + r.width/2, y: r.top + r.height/2 }; updateJoy(e); joystick.setPointerCapture(joyId); });
@@ -147,7 +129,7 @@ function updateJoy(e) {
   moveX = nx / maxR; moveY = ny / maxR;
 }
 
-// Controle de Mira (AimPad)
+// AimPad
 const aimPad = document.getElementById("aimPad"), aimDot = document.getElementById("aimDot");
 let aimId = null, aimCenter = { x: 0, y: 0 };
 aimPad.addEventListener("pointerdown", e => { aimId = e.pointerId; const r = aimPad.getBoundingClientRect(); aimCenter = { x: r.left + r.width/2, y: r.top + r.height/2 }; updateAim(e); aimPad.setPointerCapture(aimId); });
@@ -160,7 +142,7 @@ function updateAim(e) {
   if(d > 5) { aimX = nx / maxR; aimZ = ny / maxR; }
 }
 
-// Botões de Ação
+// Botões principais corrigidos
 document.getElementById("playButton").addEventListener("click", () => {
   gameStarted = true;
   document.getElementById("lobby").style.display = "none";
@@ -173,7 +155,7 @@ document.getElementById("playButton").addEventListener("click", () => {
 document.getElementById("backButton").addEventListener("click", () => {
   gameStarted = false;
   document.getElementById("gameHUD").style.display = "none";
-  document.getElementById("lobby").style.display = "block";
+  document.getElementById("lobby").style.display = "flex";
 });
 
 document.getElementById("dropButton").addEventListener("click", () => {
@@ -195,7 +177,6 @@ document.getElementById("actionButton").addEventListener("click", () => {
   isJumping = true; jumpV = 0.35;
 });
 
-// Loop Principal de Jogo
 function animate() {
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
@@ -224,7 +205,6 @@ function animate() {
     }
   }
 
-  // Câmera Isométrica Estilo Battlelands (Visão Diagonal Perfeita)
   camera.position.set(player.position.x, player.position.y + 16, player.position.z + 14);
   camera.lookAt(player.position.x, player.position.y, player.position.z);
 }
