@@ -3,30 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>BATTLELANDS ROYALE</title>
+<title>MEGA BATTLE ROYALE 3D</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#1a0b2e;color:#fff;font-family:'Segoe UI',Arial,sans-serif;touch-action:none}
 canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
 
-/* Estilo exato do Lobby (Pôr do sol roxo/dourado) */
+/* Lobby */
 #lobby{position:fixed;inset:0;z-index:10;background:linear-gradient(180deg,#2d1b4e 0%,#1a0b2e 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
-#topBar{position:absolute;top:15px;left:20px;right:20px;display:flex;justify-content:space-between;align-items:center}
-.badge{background:rgba(0,0,0,0.4);border:2px solid #ffdc51;padding:8px 14px;border-radius:12px;font-weight:bold;font-size:14px;display:flex;align-items:center;gap:8px}
-.currencyBox{display:flex;gap:15px}
-.currencyItem{background:rgba(0,0,0,0.4);border:2px solid #5a3d8a;padding:8px 14px;border-radius:12px;font-weight:bold;font-size:14px}
-
-#logoArea{text-align:center;margin-bottom:20px}
-#logo{font-size:clamp(32px, 6vw, 54px);font-weight:900;color:#ffdf45;text-shadow:3px 4px 0 #713c18,-2px -2px 0 #fff;letter-spacing:1px}
-#subLogo{display:inline-block;background:#4c2885;border:2px solid #9b51e0;padding:4px 12px;border-radius:8px;font-size:11px;font-weight:bold;letter-spacing:2px;margin-top:5px}
-
-#centerBox{display:flex;flex-direction:column;align-items:center;gap:20px;width:100%;max-width:400px}
-#playButton{width:100%;padding:18px;border:4px solid #fff1a0;border-radius:18px;background:linear-gradient(180deg,#fff06b,#ff9c19);color:#572d00;font-size:24px;font-weight:1000;box-shadow:0 8px 0 #a85a12;cursor:pointer;pointer-events:auto;text-align:center}
+#logo{font-size:clamp(28px, 6vw, 48px);font-weight:900;color:#ffdf45;text-shadow:3px 4px 0 #713c18,-2px -2px 0 #fff;margin-bottom:20px;text-align:center}
+#playButton{width:100%;max-width:320px;padding:18px;border:4px solid #fff1a0;border-radius:18px;background:linear-gradient(180deg,#fff06b,#ff9c19);color:#572d00;font-size:24px;font-weight:1000;box-shadow:0 8px 0 #a85a12;cursor:pointer;pointer-events:auto;text-align:center}
 #playButton:active{transform:translateY(4px);box-shadow:0 4px 0 #a85a12}
-
-.cardPanel{width:100%;background:rgba(26,15,46,0.85);border:2px solid #5a3d8a;border-radius:16px;padding:15px;box-shadow:0 8px 20px rgba(0,0,0,0.5)}
-.cardTitle{font-size:12px;color:#b19cd9;font-weight:bold;margin-bottom:6px;text-transform:uppercase}
-.cardDesc{font-size:14px;color:#fff;font-weight:bold}
 
 /* HUD do Jogo */
 #gameHUD{display:none;position:fixed;inset:0;z-index:5;pointer-events:none}
@@ -40,219 +27,28 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
 #aimPad{position:absolute;right:25px;bottom:130px;width:130px;height:130px;border:2px dashed rgba(255,255,255,0.5);border-radius:50%;background:rgba(23,59,88,0.4);pointer-events:auto;touch-action:none}
 #aimDot{position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px;border:2px solid white;border-radius:50%;background:#ffdc55}
 #fireButton{position:absolute;right:25px;bottom:25px;width:85px;height:85px;border:3px solid white;border-radius:50%;background:linear-gradient(135deg,#e35a35,#9c2b11);color:white;font-weight:900;pointer-events:auto;box-shadow:0 6px 0 #611808}
-#actionButton{position:absolute;right:125px;bottom:40px;width:70px;height:70px;border:3px solid white;border-radius:50%;background:linear-gradient(135deg,#9b25ff,#511094);color:white;font-weight:900;pointer-events:auto;box-shadow:0 5px 0 #31075b}
 
-#planeNotice{position:absolute;top:20%;left:50%;transform:translateX(-50%);padding:10px 18px;border-radius:12px;background:rgba(16,47,80,0.9);font-weight:bold;font-size:14px;border:2px solid #ffdc51;display:none;white-space:nowrap}
-#dropButton{position:absolute;left:50%;top:28%;transform:translateX(-50%);padding:14px 28px;border:3px solid #fff1a0;border-radius:14px;background:linear-gradient(180deg,#fff06b,#ff9c19);color:#572d00;font-weight:1000;font-size:18px;pointer-events:auto;display:none;box-shadow:0 6px 0 #a85a12}
+#planeNotice{position:absolute;top:18%;left:50%;transform:translateX(-50%);padding:10px 18px;border-radius:12px;background:rgba(16,47,80,0.9);font-weight:bold;font-size:14px;border:2px solid #ffdc51;display:none;white-space:nowrap}
+#jumpButton{position:absolute;left:50%;top:26%;transform:translateX(-50%);padding:14px 28px;border:3px solid #fff1a0;border-radius:14px;background:linear-gradient(180deg,#fff06b,#ff9c19);color:#572d00;font-weight:1000;font-size:18px;pointer-events:auto;display:none;box-shadow:0 6px 0 #a85a12}
 </style>
 </head>
 <body>
 
-<!-- LOBBY (Idêntico ao print que você enviou) -->
 <div id="lobby">
-  <div id="topBar">
-    <div class="badge">👑 COMANDANTE &nbsp;&nbsp;⭐ 1.240 · NV 12</div>
-    <div class="currencyBox">
-      <div class="currencyItem">🪙 850</div>
-      <div class="currencyItem">💎 45</div>
-    </div>
-  </div>
-
-  <div id="logoArea">
-    <div id="logo">BATTLELANDS ROYALE</div>
-    <div id="subLogo">3D ACTION ROYALE</div>
-  </div>
-
-  <div id="centerBox">
-    <div class="cardPanel">
-      <div class="cardTitle">Selecione o Herói</div>
-      <div class="cardDesc">👤 <strong>VIPER</strong><br><span style="font-size:12px;color:#d0bdf4;font-weight:normal">Capuz preto tático e olhos verde-neon.</span></div>
-    </div>
-
-    <button id="playButton">JOGAR</button>
-
-    <div class="cardPanel">
-      <div class="cardTitle">Custom Battles</div>
-      <div class="cardDesc">⚔️ <strong>SOLO ROYALE</strong><br><span style="font-size:12px;color:#d0bdf4;font-weight:normal">Arena: Quadra, Praia & Rio &nbsp;·&nbsp; Bots: 11</span></div>
-    </div>
-  </div>
+  <div id="logo">🔥 MEGA BATTLE ROYALE 🔥</div>
+  <button id="playButton">JOGAR PARTIDA</button>
 </div>
 
-<!-- HUD DO JOGO (Aparece ao clicar em Jogar) -->
 <div id="gameHUD">
   <div id="health">VIDA<div id="healthTrack"><div id="healthFill"></div></div></div>
   <button id="backButton">SAIR</button>
-  <div id="planeNotice">✈️ SOBREVÔO NA ILHA — ESCOLHA ONDE SALTAR</div>
-  <button id="dropButton">🪂 SALTAR</button>
+  <div id="planeNotice">✈️ AVIÃO NO AR — ESCOLHA O MOMENTO DE SALTAR!</div>
+  <button id="jumpButton">🪂 SALTAR DO AVIÃO</button>
   <div id="joystick"><div id="stick"></div></div>
   <div id="aimPad"><div id="aimDot"></div></div>
   <button id="fireButton">ATIRAR</button>
-  <button id="actionButton">PULAR</button>
 </div>
 
 <script type="module">
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
-
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x91cdeb);
-scene.fog = new THREE.Fog(0x91cdeb, 60, 180);
-
-const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 300);
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(innerWidth, innerHeight);
-renderer.shadowMap.enabled = true;
-document.body.appendChild(renderer.domElement);
-
-scene.add(new THREE.HemisphereLight(0xffffff, 0x617b50, 1.8));
-const sun = new THREE.DirectionalLight(0xffffff, 1.8);
-sun.position.set(30, 60, 30);
-sun.castShadow = true;
-scene.add(sun);
-
-const mat = (c, r = 0.8) => new THREE.MeshStandardMaterial({ color: c, roughness: r });
-const glow = c => new THREE.MeshStandardMaterial({ color: c, emissive: c, emissiveIntensity: 1.1 });
-const world = new THREE.Group();
-scene.add(world);
-
-function addMesh(parent, geo, material, x, y, z) {
-  const m = new THREE.Mesh(geo, material);
-  m.position.set(x, y, z);
-  m.castShadow = true; m.receiveShadow = true;
-  parent.add(m);
-  return m;
-}
-
-// Chão da Ilha
-const ground = addMesh(world, new THREE.PlaneGeometry(250, 250), mat(0x65b94e), 0, 0, 0);
-ground.rotation.x = -Math.PI / 2;
-
-// Árvores e Cabanas de Exemplo no Mapa
-function tree(x, z) {
-  addMesh(world, new THREE.CylinderGeometry(0.2, 0.3, 1.5, 6), mat(0x80502d), x, 0.75, z);
-  addMesh(world, new THREE.IcosahedronGeometry(1.1, 1), mat(0x367d3b), x, 1.8, z);
-}
-for(let i = -70; i <= 70; i += 25) {
-  tree(i, -50); tree(i, 50); tree(-70, i); tree(70, i);
-}
-
-// Personagem Chibi (Viper)
-function createViper() {
-  const g = new THREE.Group();
-  addMesh(g, new THREE.BoxGeometry(0.7, 0.8, 0.4), mat(0x191923), 0, 0.8, 0);
-  const head = addMesh(g, new THREE.SphereGeometry(0.65, 16, 16), mat(0xb87955), 0, 1.8, 0);
-  head.scale.set(1, 1.1, 1);
-  addMesh(g, new THREE.BoxGeometry(0.68, 0.3, 0.35), mat(0x101018), 0, 1.85, 0.35);
-  addMesh(g, new THREE.BoxGeometry(0.06, 0.5, 0.04), glow(0x9b25ff), -0.3, 1.85, 0.4);
-  addMesh(g, new THREE.BoxGeometry(0.06, 0.5, 0.04), glow(0x9b25ff), 0.3, 1.85, 0.4);
-  return g;
-}
-
-const player = createViper();
-scene.add(player);
-
-const shots = [];
-let gameStarted = false, moveX = 0, moveY = 0, jumpV = 0, isJumping = false;
-let dropPhase = false, playerDropped = false, planeTime = 0, aimX = 0, aimZ = -1;
-
-const plane = addMesh(scene, new THREE.BoxGeometry(4, 1, 1.5), mat(0x34495e), 0, 35, 0);
-plane.visible = false;
-
-// Controles Joystick
-const joystick = document.getElementById("joystick"), stick = document.getElementById("stick");
-let joyId = null, joyCenter = { x: 0, y: 0 };
-joystick.addEventListener("pointerdown", e => { joyId = e.pointerId; const r = joystick.getBoundingClientRect(); joyCenter = { x: r.left + r.width/2, y: r.top + r.height/2 }; updateJoy(e); joystick.setPointerCapture(joyId); });
-joystick.addEventListener("pointermove", e => { if(e.pointerId === joyId) updateJoy(e); });
-joystick.addEventListener("pointerup", e => { if(e.pointerId === joyId) { joyId = null; moveX = 0; moveY = 0; stick.style.transform = `translate(0px,0px)`; } });
-function updateJoy(e) {
-  const dx = e.clientX - joyCenter.x, dy = e.clientY - joyCenter.y, d = Math.hypot(dx, dy), maxR = 38;
-  const nx = d > maxR ? dx/d * maxR : dx, ny = d > maxR ? dy/d * maxR : dy;
-  stick.style.transform = `translate(${nx}px,${ny}px)`;
-  moveX = nx / maxR; moveY = ny / maxR;
-}
-
-// Controles AimPad (Mira)
-const aimPad = document.getElementById("aimPad"), aimDot = document.getElementById("aimDot");
-let aimId = null, aimCenter = { x: 0, y: 0 };
-aimPad.addEventListener("pointerdown", e => { aimId = e.pointerId; const r = aimPad.getBoundingClientRect(); aimCenter = { x: r.left + r.width/2, y: r.top + r.height/2 }; updateAim(e); aimPad.setPointerCapture(aimId); });
-aimPad.addEventListener("pointermove", e => { if(e.pointerId === aimId) updateAim(e); });
-aimPad.addEventListener("pointerup", e => { if(e.pointerId === aimId) { aimId = null; aimDot.style.transform = `translate(0px,0px)`; } });
-function updateAim(e) {
-  const dx = e.clientX - aimCenter.x, dy = e.clientY - aimCenter.y, d = Math.hypot(dx, dy), maxR = 45;
-  const nx = d > maxR ? dx/d * maxR : dx, ny = d > maxR ? dy/d * maxR : dy;
-  aimDot.style.transform = `translate(${nx}px,${ny}px)`;
-  if(d > 5) { aimX = nx / maxR; aimZ = ny / maxR; }
-}
-
-// Botões de Transição de Tela corrigidos
-document.getElementById("playButton").addEventListener("click", () => {
-  gameStarted = true;
-  document.getElementById("lobby").style.display = "none";
-  document.getElementById("gameHUD").style.display = "block";
-  dropPhase = true; player.visible = false;
-  document.getElementById("dropButton").style.display = "block";
-  document.getElementById("planeNotice").style.display = "block";
-});
-
-document.getElementById("backButton").addEventListener("click", () => {
-  gameStarted = false;
-  document.getElementById("gameHUD").style.display = "none";
-  document.getElementById("lobby").style.display = "flex";
-});
-
-document.getElementById("dropButton").addEventListener("click", () => {
-  if(!dropPhase) return;
-  dropPhase = false; playerDropped = true;
-  player.visible = true; player.position.set(plane.position.x, 25, plane.position.z);
-  jumpV = -0.5;
-  document.getElementById("dropButton").style.display = "none";
-  document.getElementById("planeNotice").style.display = "none";
-});
-
-document.getElementById("fireButton").addEventListener("click", () => {
-  if(!gameStarted || dropPhase) return;
-  shots.push({ x: player.position.x, z: player.position.z, dx: aimX, dz: aimZ, life: 40 });
-});
-
-document.getElementById("actionButton").addEventListener("click", () => {
-  if(!gameStarted || dropPhase || isJumping) return;
-  isJumping = true; jumpV = 0.35;
-});
-
-// Loop do Jogo
-function animate() {
-  requestAnimationFrame(animate);
-  renderer.render(scene, camera);
-  if(!gameStarted) return;
-
-  if(dropPhase) {
-    planeTime += 0.012;
-    plane.position.set(Math.sin(planeTime) * 60, 25, Math.cos(planeTime * 0.8) * 60);
-    camera.position.set(plane.position.x, plane.position.y + 14, plane.position.z + 16);
-    camera.lookAt(plane.position);
-    return;
-  }
-
-  if(playerDropped) {
-    player.position.x += moveX * 0.5;
-    player.position.z += moveY * 0.5;
-    player.position.y += jumpV;
-    jumpV -= 0.015;
-    if(player.position.y <= 0) { player.position.y = 0; playerDropped = false; }
-  } else {
-    player.position.x += moveX * 0.4;
-    player.position.z += moveY * 0.4;
-    if(isJumping) {
-      player.position.y += jumpV; jumpV -= 0.03;
-      if(player.position.y <= 0) { player.position.y = 0; isJumping = false; }
-    }
-  }
-
-  // Câmera Isométrica
-  camera.position.set(player.position.x, player.position.y + 16, player.position.z + 14);
-  camera.lookAt(player.position.x, player.position.y, player.position.z);
-}
-
-animate();
-</script>
-</body>
-</html>
+import * as THREE from "
+  
