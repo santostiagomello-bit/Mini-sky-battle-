@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Free Fire - Drag Headshot & Blinded Edition</title>
+<title>Free Fire - Fully Blinded & Failover Edition</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#030712;color:#fff;font-family:'Segoe UI',Arial,sans-serif;touch-action:none}
@@ -23,7 +23,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 #playButton{width:100%;max-width:300px;padding:16px;border:none;border-radius:14px;background:linear-gradient(180deg,#f97316,#b91c1c);color:#fff;font-size:22px;font-weight:900;box-shadow:0 6px 0 #7f1d1d;cursor:pointer;text-transform:uppercase;letter-spacing:1px;pointer-events:auto;}
 #playButton:active{transform:translateY(4px);box-shadow:0 2px 0 #7f1d1d}
 
-/* Mensagem de Erro */
+/* Mensagem de Erro Blindada */
 #errorMsg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(15,23,42,0.95);border:2px solid #ef4444;padding:20px;border-radius:10px;color:#fff;text-align:center;display:none;z-index:99999;max-width:85%}
 
 /* HUD */
@@ -66,7 +66,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 <body>
 
 <div id="lobby">
-  <div class="lobby-header">🔥 FREE FIRE - DRAG HEADSHOT 🔥</div>
+  <div class="lobby-header">🔥 FREE FIRE - ULTRA BLINDED 🔥</div>
   
   <div class="char-container">
     <div class="char-card active">ALOK</div>
@@ -84,7 +84,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 
 <div id="errorMsg">
   <h3>⚠️ Erro de Inicialização Gráfica</h3>
-  <p>Seu navegador encontrou um bloqueio no WebGL. Tente reabrir em aba anônima.</p>
+  <p>Não foi possível carregar o motor gráfico no seu navegador. Tente abrir em aba anônima.</p>
 </div>
 
 <div id="gameHUD">
@@ -110,7 +110,17 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 </div>
 
 <script type="module">
-import * as THREE from "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.js";
+let THREE;
+try {
+  THREE = await import("https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.js");
+} catch(e1) {
+  try {
+    THREE = await import("https://unpkg.com/three@0.128.0/build/three.module.js");
+  } catch(e2) {
+    document.getElementById("errorMsg").style.display = "block";
+    throw new Error("Falha crítica ao carregar a biblioteca Three.js");
+  }
+}
 
 let sensitivity = 50;
 const sensRange = document.getElementById("sensRange");
@@ -255,130 +265,5 @@ cameraArea.addEventListener("pointermove", e => {
     cameraAngleX = Math.max(-0.8, Math.min(1.2, cameraAngleX + (deltaY * sensFactor)));
     lastCamX = e.clientX;
     lastCamY = e.clientY;
-  }
-});
-cameraArea.addEventListener("pointerup", e => { if(e.pointerId === camTouchId) camTouchId = null; });
 
-// SISTEMA DRAG HEADSHOT (Botão de Atirar Oficial)
-const fireBtn = document.getElementById("fireButton");
-let fireTouchId = null, fireStartX = 0, fireStartY = 0, totalDragY = 0;
-
-fireBtn.addEventListener("pointerdown", e => {
-  fireTouchId = e.pointerId;
-  fireStartX = e.clientX;
-  fireStartY = e.clientY;
-  totalDragY = 0;
-  fireBtn.setPointerCapture(fireTouchId);
-  fireAction();
-});
-
-fireBtn.addEventListener("pointermove", e => {
-  if(e.pointerId === fireTouchId) {
-    const moveX = e.clientX - fireStartX;
-    const moveY = e.clientY - fireStartY;
-    totalDragY += moveY;
-
-    const sensFactor = getSensMultiplier();
-    cameraAngleY -= moveX * sensFactor * 0.8;
-    // Puxada de capa acentuada ao arrastar para cima no botão de tiro
-    cameraAngleX = Math.max(-0.8, Math.min(1.2, cameraAngleX + (moveY * sensFactor * 2.2)));
-
-    fireStartX = e.clientX;
-    fireStartY = e.clientY;
-  }
-});
-
-fireBtn.addEventListener("pointerup", e => {
-  if(e.pointerId === fireTouchId) {
-    // Se o jogador puxou o dedo para cima com força, ativa o Headshot assistido
-    if (totalDragY < -15) {
-      bots.forEach(bot => {
-        if(player.position.distanceTo(bot.group.position) < 25) {
-          bot.isHeadshot = true; // Marca tiro na cabeça
-        }
-      });
-    }
-    fireTouchId = null;
-  }
-});
-
-function fireAction() {
-  if(phase !== "ground") return;
-  const mat = (c) => new THREE.MeshBasicMaterial({ color: c });
-  const bMesh = new THREE.Mesh(new THREE.SphereGeometry(0.22), mat(0xfacc15));
-  bMesh.position.set(player.position.x, player.position.y + 1.2, player.position.z);
-  scene.add(bMesh);
-
-  const dirX = Math.sin(cameraAngleY);
-  const dirZ = Math.cos(cameraAngleY);
-  bullets.push({ mesh: bMesh, dx: -dirX, dz: -dirZ, life: 50 });
-}
-
-const sprintBtn = document.getElementById("sprintButton");
-sprintBtn.addEventListener("click", () => {
-  isSprinting = !isSprinting;
-  sprintBtn.style.background = isSprinting ? "rgba(234,179,8,0.85)" : "rgba(234,179,8,0.4)";
-});
-
-const aimButton = document.getElementById("aimButton");
-aimButton.addEventListener("click", () => {
-  isAiming = !isAiming;
-  aimButton.style.background = isAiming ? "rgba(250,204,21,0.85)" : "rgba(0,0,0,0.5)";
-  document.getElementById("crosshair").style.transform = isAiming ? "translate(-50%, -50%) scale(1.4)" : "translate(-50%, -50%) scale(1)";
-});
-
-// Transição Segura
-const startGame = (e) => {
-  if(e) e.stopPropagation();
-  if(!scene) { initEngine(); }
-  document.getElementById("lobby").style.display = "none";
-  document.getElementById("planeOverlay").style.display = "block";
-  gameStarted = true;
-  phase = "plane";
-  plane.visible = true;
-  if(renderer) { renderer.setSize(innerWidth, innerHeight); }
-};
-
-document.getElementById("playButton").addEventListener("click", startGame);
-document.getElementById("playButton").addEventListener("touchend", startGame);
-
-const jumpPlane = (e) => {
-  if(e) e.stopPropagation();
-  if (phase !== "plane") return;
-  phase = "diving";
-  player.visible = true;
-  player.position.set(plane.position.x, 60, plane.position.z);
-  diveY = 60;
-  plane.visible = false;
-  document.getElementById("planeOverlay").style.display = "none";
-  document.getElementById("gameHUD").style.display = "block";
-};
-
-document.getElementById("jumpButtonPlane").addEventListener("click", jumpPlane);
-document.getElementById("jumpButtonPlane").addEventListener("touchend", jumpPlane);
-
-function animate() {
-  requestAnimationFrame(animate);
   
-  if (renderer && scene && camera) {
-    const targetFOV = isAiming ? 45 : 72;
-    camera.fov += (targetFOV - camera.fov) * 0.15;
-    camera.updateProjectionMatrix();
-    renderer.render(scene, camera);
-  }
-  if (!gameStarted) return;
-
-  if (phase === "plane") {
-    planeTime += 0.008;
-    plane.position.set(Math.sin(planeTime) * 110, 60, Math.cos(planeTime * 0.6) * 110);
-    camera.position.set(plane.position.x, plane.position.y + 12, plane.position.z + 24);
-    camera.lookAt(plane.position);
-  }
-  else if (phase === "diving") {
-    player.position.x += moveX * 0.8;
-    player.position.z += moveY * 0.8;
-    diveY -= 0.5;
-    player.position.y = Math.max(0, diveY);
-
-    camera.position.set(player.position.x, player.position.y + 16, player.position.z + 2
-                        
