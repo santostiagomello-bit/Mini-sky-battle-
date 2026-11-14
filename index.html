@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Free Fire - Ultimate Anti-BlackScreen</title>
+<title>Free Fire - FPS Aim & Red Crosshair Fix</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
@@ -41,10 +41,10 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 #joystick{position:absolute;bottom:35px;left:35px;width:125px;height:125px;border:2px solid rgba(255,255,255,0.25);border-radius:50%;background:rgba(0,0,0,0.25);pointer-events:auto;touch-action:none}
 #stick{position:absolute;left:50%;top:50%;width:55px;height:55px;margin:-27px;border:2px solid #fff;border-radius:50%;background:rgba(255,255,255,0.65);box-shadow:0 2px 5px rgba(0,0,0,0.3)}
 
-/* Área de Toque Direita para Câmera Livre 360° */
+/* Área de Toque Direita para Câmera Livre */
 #cameraTouchArea{position:absolute;right:0;top:0;width:55%;height:100%;pointer-events:auto;z-index:40}
 
-/* Botão de Atirar (Com Drag Headshot) */
+/* Botão de Atirar */
 #fireButton{position:absolute;right:40px;bottom:30px;width:95px;height:95px;border:4px solid #ef4444;border-radius:50%;background:rgba(239,68,68,0.5);pointer-events:auto;box-shadow:0 4px 15px rgba(0,0,0,0.5);z-index:45;touch-action:none;display:flex;align-items:center;justify-content:center}
 .fire-inner{width:35px;height:35px;background:#fff;border-radius:50%;opacity:0.8}
 
@@ -52,8 +52,8 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 #sprintButton{position:absolute;right:155px;bottom:45px;width:60px;height:60px;border:2px solid #facc15;border-radius:50%;background:rgba(234,179,8,0.4);pointer-events:auto;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px;z-index:45}
 #jumpButtonHud{position:absolute;right:65px;bottom:145px;width:65px;height:65px;border:2px solid #38bdf8;border-radius:50%;background:rgba(56,189,248,0.4);pointer-events:auto;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px;z-index:45}
 
-/* Mira Centralizada de FPS */
-#crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:16px;height:16px;border:2px solid rgba(255,255,255,0.85);border-radius:50%;pointer-events:none;z-index:45;display:flex;align-items:center;justify-content:center;box-shadow:0 0 4px rgba(0,0,0,0.5)}
+/* Mira Centralizada de FPS (Muda de cor dinamicamente) */
+#crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:18px;height:18px;border:2px solid rgba(255,255,255,0.85);border-radius:50%;pointer-events:none;z-index:45;display:flex;align-items:center;justify-content:center;box-shadow:0 0 4px rgba(0,0,0,0.5);transition:border-color 0.1s}
 .cross-dot{width:2px;height:2px;background:#fff;border-radius:50%}
 
 /* Avião */
@@ -66,7 +66,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 <body>
 
 <div id="lobby">
-  <div class="lobby-header">🔥 FREE FIRE - NO BLACKSCREEN 🔥</div>
+  <div class="lobby-header">🔥 FREE FIRE - PERFECT AIM & RED CROSSHAIR 🔥</div>
   
   <div class="char-container">
     <div class="char-card active">ALOK</div>
@@ -134,7 +134,6 @@ let cameraAngleY = 0, cameraAngleX = 0;
 let isAiming = false, isSprinting = false;
 let killCount = 0, aliveCount = 50;
 
-// Inicializa a engine imediatamente em segundo plano para evitar tela preta
 function initEngine() {
   try {
     scene = new THREE.Scene();
@@ -143,7 +142,6 @@ function initEngine() {
 
     camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 400);
     
-    // Renderizador com fallback seguro para dispositivos móveis
     renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "default" });
     renderer.setSize(innerWidth, innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
@@ -217,7 +215,6 @@ function initEngine() {
   }
 }
 
-// Inicia imediatamente ao carregar a página
 initEngine();
 
 // Joystick
@@ -252,7 +249,7 @@ function getSensMultiplier() {
   return (sensitivity / 50) * 0.0035;
 }
 
-// Câmera Direita (Visão FPS)
+// Câmera Direita (Movimento estrito de FPS: Horizontal = Yaw, Vertical = Pitch)
 const cameraArea = document.getElementById("cameraTouchArea");
 let camTouchId = null, lastCamX = 0, lastCamY = 0;
 
@@ -267,15 +264,20 @@ cameraArea.addEventListener("pointermove", e => {
     let deltaX = e.clientX - lastCamX;
     let deltaY = e.clientY - lastCamY;
     const sensFactor = getSensMultiplier();
+
     cameraAngleY -= deltaX * sensFactor;
-    cameraAngleX = Math.max(-1.2, Math.min(1.2, cameraAngleX - (deltaY * sensFactor)));
+    cameraAngleX -= deltaY * sensFactor; // Apenas cima e baixo puro
+
+    // Trava para não olhar de ponta-cabeça
+    cameraAngleX = Math.max(-1.2, Math.min(1.2, cameraAngleX));
+
     lastCamX = e.clientX;
     lastCamY = e.clientY;
   }
 });
 cameraArea.addEventListener("pointerup", e => { if(e.pointerId === camTouchId) camTouchId = null; });
 
-// Sistema Drag Headshot (Primeira Pessoa)
+// Sistema Drag Headshot e Disparo
 const fireBtn = document.getElementById("fireButton");
 let fireTouchId = null, fireStartX = 0, fireStartY = 0, totalDragY = 0;
 
@@ -296,7 +298,8 @@ fireBtn.addEventListener("pointermove", e => {
 
     const sensFactor = getSensMultiplier();
     cameraAngleY -= moveX * sensFactor * 0.8;
-    cameraAngleX = Math.max(-1.2, Math.min(1.2, cameraAngleX - (moveY * sensFactor * 1.8)));
+    cameraAngleX -= moveY * sensFactor * 2.0; // Puxadão de capa com o botão de tiro
+    cameraAngleX = Math.max(-1.2, Math.min(1.2, cameraAngleX));
 
     fireStartX = e.clientX;
     fireStartY = e.clientY;
@@ -305,9 +308,9 @@ fireBtn.addEventListener("pointermove", e => {
 
 fireBtn.addEventListener("pointerup", e => {
   if(e.pointerId === fireTouchId) {
-    if (totalDragY < -15) {
+    if (totalDragY < -10) {
       bots.forEach(bot => {
-        if(player.position.distanceTo(bot.group.position) < 25) {
+        if(player.position.distanceTo(bot.group.position) < 30) {
           bot.isHeadshot = true;
         }
       });
@@ -323,9 +326,11 @@ function fireAction() {
   bMesh.position.set(player.position.x, player.position.y + 1.6, player.position.z);
   scene.add(bMesh);
 
-  const dirX = Math.sin(cameraAngleY);
-  const dirZ = Math.cos(cameraAngleY);
-  bullets.push({ mesh: bMesh, dx: -dirX, dz: -dirZ, life: 50 });
+  // Vetor de direção exato da câmera FPS (para onde a mira aponta)
+  const dir = new THREE.Vector3();
+  camera.getWorldDirection(dir);
+
+  bullets.push({ mesh: bMesh, dir: dir.clone(), life: 60 });
 }
 
 const sprintBtn = document.getElementById("sprintButton");
@@ -400,6 +405,7 @@ function animate() {
 
     camera.position.copy(player.position);
     camera.rotation.set(0, 0, 0);
+    camera.rotation.order = 'YXZ';
     camera.rotation.y = cameraAngleY;
     camera.rotation.x = cameraAngleX;
 
@@ -415,8 +421,36 @@ function animate() {
 
     camera.position.set(player.position.x, player.position.y + 1.6, player.position.z);
     camera.rotation.set(0, 0, 0);
+    camera.rotation.order = 'YXZ';
     camera.rotation.y = cameraAngleY;
     camera.rotation.x = cameraAngleX;
+
+    // Assistência de mira, checagem de proximidade e cor vermelha da mira
+    let enemyInSight = false;
+    const camDir = new THREE.Vector3();
+    camera.getWorldDirection(camDir);
+
+    bots.forEach(bot => {
+      const dist = player.position.distanceTo(bot.group.position);
+      if(dist < 35) {
+        const toBot = bot.group.position.clone().sub(camera.position).normalize();
+        const dot = camDir.dot(toBot); // Verifica se o bot está na frente da câmera
+
+        if (dot > 0.85) { // Alvo na mira
+          enemyInSight = true;
+          // Puxadão suave de assistência de mira
+          const targetAngleY = Math.atan2(bot.group.position.x - player.position.x, bot.group.position.z - player.position.z);
+          cameraAngleY += (targetAngleY - cameraAngleY) * 0.05;
+        }
+      }
+    });
+
+    const crosshairEl = document.getElementById("crosshair");
+    if (enemyInSight) {
+      crosshairEl.style.borderColor = "#ef4444"; // Fica vermelha
+    } else {
+      crosshairEl.style.borderColor = "rgba(255,255,255,0.85)"; // Branca padrão
+    }
 
     bots.forEach(bot => {
       const dx = player.position.x - bot.group.position.x;
@@ -431,8 +465,7 @@ function animate() {
 
     for(let i = bullets.length - 1; i >= 0; i--) {
       const b = bullets[i];
-      b.mesh.position.x += b.dx * 2.5;
-      b.mesh.position.z += b.dz * 2.5;
+      b.mesh.position.addScaledVector(b.dir, 3.0);
       b.life--;
 
       bots.forEach((bot, bIdx) => {
@@ -448,15 +481,4 @@ function animate() {
         }
       });
 
-      if(b.life <= 0 && b.mesh.parent) {
-        scene.remove(b.mesh);
-        bullets.splice(i, 1);
-      }
-    }
-  }
-}
-
-animate();
-</script>
-</body>
-</html>
+      if(b.life <= 0 && b.mes
