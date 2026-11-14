@@ -1,235 +1,56 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>MINI SKY BATTLE V4</title>
+<title>BATTLELANDS 3D - MINI ROYALE</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#142e48;color:#fff;font-family:Arial,sans-serif;touch-action:none}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#2b6cb0;color:#fff;font-family:'Segoe UI',Arial,sans-serif;touch-action:none}
 canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
-#background{position:fixed;inset:0;z-index:1;background:radial-gradient(ellipse at 50% 35%,#9ad7ef 0%,#5eacd0 48%,#275477 100%)}
-#lobby{position:fixed;inset:0;z-index:5;pointer-events:none}
-#logo{position:absolute;top:4%;left:50%;transform:translateX(-50%);font-size:clamp(23px,4vw,43px);font-weight:1000;color:#ffdf45;text-shadow:3px 4px 0 #713c18,-2px -2px 0 white;white-space:nowrap}
-#playArea{position:absolute;top:5%;left:3%;pointer-events:auto}
-#playButton{padding:14px 26px;border:3px solid #fff1a0;border-radius:15px;background:linear-gradient(#fff06b,#ff9c19);color:#663300;font-size:clamp(18px,2.5vw,27px);font-weight:1000;box-shadow:0 6px 0 #a85a12}
-#profile{position:absolute;top:22%;left:3%;padding:12px;width:clamp(125px,20vw,205px);border:2px solid #9bcfff;border-radius:13px;background:#102f50e8;font-size:14px;font-weight:bold}
-#profile small{display:block;margin-top:6px;color:#ffdc51}
-#currency{position:absolute;top:5%;right:3%;padding:10px 14px;border:2px solid #9bcfff;border-radius:12px;background:#102f50e8;font-weight:bold}
-#sideButtons{position:absolute;right:3%;top:34%;display:flex;flex-direction:column;gap:9px;pointer-events:auto}
-.menuButton{min-width:125px;padding:12px 8px;border:2px solid #b6ddff;border-radius:12px;background:linear-gradient(135deg,#205d91,#102d52);color:white;font-weight:900}
-#subtitle{position:absolute;bottom:5%;left:50%;transform:translateX(-50%);padding:10px 18px;border:2px solid #ffffffaa;border-radius:12px;background:#102f50d9;font-weight:1000;white-space:nowrap;text-align:center}
-#popup{display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(320px,80%);padding:18px;border:3px solid #ffdc51;border-radius:16px;background:#123858f5;text-align:center;pointer-events:auto}
-#popup button{padding:10px 24px;border:0;border-radius:9px;background:#ffbd37;color:#573000;font-weight:bold}
+#lobby{position:fixed;inset:0;z-index:5;pointer-events:none;background:radial-gradient(circle at 50% 30%,#4299e1 0%,#1a365d 100%)}
+#logo{position:absolute;top:6%;left:50%;transform:translateX(-50%);font-size:clamp(26px,5vw,46px);font-weight:900;color:#f6e05e;text-shadow:3px 3px 0 #9b2c2c,-2px -2px 0 #fff;white-space:nowrap}
+#playArea{position:absolute;top:16%;left:50%;transform:translateX(-50%);pointer-events:auto}
+#playButton{padding:16px 36px;border:4px solid #fef08a;border-radius:20px;background:linear-gradient(180deg,#facc15,#d97706);color:#422006;font-size:clamp(20px,3vw,30px);font-weight:900;box-shadow:0 8px 0 #92400e,0 12px 20px rgba(0,0,0,0.4);cursor:pointer}
+#playButton:active{transform:translateY(4px);box-shadow:0 4px 0 #92400e}
+#sideButtons{position:absolute;right:4%;top:25%;display:flex;flex-direction:column;gap:12px;pointer-events:auto}
+.menuButton{min-width:140px;padding:12px 14px;border:2px solid #90cdf4;border-radius:14px;background:linear-gradient(135deg,#3182ce,#2b6cb0);color:white;font-weight:800;box-shadow:0 4px 10px rgba(0,0,0,0.3)}
 #gameHUD{display:none;position:fixed;inset:0;z-index:4;pointer-events:none}
-#health{position:absolute;top:12px;left:12px;width:165px;padding:9px 11px;border-radius:10px;background:#173b58e8;font-size:12px;font-weight:bold}
-#healthTrack{height:9px;margin-top:6px;border-radius:8px;background:#5b2630;overflow:hidden}
-#healthFill{height:100%;width:100%;background:#52df68;transition:width .15s}
-#healthText{display:block;margin-top:4px}
-#status{position:absolute;top:12px;left:190px;padding:9px 11px;border-radius:10px;background:#173b58e8;font-size:12px;font-weight:bold}
-#backButton{position:absolute;top:12px;right:12px;padding:10px 13px;border:2px solid white;border-radius:10px;background:#174566e8;color:white;font-weight:bold;pointer-events:auto}
-#joystick{position:absolute;bottom:18px;left:20px;width:112px;height:112px;border:3px solid #ffffffaa;border-radius:50%;background:#173b5877;pointer-events:auto;touch-action:none}
-#stick{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px;border:2px solid white;border-radius:50%;background:#ffffffbb}
-#actionButton{position:absolute;right:22px;bottom:24px;width:82px;height:82px;border:3px solid white;border-radius:50%;background:#8539d9e8;color:white;font-weight:1000;pointer-events:auto;box-shadow:0 0 15px #a64cff}
-#fireButton{position:absolute;right:116px;bottom:38px;width:68px;height:68px;border:3px solid white;border-radius:50%;background:#e35a35e8;color:white;font-weight:1000;pointer-events:auto}
-#hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);padding:6px 10px;border-radius:8px;background:#102f50c9;font-size:11px;white-space:nowrap}
-#inventory{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:flex;gap:6px;pointer-events:auto}
-.invSlot{min-width:66px;padding:7px 8px;border:2px solid #d5eaff;border-radius:9px;background:#102f50e8;color:white;text-align:center;font-size:10px;font-weight:bold}
-.invSlot.active{border-color:#ffd64a;background:#76521be8}
-.invSlot span{display:block;font-size:17px;margin-bottom:3px}
-#aimPad{position:absolute;right:18px;top:32%;width:125px;height:125px;border:2px dashed #ffffff88;border-radius:50%;background:#173b5844;pointer-events:auto;touch-action:none}
-#aimDot{position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px;border:2px solid white;border-radius:50%;background:#ffdc55}
-#fireButton{right:22px;bottom:26px;width:82px;height:82px}
-#actionButton{right:116px;bottom:34px}
-#useItemButton{position:absolute;right:116px;bottom:124px;width:62px;height:48px;border:2px solid white;border-radius:12px;background:#258b58;color:white;font-size:11px;font-weight:bold;pointer-events:auto}
-#dropButton{position:absolute;left:50%;top:18%;transform:translateX(-50%);padding:13px 22px;border:3px solid #fff1a0;border-radius:13px;background:linear-gradient(#ffe76a,#ff9b19);color:#603400;font-weight:1000;pointer-events:auto;display:none}
-#planeNotice{position:absolute;top:20%;left:50%;transform:translateX(-50%);padding:8px 12px;border-radius:10px;background:#102f50dd;font-weight:bold;font-size:13px;white-space:nowrap}
-#pickupButton{position:absolute;right:22px;bottom:124px;padding:12px 16px;border:2px solid white;border-radius:12px;background:#e4a72d;color:#402500;font-weight:1000;display:none;pointer-events:auto}
-#lootPanel{display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(390px,88vw);max-height:78vh;overflow:auto;padding:15px;border:3px solid #ffd85b;border-radius:16px;background:#102f50f5;pointer-events:auto;box-shadow:0 8px 28px #0009}
-#lootPanel h3{margin:0 0 8px;color:#ffdf68;text-align:center}
-#lootItems{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
-.lootChoice{padding:10px 6px;border:2px solid #8ecbff;border-radius:10px;background:#1d5278;color:white;font-weight:bold}
-#lootClose{display:block;margin:8px auto 0;padding:9px 22px;border:0;border-radius:9px;background:#ffcf4c;color:#573000;font-weight:900}
-#soundButton{position:absolute;right:3%;top:5%;margin-top:56px;padding:9px 12px;border:2px solid #b6ddff;border-radius:10px;background:#173e60;color:white;font-weight:bold;pointer-events:auto}
-#rotateMessage{display:none;position:fixed;inset:0;z-index:20;background:linear-gradient(145deg,#102d4a,#2472a3);align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:25px}
+#health{position:absolute;top:15px;left:15px;width:180px;padding:10px 12px;border-radius:12px;background:rgba(26,54,93,0.9);border:2px solid rgba(255,255,255,0.2);font-size:12px;font-weight:bold}
+#healthTrack{height:10px;margin-top:6px;border-radius:6px;background:#742a2a;overflow:hidden}
+#healthFill{height:100%;width:100%;background:#48bb78;transition:width .15s}
+#backButton{position:absolute;top:15px;right:15px;padding:10px 16px;border:2px solid white;border-radius:12px;background:rgba(43,108,176,0.9);color:white;font-weight:bold;pointer-events:auto}
+#joystick{position:absolute;bottom:20px;left:20px;width:120px;height:120px;border:3px solid rgba(255,255,255,0.4);border-radius:50%;background:rgba(26,54,93,0.3);pointer-events:auto;touch-action:none}
+#stick{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px;border:2px solid white;border-radius:50%;background:rgba(255,255,255,0.8)}
+#aimPad{position:absolute;right:20px;bottom:120px;width:130px;height:130px;border:2px dashed rgba(255,255,255,0.5);border-radius:50%;background:rgba(26,54,93,0.3);pointer-events:auto;touch-action:none}
+#aimDot{position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px;border:2px solid white;border-radius:50%;background:#f6e05e}
+#fireButton{position:absolute;right:20px;bottom:20px;width:85px;height:85px;border:3px solid white;border-radius:50%;background:linear-gradient(135deg,#f56565,#c53030);color:white;font-weight:900;font-size:15px;pointer-events:auto;box-shadow:0 6px 0 #742a2a}
+#actionButton{position:absolute;right:120px;bottom:35px;width:70px;height:70px;border:3px solid white;border-radius:50%;background:linear-gradient(135deg,#9f7aea,#6b46c1);color:white;font-weight:900;pointer-events:auto;box-shadow:0 5px 0 #44337a}
+#planeNotice{position:absolute;top:20%;left:50%;transform:translateX(-50%);padding:10px 18px;border-radius:12px;background:rgba(26,54,93,0.9);font-weight:bold;font-size:14px;border:2px solid #f6e05e;display:none;white-space:nowrap}
+#dropButton{position:absolute;left:50%;top:28%;transform:translateX(-50%);padding:14px 28px;border:3px solid #fef08a;border-radius:14px;background:linear-gradient(180deg,#facc15,#d97706);color:#422006;font-weight:900;font-size:18px;pointer-events:auto;display:none;box-shadow:0 6px 0 #92400e}
+#rotateMessage{display:none;position:fixed;inset:0;z-index:20;background:#1a365d;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:25px}
 #rotateMessage .phone{font-size:70px;animation:turn 2s infinite}
 @keyframes turn{50%{transform:rotate(90deg)}}
-@media(orientation:portrait){
-#pickupButton{position:absolute;right:22px;bottom:124px;padding:12px 16px;border:2px solid white;border-radius:12px;background:#e4a72d;color:#402500;font-weight:1000;display:none;pointer-events:auto}
-#lootPanel{display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(390px,88vw);max-height:78vh;overflow:auto;padding:15px;border:3px solid #ffd85b;border-radius:16px;background:#102f50f5;pointer-events:auto;box-shadow:0 8px 28px #0009}
-#lootPanel h3{margin:0 0 8px;color:#ffdf68;text-align:center}
-#lootItems{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
-.lootChoice{padding:10px 6px;border:2px solid #8ecbff;border-radius:10px;background:#1d5278;color:white;font-weight:bold}
-#lootClose{display:block;margin:8px auto 0;padding:9px 22px;border:0;border-radius:9px;background:#ffcf4c;color:#573000;font-weight:900}
-#soundButton{position:absolute;right:3%;top:5%;margin-top:56px;padding:9px 12px;border:2px solid #b6ddff;border-radius:10px;background:#173e60;color:white;font-weight:bold;pointer-events:auto}
-#rotateMessage{display:flex}}
+@media(orientation:portrait){#rotateMessage{display:flex}}
 </style>
 </head>
 <body>
-<div id="background"></div>
-<div id="rotateMessage"><div class="phone">📱</div><h2>MINI SKY BATTLE</h2><p>Gire o celular para jogar na horizontal!</p></div>
+<div id="rotateMessage"><div class="phone">📱</div><h2>BATTLELANDS ROYALE 3D</h2><p>Gire o celular para a horizontal!</p></div>
 <div id="lobby">
-  <div id="logo">👑 MINI SKY BATTLE</div>
-  <div id="playArea"><button id="playButton">▶ JOGAR</button></div>
-  <div id="profile">👤 JOGADOR<small>NÍVEL 1 · SHADOW ROXO</small></div>
-  <div id="currency">🪙 0 &nbsp; 💎 0</div>
-  <button id="soundButton">🔊 SOM: LIGADO</button>
+  <div id="logo">⭐ BATTLELANDS MINI ⭐</div>
+  <div id="playArea"><button id="playButton">JOGAR</button></div>
   <div id="sideButtons">
-    <button class="menuButton" onclick="openMenu('PERSONAGENS')">👤 PERSONAGENS</button>
-    <button class="menuButton" onclick="openMenu('LOJA')">🛒 LOJA</button>
-    <button class="menuButton" onclick="openMenu('EVENTOS')">🏆 EVENTOS</button>
-    <button class="menuButton" onclick="openMenu('AJUSTES')">⚙️ AJUSTES</button>
+    <button class="menuButton" onclick="alert('Personagens personalizados estilo Battlelands!')">👤 HERÓIS</button>
+    <button class="menuButton" onclick="alert('Loja de itens em breve!')">🛒 LOJA</button>
   </div>
-  <div id="subtitle">UMA PEQUENA IDEIA, UM GRANDE MUNDO.</div>
-  <div id="popup"><h2 id="popupTitle">MENU</h2><p id="popupText">Novidades em breve!</p><button onclick="closeMenu()">FECHAR</button></div>
 </div>
 <div id="gameHUD">
   <div id="health">VIDA<div id="healthTrack"><div id="healthFill"></div></div><span id="healthText">100 / 100</span></div>
-  <div id="status">BOTS: 5 · ARMA: BÁSICA</div>
-  <button id="backButton">VOLTAR AO LOBBY</button>
-  <div id="planeNotice">✈️ VOO SOBRE A ILHA — ESCOLHA ONDE SALTAR</div>
+  <button id="backButton">SAIR</button>
+  <div id="planeNotice">✈️ SOBREVÔO NA ILHA</div>
   <button id="dropButton">🪂 SALTAR</button>
   <div id="joystick"><div id="stick"></div></div>
   <div id="aimPad"><div id="aimDot"></div></div>
   <button id="fireButton">ATIRAR</button>
   <button id="actionButton">PULAR</button>
-  <button id="useItemButton">🩹 CURAR</button>
-  <div id="inventory">
-    <button class="invSlot active" id="slot1"><span>🔫</span>BÁSICA<br><small>∞</small></button>
-    <button class="invSlot" id="slot2"><span>⚡</span>BLASTER<br><small id="ammoText">0</small></button>
-    <button class="invSlot" id="slot3"><span>🩹</span>KIT<br><small id="medText">1</small></button>
-  </div>
-  <button id="pickupButton">🖐️ COLETAR</button>
-  <div id="lootPanel"><h3 id="lootTitle">LOOT DO INIMIGO</h3><p style="text-align:center;margin:4px 0;font-size:12px">Escolha os itens que deseja pegar</p><div id="lootItems"></div><button id="lootClose">FECHAR</button></div>
-  <div id="hint">Joystick esquerdo: mover · Arraste no círculo direito: mirar · ATIRAR: disparo manual</div>
 </div>
-
-<script type="module">
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
-
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x91cdeb);
-scene.fog = new THREE.Fog(0x91cdeb,85,210);
-const camera = new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,350);
-const renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
-renderer.setSize(innerWidth,innerHeight);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-document.body.appendChild(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xffffff,0x617b50,2.1));
-const sun = new THREE.DirectionalLight(0xffffff,2.2);
-sun.position.set(-35,65,30); sun.castShadow=true; sun.shadow.mapSize.set(1024,1024); scene.add(sun);
-
-const mat=(c,r=.85)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
-const glow=c=>new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:1.1});
-const world=new THREE.Group(); scene.add(world);
-function addMesh(parent,geo,material,x,y,z){const m=new THREE.Mesh(geo,material);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
-function groundPatch(x,z,size,color){const m=addMesh(world,new THREE.PlaneGeometry(size,size),mat(color),x,.025,z);m.rotation.x=-Math.PI/2;return m}
-const base=addMesh(world,new THREE.PlaneGeometry(300,300),mat(0x65b94e),0,0,0);base.rotation.x=-Math.PI/2;
-groundPatch(0,0,115,0x65b94e);
-groundPatch(90,-90,115,0xd9b56e);
-groundPatch(-90,-90,115,0xdceeff);
-groundPatch(90,90,115,0x39333b);
-groundPatch(-90,90,115,0xe9d18d);
-
-function tree(x,z,s=1){addMesh(world,new THREE.CylinderGeometry(.2*s,.29*s,1.5*s,7),mat(0x80502d),x,.75*s,z);addMesh(world,new THREE.IcosahedronGeometry(1.05*s,1),mat(0x367d3b),x,1.8*s,z)}
-function pine(x,z,s=1){addMesh(world,new THREE.CylinderGeometry(.15*s,.23*s,1.1*s,7),mat(0x67442b),x,.55*s,z);for(let i=0;i<3;i++)addMesh(world,new THREE.ConeGeometry((1-i*.18)*s,1.5*s,7),mat(0x28634c),x,(1.35+i*.58)*s,z)}
-function cactus(x,z,s=1){addMesh(world,new THREE.CylinderGeometry(.2*s,.25*s,2*s,8),mat(0x328b50),x,s,z);const arm=addMesh(world,new THREE.CylinderGeometry(.12*s,.14*s,.8*s,8),mat(0x328b50),x+.34*s,.85*s,z);arm.rotation.z=Math.PI/2}
-function rock(x,z,s,c=0x777777){const m=addMesh(world,new THREE.IcosahedronGeometry(s,1),mat(c),x,s*.55,z);m.scale.set(1,.75,1.2)}
-function palm(x,z,s=1){const t=addMesh(world,new THREE.CylinderGeometry(.12*s,.2*s,3*s,7),mat(0x87532d),x,1.5*s,z);t.rotation.z=-.12;for(let i=0;i<7;i++){const a=i*Math.PI*2/7;const leaf=addMesh(world,new THREE.ConeGeometry(.2*s,2*s,6),mat(0x258447),x+Math.cos(a)*.8*s,2.9*s,z+Math.sin(a)*.8*s);leaf.rotation.z=Math.PI/2;leaf.rotation.y=-a}}
-function house(x,z){addMesh(world,new THREE.BoxGeometry(4,2.5,3.5),mat(0xf0d49b),x,1.25,z);const roof=addMesh(world,new THREE.ConeGeometry(3.1,1.8,4),mat(0xd45b3c),x,3.35,z);roof.rotation.y=Math.PI/4}
-for(const [x,z,s] of [[-35,-30,1.3],[35,-30,1.2],[-35,30,1.2],[35,30,1.3],[-20,-12,1],[20,15,1.1],[0,-42,1.2],[0,42,1.2]])tree(x,z,s);
-house(-28,-43);house(30,42);
-for(const [x,z,s] of [[55,-55,1.1],[95,-48,.9],[125,-85,1.2],[70,-115,1],[110,-125,.8]])cactus(x,z,s);
-[[60,-100,2,0xa17b51],[120,-55,2.5,0x997044],[90,-75,1.5,0xb28a56],[130,-115,1.8,0x997044]].forEach(a=>rock(...a));
-[[-55,-55,1.3],[-95,-48,1.1],[-125,-80,1.2],[-75,-115,1.3],[-115,-125,1]].forEach(a=>pine(...a));
-[[-60,-100,2,0xa9c5d8],[-120,-55,2.3,0xc0d6e8],[-100,-85,1.5,0x91a9bb]].forEach(a=>rock(...a));
-const mountain=addMesh(world,new THREE.ConeGeometry(16,23,6),mat(0xb9d9ef),-115,11,-105);
-[[55,55,3,0x29252d],[125,65,3.5,0x242128],[75,125,2.8,0x302a32],[125,120,2.5,0x28232b],[95,85,2,0x201c25]].forEach(a=>rock(...a));
-function lava(x,z,w,h){addMesh(world,new THREE.BoxGeometry(w,.08,h),glow(0xff4b12),x,.08,z)}
-lava(90,65,3,28);lava(105,100,24,2);lava(65,115,2,20);
-addMesh(world,new THREE.ConeGeometry(17,22,8),mat(0x242128),110,10,110);
-addMesh(world,new THREE.CylinderGeometry(5,7,1,12),glow(0xff3b0b),110,20.5,110);
-[[-55,55,1.2],[-95,60,1],[-120,105,1.2],[-70,125,1.1]].forEach(a=>palm(...a));
-rock(-45,90,1.5,0xb6a078);rock(-115,45,1.3,0xb6a078);
-const sea=addMesh(world,new THREE.PlaneGeometry(18,115),mat(0x249bd4,.35),-145,.04,90);sea.rotation.x=-Math.PI/2;
-const border=mat(0x283d4c);
-for(const [x,y,z,sx,sy,sz] of [[0,1,-150,300,2,.8],[0,1,150,300,2,.8],[-150,1,0,.8,2,300],[150,1,0,.8,2,300]])addMesh(world,new THREE.BoxGeometry(sx,sy,sz),border,x,y,z);
-
-// Personagem cartunesco Shadow Roxo
-function createCharacter(isPlayer=false){
- const g=new THREE.Group(), body=new THREE.Group();g.add(body);
- const black=mat(0x101018),cloth=mat(0x191923),purple=glow(0x9b25ff),skin=mat(0xb87955),eye=glow(0xc77aff);
- addMesh(body,new THREE.CapsuleGeometry(.5,.68,5,12),cloth,0,1.48,0);
- addMesh(body,new THREE.BoxGeometry(.68,.72,.08),black,0,1.52,.42);
- addMesh(body,new THREE.BoxGeometry(.055,.7,.035),purple,-.31,1.52,.47);
- addMesh(body,new THREE.BoxGeometry(.055,.7,.035),purple,.31,1.52,.47);
- addMesh(body,new THREE.BoxGeometry(.55,.045,.035),purple,0,1.17,.47);
- const head=new THREE.Group();head.position.set(0,2.52,0);body.add(head);
- const hood=addMesh(head,new THREE.SphereGeometry(.59,20,16),black,0,.05,-.04);hood.scale.set(1.05,1.08,.92);
- addMesh(head,new THREE.SphereGeometry(.32,18,14),skin,0,.01,.36);
- addMesh(head,new THREE.BoxGeometry(.55,.23,.13),black,0,-.16,.61);
- addMesh(head,new THREE.BoxGeometry(.56,.035,.035),purple,0,-.08,.69);
- addMesh(head,new THREE.SphereGeometry(.045,10,10),eye,-.13,.06,.65);
- addMesh(head,new THREE.SphereGeometry(.045,10,10),eye,.13,.06,.65);
- const ring=addMesh(head,new THREE.TorusGeometry(.43,.035,8,32),purple,0,.02,.43);ring.scale.set(1,1.13,1);
- const limbs=[];
- for(const side of [-1,1]){
-  const leg=new THREE.Group();leg.position.set(side*.23,1.02,0);body.add(leg);
-  addMesh(leg,new THREE.BoxGeometry(.35,.78,.39),cloth,0,-.38,0);
-  addMesh(leg,new THREE.BoxGeometry(.38,.05,.4),purple,0,-.18,.02);
-  addMesh(leg,new THREE.BoxGeometry(.4,.2,.56),black,0,-.8,.1);
-  const arm=new THREE.Group();arm.position.set(side*.53,1.85,0);body.add(arm);
-  addMesh(arm,new THREE.CapsuleGeometry(.17,.58,5,10),cloth,0,-.38,0);
-  addMesh(arm,new THREE.BoxGeometry(.34,.055,.34),purple,0,-.56,.03);
-  limbs.push({leg,arm});
- }
- g.userData={body,limbs,isPlayer};return g;
-}
-const player=createCharacter(true);player.scale.setScalar(1.05);scene.add(player);
-const platform=addMesh(scene,new THREE.CylinderGeometry(1.35,1.5,.18,32),mat(0x4b8b43),0,.09,0);
-const bots=[],loot=[],shots=[],effects=[],enemyCrates=[];
-let nearbyPickup=null,activeEnemyCrate=null;
-let gameStarted=false,health=100,coins=0,weapon="BÁSICA",ammo=Infinity,medkits=1,moveX=0,moveY=0,jumpV=0,isJumping=false,fireCooldown=0,elapsed=0;
-let dropPhase=false,playerDropped=false,planeTime=0,aimX=0,aimZ=-1,aimPointer=null,aimStart=null;
-const plane=new THREE.Group();scene.add(plane);
-const planeMat=mat(0x34495e),wingMat=mat(0x71879a);
-addMesh(plane,new THREE.BoxGeometry(5,.8,1.2),planeMat,0,0,0);
-addMesh(plane,new THREE.BoxGeometry(1.3,.18,10),wingMat,0,.05,0);
-addMesh(plane,new THREE.ConeGeometry(.65,2,8),planeMat,0,0,-3.2).rotation.x=-Math.PI/2;
-addMesh(plane,new THREE.BoxGeometry(.25,1.8,2),wingMat,0,.7,-3.7);
-plane.visible=false;
-function addParachute(character){
- const pack=new THREE.Group();character.add(pack);pack.position.set(0,4.3,0);
- const canopy=addMesh(pack,new THREE.SphereGeometry(1,16,10,0,Math.PI*2,0,Math.PI/2),mat(0xa32be8),0,.8,0);
- canopy.scale.set(1.6,.65,1.05);
- for(let i=-1;i<=1;i++){
-  const cord=addMesh(pack,new THREE.CylinderGeometry(.018,.018,1.15,5),mat(0xf4f4f4),i*.72,.05,.05);
-  cord.rotation.z=i*.45;
- }
- pack.visible=false;return pack;
-}
-const playerParachute=addParachute(player);
-const lobby=document.getElementById("lobby"),hud=document.getElementById("gameHUD"),background=document.getElementById("background");
-const $=id=>document.getElementById(id);
-// Áudio sintetizado: funciona sem baixar arquivos externos.
-let audioCtx=null,soundEnabled=true,lobbyMusicTimer=null,lobbyMusicStep=0;
-function audioReady(){if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume();}
-function tone(freq,duration,type="sine",volume=.035,slide=0){
- if(!soundEnabled)return;
- try{audioReady();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.setValueAtTime(freq,audioCtx.currentTime);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(30,freq+slide),audioCtx.currentTime+duration);g.gain.setValueAtTime(volume,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+duration);}catch(e){}
-}
-function sfx(name){
- if(!soundEnabled)return;
- if(name==="shot"){tone(150,.12,"sawtooth",.055,-90);tone(65,.09,"triangle",.035,-25);}
- if(name==="pickup"){tone(620,.08,"sine",.04,180);setTimeout(()=>tone(880,.12,"sine",.035,120),65);}
- if(name==="open"){tone(330,.12,"triangle",.04,170);setTimeout(()=>tone(520,.15,"sine",.035,220),90);}
- if(name==="lobby"){tone([392,494,587,494][lobbyMusicStep%4],.28,"sine",.012);lobbyMusicStep++;}
- if(name==="enemy"){tone(220,.16,"square",.025,-90);}
-}
-function startLobbyMusic(){stopLobbyMusic();if(!soundEnabled||gameStarted)return;lobbyMusicTimer=setInterval(()=>sfx("lobby"),520);}
-function stopLobbyMusic(){if(lobbyMusicTimer){clearInterval(lobbyMusicTimer);lobbyMusicTimer=null;}}
-$("soundButton").addEventListener("click",()=>{soundEnabled=!soundEnabled;$("soundButton").textContent=sound
