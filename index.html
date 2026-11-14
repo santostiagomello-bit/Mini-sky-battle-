@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Free Fire - Fully Blinded Stable Edition</title>
-<!-- CDN Oficial Estável com Fallback Automático -->
+<title>Free Fire - Fully Blinded & Safe Start</title>
+<!-- CDN Oficial Estável -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
@@ -70,7 +70,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 <body>
 
 <div id="lobby">
-  <div class="lobby-header">🔥 FREE FIRE - STABLE BLINDED 🔥</div>
+  <div class="lobby-header">🔥 FREE FIRE - SAFE START EDITION 🔥</div>
   
   <div class="char-container">
     <div class="char-card active">ALOK</div>
@@ -196,17 +196,5 @@ function initEngine() {
 
     const gunBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.6), mat(0x0f172a));
     gunBarrel.rotation.x = Math.PI / 2;
-    gunBarrel.position.set(0.3, -0.23, -0.9);
-    weaponGroup.add(gunBarrel);
-
-    camera.add(weaponGroup);
-    scene.add(camera);
-
-    plane = new THREE.Mesh(new THREE.BoxGeometry(8, 2.2, 3), mat(0x334155));
-    plane.visible = false;
-    scene.add(plane);
-
-    for(let i = 0; i < 6; i++) {
-      const bGroup = new THREE.Group();
-      const bTorso = new THREE.Mesh(new THREE.BoxGeometry(0.75, 1.1, 0.45
-                                                          
+    gunBarrel.position.set(0.3
+                           
