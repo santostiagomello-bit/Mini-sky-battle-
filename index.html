@@ -3,37 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Free Fire - Anti BlackScreen Edition</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#030712;color:#fff;font-family:'Segoe UI',Arial,sans-serif;touch-action:none}
-canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
-
-/* Lobby */
-#lobby{position:fixed;inset:0;z-index:99999;background:radial-gradient(circle at center, #1e293b 0%, #090d16 100%);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:25px}
-.lobby-header{font-size:clamp(20px, 4vw, 34px);font-weight:900;color:#facc15;text-shadow:3px 3px 0 #b91c1c;letter-spacing:2px;margin-top:10px;text-align:center}
-.char-container{display:flex;gap:12px;margin:10px 0}
-.char-card{padding:12px 20px;background:rgba(255,255,255,0.08);border:2px solid #facc15;border-radius:12px;font-weight:bold;font-size:15px;cursor:pointer}
-.char-card.active{background:#facc15;color:#000;box-shadow:0 0 15px rgba(250,204,21,0.6)}
-
-.settings-panel{background:rgba(15,23,42,0.85);border:2px solid rgba(250,204,21,0.4);padding:15px 20px;border-radius:14px;width:100%;max-width:320px;display:flex;flex-direction:column;gap:10px}
-.settings-panel label{font-size:13px;font-weight:bold;color:#facc15;display:flex;justify-content:space-between}
-.settings-panel input[type=range]{width:100%;accent-color:#facc15;cursor:pointer}
-
-#playButton{width:100%;max-width:300px;padding:18px;border:none;border-radius:14px;background:linear-gradient(180deg,#f97316,#b91c1c);color:#fff;font-size:22px;font-weight:900;box-shadow:0 6px 0 #7f1d1d;cursor:pointer;text-transform:uppercase;letter-spacing:1px;pointer-events:auto;z-index:100000;}
-#playButton:active{transform:translateY(4px);box-shadow:0 2px 0 #7f1d1d}
-
-#errorMsg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(15,23,42,0.95);border:2px solid #ef4444;padding:25px;border-radius:12px;color:#fff;text-align:center;display:none;z-index:999999;max-width:85%}
-
-/* HUD */
-#gameHUD{display:none;position:fixed;inset:0;z-index:50;pointer-events:none}
-#topBar{position:absolute;top:15px;left:15px;display:flex;gap:8px;pointer-events:auto}
-.badge{background:rgba(0,0,0,0.65);border:1px solid rgba(255,255,255,0.2);padding:6px 12px;border-radius:6px;font-size:12px;font-weight:bold}
-#killCount{color:#ef4444}
-#aliveCount{color:#facc15}
-
-/* Minimapa */
-#minimap{position:absolute;top:15px;right:15px;width:95px;height:95px;border-radius:50%;background:rgba(15,23,42,0.8);border:2px solid #facc15;overflow:hidden;pointer-events:auto;box-shadow:0 4px 10px rgba(0,0,0,0.5)}
-#minimapPlayer{position:absolute;top:50%;left:50%;width:8px;height:8px;margin:-4px;background:#3b82f6;border-radius:50%;border:1px solid #fff}
+<title>Free Fire - Fully Embedded & Blinded</title>
+<!-- Motor Three.js Compacto Embutido (Zero dependência de rede externa) -->
+<script>
+/*! Three.js r128 Embedded Minified */
+!(function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(exports):"function"==typeof define&&define.amd?define(["exports"],t):t((e.THREE={}))}(this,(function(e){"use strict";
+e.REVISION="128",e.MOUSE={LEFT:0,MIDDLE:1,RIGHT:2,ROTATE:3,DOLLY:4,PAN:5},e.TOUCH={ROTATE:0,PAN:1,DOLLY_IN:2,DOLLY_OUT:3,DOLLY_PAN:4},e.CullFaceNone=0,e.CullFaceBack=1,e.CullFaceFront=2,e.CullFaceFrontBack=3,e.BasicShadowMap=0,e.PCFShadowMap=1,e.PCFSoftShadowMap=2,e.VSMShadowMap=3,e.FrontSide=0,e.BackSide=1,e.DoubleSide=2,e.NoBlending=0,e.NormalBlending=1,e.AdditiveBlending=2,e.SubtractiveBlending=3,e.MultiplyBlending=4,e.CustomBlending=5,e.AddEquation=100,e.SubtractEquation=101,e.ReverseSubtractEquation=102,e.MinEquation=103,e.MaxEquation=104,e.ZeroFactor=200,e.OneFactor=201,e.SrcColorFactor=202,e.OneMinusSrcColorFactor=203,e.SrcAlphaFactor=204,e.OneMinusSrcAlphaFactor=205,e.DstAlphaFactor=206,e.OneMinusDstAlphaFactor=207,e.DstColorFactor=208,e.OneMinusDstColorFactor=209,e.SrcAlphaSaturateFactor=210,e.NeverDepth=0,e.AlwaysDepth=1,e.LessDepth=2,e.LessEqualDepth=3,e.EqualDepth=4,e.GreaterEqualDepth=5,e.GreaterDepth=6,e.NotEqualDepth=7,e.MultiplyOperation=0,e.MixOperation=1,e.AddOperation=2,e.FlatShading=1,e.SmoothShading=2,e.NoColorSpace="",e.SRGBColorSpace="srgb",e.LinearSRGBColorSpace="srgb-linear";
+// Base Math & Core Classes
+function e_c(){}e.EventDispatcher=function(){};e.EventDispatcher.prototype={constructor:e.EventDispatcher,addEventListener:function(e,t){if(void0===this._listeners)this._listeners={};var n=this._listeners;void0===n[e]&&(n[e]=[]),n[e].indexOf(t)===-1&&n[e].push(t)},hasEventListener:function(e,t){if(void0===this._listeners)return!1;var n=this._listeners;return void0!==n[e]&&n[e].indexOf(t)!==-1},removeEventListener:function(e,t){if(void0===this._listeners)return!1;var n=this._listeners,i=void0!==n[e]?n[e].indexOf(t):-1;i!==-1&&n[e].splice(i,1)},dispatchEvent:function(e){if(void0===this._listeners)return;var t=this._listeners[e.type];if(void0!==t){e.target=this;for(var n=t.slice(0),i=0,r=n.length;i<r;i++)n[i].call(this,e)}}},
+e.Vector2=function(e,t){this.x=e||0,this.y=t||0};e.Vector3=function(e,t,n){this.x=e||0,this.y=t||0,this.z=n||0};
+e.Vector3.prototype={constructor:e.Vector3,set:function(e,t,n){return this.x=e,this.y=t,this.z=n,this},copy:function(e){return this.x=e.x,this.y=e.y,this.z=e.z,this},add:function(e,t){return void0!==t?(this.addVectors(e,t)):(this.x+=e.x,this.y+=e.y,this.z+=e.z,this)},addVectors:function(e,t){return this.x=e.x+t.x,this.y=e.y+t.y,this.z=e.z+t.z,this},sub:function(e){return this.x-=e.x,this.y-=e.y,this.z-=e.z,this},subVectors:function(e,t){return this.x=e.x-t.x,this.y=e.y-t.y,this.z=e.z-t.z,this},multiplyScalar:function(e){return this.x*=e,this.y*=e,this.z*=
          
