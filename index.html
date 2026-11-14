@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Free Fire 2020 - Poco Edition</title>
+<title>Free Fire 2020 - Ultimate Edition</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#030712;color:#fff;font-family:'Segoe UI',Arial,sans-serif;touch-action:none}
@@ -33,7 +33,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 #joystick{position:absolute;bottom:30px;left:30px;width:120px;height:120px;border:2px solid rgba(255,255,255,0.25);border-radius:50%;background:rgba(0,0,0,0.25);pointer-events:auto;touch-action:none}
 #stick{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px;border:2px solid #fff;border-radius:50%;background:rgba(255,255,255,0.65);box-shadow:0 2px 5px rgba(0,0,0,0.3)}
 
-/* Área de Toque Direita para Câmera Livre 360° */
+/* Área de Toque Direita para Câmera 360° + Puxar Capa (Cima/Baixo) */
 #cameraTouchArea{position:absolute;right:0;top:0;width:55%;height:100%;pointer-events:auto;z-index:40}
 
 /* Botões Direito (HUD 2020) */
@@ -42,13 +42,12 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 
 #aimButton{position:absolute;right:145px;bottom:115px;width:60px;height:60px;border:2px solid #fff;border-radius:50%;background:rgba(0,0,0,0.5);pointer-events:auto;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px;z-index:45}
 #sprintButton{position:absolute;right:145px;bottom:35px;width:60px;height:60px;border:2px solid #facc15;border-radius:50%;background:rgba(234,179,8,0.4);pointer-events:auto;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px;z-index:45}
-#gelButton{position:absolute;right:225px;bottom:85px;width:55px;height:55px;border:2px solid #38bdf8;border-radius:50%;background:rgba(56,189,248,0.4);pointer-events:auto;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px;z-index:45}
 
-/* Mira na Tela (ADS) */
-#crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:16px;height:16px;pointer-events:none;display:none;z-index:45}
-#crosshair::before,#crosshair::after{content:'';position:absolute;background:#ef4444}
-#crosshair::before{top:7px;left:0;width:16px;height:2px}
-#crosshair::after{top:0;left:7px;width:2px;height:16px}
+/* Retícula de Mira na Frente (ADS) */
+#crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:18px;height:18px;pointer-events:none;z-index:45}
+#crosshair::before,#crosshair::after{content:'';position:absolute;background:#facc15}
+#crosshair::before{top:8px;left:0;width:18px;height:2px}
+#crosshair::after{top:0;left:8px;width:2px;height:18px}
 
 /* Tela de Voo / Avião */
 #planeOverlay{position:fixed;inset:0;z-index:60;display:none;pointer-events:none}
@@ -62,9 +61,9 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 <div id="lobby">
   <div class="lobby-header">🔥 FREE FIRE 2020 (CLASSIC) 🔥</div>
   <div class="char-container">
-    <div class="char-card active">ALOK</div>
-    <div class="char-card">KELLY</div>
-    <div class="char-card">ANDREW</div>
+    <div class="char-card active" onclick="selectChar('ALOK', this)">ALOK</div>
+    <div class="char-card" onclick="selectChar('KELLY', this)">KELLY</div>
+    <div class="char-card" onclick="selectChar('MOCO', this)">MOCO</div>
   </div>
   <button id="playButton">INICIAR PARTIDA</button>
 </div>
@@ -78,7 +77,6 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
   <div id="joystick"><div id="stick"></div></div>
   <div id="cameraTouchArea"></div>
   <div id="crosshair"></div>
-  <div id="gelButton">GELO</div>
   <div id="sprintButton">CORRER</div>
   <div id="aimButton">MIRA</div>
   <button id="fireButton"></button>
@@ -94,7 +92,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x60a5fa);
-scene.fog = new THREE.Fog(0x60a5fa, 80, 260);
+scene.fog = new THREE.Fog(0x60a5fa, 80, 280);
 
 const camera = new THREE.PerspectiveCamera(65, innerWidth / innerHeight, 0.1, 400);
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
@@ -103,7 +101,6 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 document.body.appendChild(renderer.domElement);
 
-// Correção de redimensionamento para telas AMOLED de alta resolução
 window.addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();
@@ -120,11 +117,13 @@ const mat = (c, r = 0.7) => new THREE.MeshStandardMaterial({ color: c, roughness
 const world = new THREE.Group();
 scene.add(world);
 
+// Chão da Ilha
 const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), mat(0x22c55e));
 ground.rotation.x = -Math.PI / 2;
 ground.receiveShadow = true;
 world.add(ground);
 
+// Estruturas do Mapa Bermuda
 function makeBuilding(x, z, w, h, d, color) {
   const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(color));
   m.position.set(x, h/2, z);
@@ -136,6 +135,7 @@ makeBuilding(35, 35, 10, 9, 10, 0x991b1b);
 makeBuilding(-40, 35, 14, 5, 14, 0x334155);
 makeBuilding(35, -35, 10, 6, 10, 0x0f172a);
 
+// Personagem Customizado 2020
 const player = new THREE.Group();
 const pTorso = new THREE.Mesh(new THREE.BoxGeometry(0.75, 1.1, 0.45), mat(0x1e293b));
 pTorso.position.y = 0.55; player.add(pTorso);
@@ -152,15 +152,29 @@ const armRight = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.8, 0.22), mat(0x1e
 armRight.position.set(0.5, 0.7, 0); player.add(armRight);
 
 const rifle = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.8), mat(0x0f172a));
-rifle.position.set(0.35, 0.6, 0.35);
-player.add(rifle);
+rifle.position.set(0.35, 0.6, 0.35); player.add(rifle);
 
 player.visible = false;
 scene.add(player);
 
+// Avião de Transporte
 const plane = new THREE.Mesh(new THREE.BoxGeometry(8, 2.2, 3), mat(0x334155));
 plane.visible = false;
 scene.add(plane);
+
+// Criação de Bots Inimigos com IA
+const bots = [];
+for(let i = 0; i < 6; i++) {
+  const bGroup = new THREE.Group();
+  const bTorso = new THREE.Mesh(new THREE.BoxGeometry(0.75, 1.1, 0.45), mat(0xef4444));
+  bTorso.position.y = 0.55; bGroup.add(bTorso);
+  const bHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), mat(0xfde047));
+  bHead.position.y = 1.35; bGroup.add(bHead);
+  
+  bGroup.position.set((Math.random() - 0.5) * 120, 0, (Math.random() - 0.5) * 120);
+  scene.add(bGroup);
+  bots.push({ group: bGroup, health: 100, speed: 0.12 });
+}
 
 const bullets = [];
 let gameStarted = false;
@@ -168,7 +182,14 @@ let phase = "lobby";
 let planeTime = 0, moveX = 0, moveY = 0, diveY = 60;
 let cameraAngleY = 0, cameraAngleX = 0.4;
 let isAiming = false, isSprinting = false, runAnimationTimer = 0;
+let killCount = 0, aliveCount = 50;
 
+window.selectChar = (name, el) => {
+  document.querySelectorAll('.char-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+};
+
+// Joystick Esquerdo (Movimento)
 const joystick = document.getElementById("joystick"), stick = document.getElementById("stick");
 let joyId = null, joyCenter = { x: 0, y: 0 };
 
@@ -196,6 +217,7 @@ function updateJoy(e) {
   moveX = nx / maxR; moveY = ny / maxR;
 }
 
+// Câmera Livre 360° + Puxar Capa (Vertical e Horizontal)
 const cameraArea = document.getElementById("cameraTouchArea");
 let camTouchId = null, lastCamX = 0, lastCamY = 0;
 
@@ -210,7 +232,8 @@ cameraArea.addEventListener("pointermove", e => {
     const deltaX = e.clientX - lastCamX;
     const deltaY = e.clientY - lastCamY;
     cameraAngleY -= deltaX * 0.005;
-    cameraAngleX = Math.max(0.15, Math.min(1.3, cameraAngleX + deltaY * 0.005));
+    // Puxar capa: arrastar para cima/baixo ajusta o ângulo vertical da visão
+    cameraAngleX = Math.max(-0.2, Math.min(1.4, cameraAngleX + deltaY * 0.005));
     lastCamX = e.clientX;
     lastCamY = e.clientY;
   }
@@ -227,12 +250,32 @@ const aimButton = document.getElementById("aimButton");
 aimButton.addEventListener("click", () => {
   isAiming = !isAiming;
   aimButton.style.background = isAiming ? "rgba(250,204,21,0.85)" : "rgba(0,0,0,0.5)";
-  document.getElementById("crosshair").style.display = isAiming ? "block" : "none";
 });
 
+// Botão de Atirar com Aimbot Embutido e Headshot (Puxar Capa)
 const fireBtn = document.getElementById("fireButton");
-const fireAction = (e) => {
+const fireAction = () => {
   if(phase !== "ground") return;
+
+  // Sistema de Aimbot: Trava levemente no bot mais próximo ao atirar
+  let closestBot = null;
+  let minDist = 35; // Raio de alcance do aimbot
+  bots.forEach(bot => {
+    const dist = player.position.distanceTo(bot.group.position);
+    if(dist < minDist) {
+      minDist = dist;
+      closestBot = bot;
+    }
+  });
+
+  let targetAngleY = cameraAngleY;
+  if(closestBot) {
+    const dx = player.position.x - closestBot.group.position.x;
+    const dz = player.position.z - closestBot.group.position.z;
+    targetAngleY = Math.atan2(dx, dz);
+    cameraAngleY = targetAngleY; // Aimbot direciona instantaneamente para o bot
+  }
+
   const bMesh = new THREE.Mesh(new THREE.SphereGeometry(0.22), mat(0xfacc15));
   bMesh.position.set(player.position.x, player.position.y + 1.2, player.position.z);
   scene.add(bMesh);
@@ -242,7 +285,7 @@ const fireAction = (e) => {
   bullets.push({ mesh: bMesh, dx: -dirX, dz: -dirZ, life: 50 });
 };
 fireBtn.addEventListener("click", fireAction);
-fireBtn.addEventListener("touchend", (e) => { e.preventDefault(); fireAction(e); });
+fireBtn.addEventListener("touchend", (e) => { e.preventDefault(); fireAction(); });
 
 const startGame = () => {
   document.getElementById("lobby").style.display = "none";
@@ -307,21 +350,50 @@ function animate() {
       armRight.rotation.x = 0;
     }
 
-    const dist = isAiming ? 3.5 : 11;
-    const heightOffset = isAiming ? 1.8 : 7.5;
+    // IA dos Bots: Perseguem o jogador pelo mapa
+    bots.forEach(bot => {
+      const dx = player.position.x - bot.group.position.x;
+      const dz = player.position.z - bot.group.position.z;
+      const dist = Math.hypot(dx, dz);
+      if(dist > 1.2) {
+        bot.group.position.x += (dx / dist) * bot.speed;
+        bot.group.position.z += (dz / dist) * bot.speed;
+        bot.group.rotation.y = Math.atan2(dx, dz);
+      }
+    });
+
+    // Câmera Dinâmica com suporte a Puxar Capa (Vertical)
+    const dist = isAiming ? 3.0 : 10;
+    const heightOffset = isAiming ? 1.6 : 7.0;
     
     const camX = player.position.x + Math.sin(cameraAngleY) * dist;
     const camZ = player.position.z + Math.cos(cameraAngleY) * dist;
-    const camY = player.position.y + heightOffset + (cameraAngleX * 3.5);
+    const camY = player.position.y + heightOffset + (cameraAngleX * 4.0);
 
     camera.position.set(camX, camY, camZ);
     camera.lookAt(player.position.x, player.position.y + 1.2, player.position.z);
 
+    // Atualizar Balas e Colisão com Bots
     for(let i = bullets.length - 1; i >= 0; i--) {
       const b = bullets[i];
-      b.mesh.position.x += b.dx * 2.2;
-      b.mesh.position.z += b.dz * 2.2;
+      b.mesh.position.x += b.dx * 2.5;
+      b.mesh.position.z += b.dz * 2.5;
       b.life--;
+
+      // Verificar acerto nos bots
+      bots.forEach((bot, bIdx) => {
+        if(b.mesh.position.distanceTo(bot.group.position) < 1.8) {
+          scene.remove(b.mesh);
+          bullets.splice(i, 1);
+          scene.remove(bot.group);
+          bots.splice(bIdx, 1);
+          killCount++;
+          aliveCount = Math.max(1, aliveCount - 1);
+          document.getElementById("killCount").innerText = killCount;
+          document.getElementById("aliveCount").innerText = aliveCount;
+        }
+      });
+
       if(b.life <= 0 && b.mesh.parent) {
         scene.remove(b.mesh);
         bullets.splice(i, 1);
