@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Free Fire 2020 - Ultimate Edition</title>
+<title>Free Fire 2020 - Video Style Edition</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#030712;color:#fff;font-family:'Segoe UI',Arial,sans-serif;touch-action:none}
@@ -18,32 +18,32 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 #playButton{width:100%;max-width:300px;padding:18px;border:none;border-radius:14px;background:linear-gradient(180deg,#f97316,#b91c1c);color:#fff;font-size:24px;font-weight:900;box-shadow:0 6px 0 #7f1d1d;cursor:pointer;margin-bottom:30px;text-transform:uppercase;letter-spacing:1px}
 #playButton:active{transform:translateY(4px);box-shadow:0 2px 0 #7f1d1d}
 
-/* HUD Clássica Free Fire 2020 */
+/* HUD Estilo Free Fire (Vídeo) */
 #gameHUD{display:none;position:fixed;inset:0;z-index:50;pointer-events:none}
 #topBar{position:absolute;top:15px;left:15px;display:flex;gap:8px;pointer-events:auto}
 .badge{background:rgba(0,0,0,0.65);border:1px solid rgba(255,255,255,0.2);padding:6px 12px;border-radius:6px;font-size:12px;font-weight:bold}
 #killCount{color:#ef4444}
 #aliveCount{color:#facc15}
 
-/* Minimapa Circular 2020 */
+/* Minimapa Circular */
 #minimap{position:absolute;top:15px;right:15px;width:90px;height:90px;border-radius:50%;background:rgba(15,23,42,0.8);border:2px solid #facc15;overflow:hidden;pointer-events:auto;box-shadow:0 4px 10px rgba(0,0,0,0.5)}
 #minimapPlayer{position:absolute;top:50%;left:50%;width:8px;height:8px;margin:-4px;background:#3b82f6;border-radius:50%;border:1px solid #fff}
 
-/* Joystick Esquerdo (Movimento) */
+/* Joystick Esquerdo (Movimento Fluido) */
 #joystick{position:absolute;bottom:30px;left:30px;width:120px;height:120px;border:2px solid rgba(255,255,255,0.25);border-radius:50%;background:rgba(0,0,0,0.25);pointer-events:auto;touch-action:none}
 #stick{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px;border:2px solid #fff;border-radius:50%;background:rgba(255,255,255,0.65);box-shadow:0 2px 5px rgba(0,0,0,0.3)}
 
-/* Área de Toque Direita para Câmera 360° + Puxar Capa (Cima/Baixo) */
+/* Área de Câmera 360° + Puxar Capa */
 #cameraTouchArea{position:absolute;right:0;top:0;width:55%;height:100%;pointer-events:auto;z-index:40}
 
-/* Botões Direito (HUD 2020) */
+/* Botões da HUD do Vídeo */
 #fireButton{position:absolute;right:35px;bottom:35px;width:85px;height:85px;border:3px solid #ef4444;border-radius:50%;background:rgba(239,68,68,0.55);pointer-events:auto;box-shadow:0 4px 12px rgba(0,0,0,0.4);z-index:45}
 #fireButton:active{transform:scale(0.93)}
 
 #aimButton{position:absolute;right:145px;bottom:115px;width:60px;height:60px;border:2px solid #fff;border-radius:50%;background:rgba(0,0,0,0.5);pointer-events:auto;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px;z-index:45}
 #sprintButton{position:absolute;right:145px;bottom:35px;width:60px;height:60px;border:2px solid #facc15;border-radius:50%;background:rgba(234,179,8,0.4);pointer-events:auto;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px;z-index:45}
 
-/* Retícula de Mira na Frente (ADS) */
+/* Retícula de Mira Central */
 #crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:18px;height:18px;pointer-events:none;z-index:45}
 #crosshair::before,#crosshair::after{content:'';position:absolute;background:#facc15}
 #crosshair::before{top:8px;left:0;width:18px;height:2px}
@@ -59,11 +59,11 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 <body>
 
 <div id="lobby">
-  <div class="lobby-header">🔥 FREE FIRE 2020 (CLASSIC) 🔥</div>
+  <div class="lobby-header">🔥 FREE FIRE 2020 (VIDEO STYLE) 🔥</div>
   <div class="char-container">
-    <div class="char-card active" onclick="selectChar('ALOK', this)">ALOK</div>
-    <div class="char-card" onclick="selectChar('KELLY', this)">KELLY</div>
-    <div class="char-card" onclick="selectChar('MOCO', this)">MOCO</div>
+    <div class="char-card active">ALOK</div>
+    <div class="char-card">KELLY</div>
+    <div class="char-card">MOCO</div>
   </div>
   <button id="playButton">INICIAR PARTIDA</button>
 </div>
@@ -123,7 +123,7 @@ ground.rotation.x = -Math.PI / 2;
 ground.receiveShadow = true;
 world.add(ground);
 
-// Estruturas do Mapa Bermuda
+// Casas e Instalações (Estilo Bermuda)
 function makeBuilding(x, z, w, h, d, color) {
   const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(color));
   m.position.set(x, h/2, z);
@@ -135,23 +135,24 @@ makeBuilding(35, 35, 10, 9, 10, 0x991b1b);
 makeBuilding(-40, 35, 14, 5, 14, 0x334155);
 makeBuilding(35, -35, 10, 6, 10, 0x0f172a);
 
-// Personagem Customizado 2020
+// Personagem Estilizado com Jaqueta e Arma Rosa/Roxa (como no vídeo)
 const player = new THREE.Group();
-const pTorso = new THREE.Mesh(new THREE.BoxGeometry(0.75, 1.1, 0.45), mat(0x1e293b));
+const pTorso = new THREE.Mesh(new THREE.BoxGeometry(0.75, 1.1, 0.45), mat(0x2563eb));
 pTorso.position.y = 0.55; player.add(pTorso);
-const pHood = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.3, 0.5), mat(0xef4444));
+const pHood = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.3, 0.5), mat(0x9333ea));
 pHood.position.set(0, 1.0, -0.05); player.add(pHood);
 const pHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), mat(0xfde047));
 pHead.position.y = 1.35; player.add(pHead);
-const pHair = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.15, 0.38), mat(0x18181b));
+const pHair = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.15, 0.38), mat(0x38bdf8));
 pHair.position.set(0, 1.55, 0); player.add(pHair);
 
-const armLeft = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.8, 0.22), mat(0x1e293b));
+const armLeft = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.8, 0.22), mat(0x2563eb));
 armLeft.position.set(-0.5, 0.7, 0); player.add(armLeft);
-const armRight = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.8, 0.22), mat(0x1e293b));
+const armRight = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.8, 0.22), mat(0x2563eb));
 armRight.position.set(0.5, 0.7, 0); player.add(armRight);
 
-const rifle = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.8), mat(0x0f172a));
+// Arma com detalhe colorido igual ao vídeo
+const rifle = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.8), mat(0xdb2777));
 rifle.position.set(0.35, 0.6, 0.35); player.add(rifle);
 
 player.visible = false;
@@ -162,18 +163,18 @@ const plane = new THREE.Mesh(new THREE.BoxGeometry(8, 2.2, 3), mat(0x334155));
 plane.visible = false;
 scene.add(plane);
 
-// Criação de Bots Inimigos com IA
+// Bots Inimigos correndo pelo mapa
 const bots = [];
 for(let i = 0; i < 6; i++) {
   const bGroup = new THREE.Group();
-  const bTorso = new THREE.Mesh(new THREE.BoxGeometry(0.75, 1.1, 0.45), mat(0xef4444));
+  const bTorso = new THREE.Mesh(new THREE.BoxGeometry(0.75, 1.1, 0.45), mat(0xdc2626));
   bTorso.position.y = 0.55; bGroup.add(bTorso);
   const bHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), mat(0xfde047));
   bHead.position.y = 1.35; bGroup.add(bHead);
   
   bGroup.position.set((Math.random() - 0.5) * 120, 0, (Math.random() - 0.5) * 120);
   scene.add(bGroup);
-  bots.push({ group: bGroup, health: 100, speed: 0.12 });
+  bots.push({ group: bGroup, health: 100, speed: 0.14 });
 }
 
 const bullets = [];
@@ -184,12 +185,7 @@ let cameraAngleY = 0, cameraAngleX = 0.4;
 let isAiming = false, isSprinting = false, runAnimationTimer = 0;
 let killCount = 0, aliveCount = 50;
 
-window.selectChar = (name, el) => {
-  document.querySelectorAll('.char-card').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-};
-
-// Joystick Esquerdo (Movimento)
+// Joystick Esquerdo
 const joystick = document.getElementById("joystick"), stick = document.getElementById("stick");
 let joyId = null, joyCenter = { x: 0, y: 0 };
 
@@ -217,7 +213,7 @@ function updateJoy(e) {
   moveX = nx / maxR; moveY = ny / maxR;
 }
 
-// Câmera Livre 360° + Puxar Capa (Vertical e Horizontal)
+// Câmera Direita com Assistência de Mira e Puxar Capa Fluido
 const cameraArea = document.getElementById("cameraTouchArea");
 let camTouchId = null, lastCamX = 0, lastCamY = 0;
 
@@ -227,13 +223,27 @@ cameraArea.addEventListener("pointerdown", e => {
   lastCamY = e.clientY;
   cameraArea.setPointerCapture(camTouchId);
 });
+
 cameraArea.addEventListener("pointermove", e => {
   if(e.pointerId === camTouchId) {
-    const deltaX = e.clientX - lastCamX;
-    const deltaY = e.clientY - lastCamY;
-    cameraAngleY -= deltaX * 0.005;
-    // Puxar capa: arrastar para cima/baixo ajusta o ângulo vertical da visão
-    cameraAngleX = Math.max(-0.2, Math.min(1.4, cameraAngleX + deltaY * 0.005));
+    let deltaX = e.clientX - lastCamX;
+    let deltaY = e.clientY - lastCamY;
+
+    let nearBot = false;
+    bots.forEach(bot => {
+      const dist = player.position.distanceTo(bot.group.position);
+      if(dist < 25) {
+        const dx = player.position.x - bot.group.position.x;
+        const dz = player.position.z - bot.group.position.z;
+        const targetAngleY = Math.atan2(dx, dz);
+        if(Math.abs(cameraAngleY - targetAngleY) < 0.35) nearBot = true;
+      }
+    });
+
+    let sensitivity = nearBot ? 0.0025 : 0.005;
+    cameraAngleY -= deltaX * sensitivity;
+    cameraAngleX = Math.max(-0.2, Math.min(1.4, cameraAngleX + (deltaY * sensitivity)));
+
     lastCamX = e.clientX;
     lastCamY = e.clientY;
   }
@@ -252,30 +262,10 @@ aimButton.addEventListener("click", () => {
   aimButton.style.background = isAiming ? "rgba(250,204,21,0.85)" : "rgba(0,0,0,0.5)";
 });
 
-// Botão de Atirar com Aimbot Embutido e Headshot (Puxar Capa)
+// Botão de Disparo
 const fireBtn = document.getElementById("fireButton");
 const fireAction = () => {
   if(phase !== "ground") return;
-
-  // Sistema de Aimbot: Trava levemente no bot mais próximo ao atirar
-  let closestBot = null;
-  let minDist = 35; // Raio de alcance do aimbot
-  bots.forEach(bot => {
-    const dist = player.position.distanceTo(bot.group.position);
-    if(dist < minDist) {
-      minDist = dist;
-      closestBot = bot;
-    }
-  });
-
-  let targetAngleY = cameraAngleY;
-  if(closestBot) {
-    const dx = player.position.x - closestBot.group.position.x;
-    const dz = player.position.z - closestBot.group.position.z;
-    targetAngleY = Math.atan2(dx, dz);
-    cameraAngleY = targetAngleY; // Aimbot direciona instantaneamente para o bot
-  }
-
   const bMesh = new THREE.Mesh(new THREE.SphereGeometry(0.22), mat(0xfacc15));
   bMesh.position.set(player.position.x, player.position.y + 1.2, player.position.z);
   scene.add(bMesh);
@@ -350,7 +340,6 @@ function animate() {
       armRight.rotation.x = 0;
     }
 
-    // IA dos Bots: Perseguem o jogador pelo mapa
     bots.forEach(bot => {
       const dx = player.position.x - bot.group.position.x;
       const dz = player.position.z - bot.group.position.z;
@@ -362,7 +351,6 @@ function animate() {
       }
     });
 
-    // Câmera Dinâmica com suporte a Puxar Capa (Vertical)
     const dist = isAiming ? 3.0 : 10;
     const heightOffset = isAiming ? 1.6 : 7.0;
     
@@ -373,14 +361,12 @@ function animate() {
     camera.position.set(camX, camY, camZ);
     camera.lookAt(player.position.x, player.position.y + 1.2, player.position.z);
 
-    // Atualizar Balas e Colisão com Bots
     for(let i = bullets.length - 1; i >= 0; i--) {
       const b = bullets[i];
       b.mesh.position.x += b.dx * 2.5;
       b.mesh.position.z += b.dz * 2.5;
       b.life--;
 
-      // Verificar acerto nos bots
       bots.forEach((bot, bIdx) => {
         if(b.mesh.position.distanceTo(bot.group.position) < 1.8) {
           scene.remove(b.mesh);
