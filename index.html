@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Free Fire - Fixed Camera & Speed</title>
+<title>Free Fire - Stable Mobile Edition</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#030712;color:#fff;font-family:'Segoe UI',Arial,sans-serif;touch-action:none}
@@ -38,15 +38,15 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 #joystick{position:absolute;bottom:30px;left:30px;width:120px;height:120px;border:2px solid rgba(255,255,255,0.25);border-radius:50%;background:rgba(0,0,0,0.25);pointer-events:auto;touch-action:none}
 #stick{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px;border:2px solid #fff;border-radius:50%;background:rgba(255,255,255,0.65);box-shadow:0 2px 5px rgba(0,0,0,0.3)}
 
-/* Área de Toque Direita para Câmera 360° Livre (Cima, Baixo, Esquerda, Direita) */
-#cameraTouchArea{position:absolute;right:0;top:0;width:65%;height:100%;pointer-events:auto;z-index:40}
+/* Área de Toque Direita para Câmera Livre (Não bloqueia o render) */
+#cameraTouchArea{position:absolute;right:0;top:0;width:55%;height:75%;pointer-events:auto;z-index:40}
 
 /* Botões da HUD */
 #fireButton{position:absolute;right:35px;bottom:35px;width:85px;height:85px;border:3px solid #ef4444;border-radius:50%;background:rgba(239,68,68,0.55);pointer-events:auto;box-shadow:0 4px 12px rgba(0,0,0,0.4);z-index:45;touch-action:none}
 #aimButton{position:absolute;right:145px;bottom:115px;width:60px;height:60px;border:2px solid #fff;border-radius:50%;background:rgba(0,0,0,0.5);pointer-events:auto;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px;z-index:45}
 #sprintButton{position:absolute;right:145px;bottom:35px;width:60px;height:60px;border:2px solid #facc15;border-radius:50%;background:rgba(234,179,8,0.4);pointer-events:auto;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px;z-index:45}
 
-/* Mira */
+/* Mira Desgrudada (Mais à Frente) */
 #crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:26px;height:26px;border:2px solid rgba(255,255,255,0.85);border-radius:50%;pointer-events:none;z-index:45;display:flex;align-items:center;justify-content:center;box-shadow:0 0 4px rgba(0,0,0,0.5);transition:border-color 0.15s, transform 0.15s}
 .cross-dot{width:4px;height:4px;background:#fff;border-radius:50%;box-shadow:0 0 2px #000}
 
@@ -114,10 +114,10 @@ scene.background = new THREE.Color(0x60a5fa);
 scene.fog = new THREE.Fog(0x60a5fa, 80, 280);
 
 const camera = new THREE.PerspectiveCamera(65, innerWidth / innerHeight, 0.1, 400);
-const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
 renderer.setSize(innerWidth, innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+renderer.shadowMap.enabled = false; // Desativado leve para evitar travamento mobile
 document.body.appendChild(renderer.domElement);
 
 window.addEventListener('resize', () => {
@@ -129,22 +129,19 @@ window.addEventListener('resize', () => {
 scene.add(new THREE.HemisphereLight(0xffffff, 0x334155, 1.5));
 const sun = new THREE.DirectionalLight(0xfffaed, 1.7);
 sun.position.set(60, 100, 60);
-sun.castShadow = true;
 scene.add(sun);
 
-const mat = (c, r = 0.7) => new THREE.MeshStandardMaterial({ color: c, roughness: r });
+const mat = (c, r = 0.7) => new THREE.MeshLambertMaterial({ color: c, roughness: r });
 const world = new THREE.Group();
 scene.add(world);
 
 const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), mat(0x22c55e));
 ground.rotation.x = -Math.PI / 2;
-ground.receiveShadow = true;
 world.add(ground);
 
 function makeBuilding(x, z, w, h, d, color) {
   const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(color));
   m.position.set(x, h/2, z);
-  m.castShadow = true; m.receiveShadow = true;
   world.add(m);
 }
 makeBuilding(-35, -35, 12, 7, 12, 0x475569);
@@ -227,7 +224,7 @@ function getSensMultiplier() {
   return (sensitivity / 50) * 0.004;
 }
 
-// Câmera Direita: Movimento livre e amplo para cima, baixo, esquerda e direita
+// Câmera Direita: Movimento livre 360° (Cima, Baixo, Esquerda, Direita)
 const cameraArea = document.getElementById("cameraTouchArea");
 let camTouchId = null, lastCamX = 0, lastCamY = 0;
 
@@ -245,7 +242,6 @@ cameraArea.addEventListener("pointermove", e => {
 
     const sensFactor = getSensMultiplier();
     cameraAngleY -= deltaX * sensFactor;
-    // Liberado ângulo vertical total para cima e para baixo
     cameraAngleX = Math.max(-1.0, Math.min(1.4, cameraAngleX + (deltaY * sensFactor)));
 
     lastCamX = e.clientX;
@@ -323,131 +319,4 @@ const jumpPlane = (e) => {
   if(e) e.stopPropagation();
   if (phase !== "plane") return;
   phase = "diving";
-  player.visible = true;
-  player.position.set(plane.position.x, 60, plane.position.z);
-  diveY = 60;
-  plane.visible = false;
-  document.getElementById("planeOverlay").style.display = "none";
-  document.getElementById("gameHUD").style.display = "block";
-};
-
-document.getElementById("jumpButton").addEventListener("click", jumpPlane);
-document.getElementById("jumpButton").addEventListener("touchend", jumpPlane);
-
-function animate() {
-  requestAnimationFrame(animate);
-  renderer.render(scene, camera);
-  if (!gameStarted) return;
-
-  if (phase === "plane") {
-    planeTime += 0.008;
-    plane.position.set(Math.sin(planeTime) * 110, 60, Math.cos(planeTime * 0.6) * 110);
-    camera.position.set(plane.position.x, plane.position.y + 12, plane.position.z + 24);
-    camera.lookAt(plane.position);
-  }
-  else if (phase === "diving") {
-    player.position.x += moveX * 0.8;
-    player.position.z += moveY * 0.8;
-    diveY -= 0.5;
-    player.position.y = Math.max(0, diveY);
-
-    camera.position.set(player.position.x, player.position.y + 16, player.position.z + 20);
-    camera.lookAt(player.position);
-
-    if (player.position.y <= 0) phase = "ground";
-  }
-  else if (phase === "ground") {
-    if(moveX !== 0 || moveY !== 0) {
-      const moveAngle = Math.atan2(moveX, moveY) + cameraAngleY;
-      // Velocidade do personagem mais leve e controlada
-      const speed = isSprinting ? 0.45 : 0.28;
-      player.position.x += Math.sin(moveAngle) * speed;
-      player.position.z += Math.cos(moveAngle) * speed;
-      player.rotation.y = moveAngle;
-
-      runAnimationTimer += 0.15;
-      pTorso.rotation.x = 0.2;
-      armLeft.rotation.x = Math.sin(runAnimationTimer) * 0.6;
-      armRight.rotation.x = -Math.sin(runAnimationTimer) * 0.6;
-    } else {
-      pTorso.rotation.x = 0;
-      armLeft.rotation.x = 0;
-      armRight.rotation.x = 0;
-    }
-
-    let targetLocked = false;
-    bots.forEach(bot => {
-      const dist = player.position.distanceTo(bot.group.position);
-      if(dist < 32) {
-        const dx = player.position.x - bot.group.position.x;
-        const dz = player.position.z - bot.group.position.z;
-        const targetAngleY = Math.atan2(dx, dz);
-        let angleDiff = Math.abs(cameraAngleY - targetAngleY);
-        
-        if(angleDiff < 0.3) {
-          targetLocked = true;
-          cameraAngleY += (targetAngleY - cameraAngleY) * 0.1;
-        }
-      }
-    });
-
-    const crosshairEl = document.getElementById("crosshair");
-    if(targetLocked) {
-      crosshairEl.style.borderColor = "#ef4444";
-    } else {
-      crosshairEl.style.borderColor = "rgba(255,255,255,0.85)";
-    }
-
-    bots.forEach(bot => {
-      const dx = player.position.x - bot.group.position.x;
-      const dz = player.position.z - bot.group.position.z;
-      const dist = Math.hypot(dx, dz);
-      if(dist > 1.2) {
-        bot.group.position.x += (dx / dist) * bot.speed;
-        bot.group.position.z += (dz / dist) * bot.speed;
-        bot.group.rotation.y = Math.atan2(dx, dz);
-      }
-    });
-
-    // Câmera bem mais à frente e aberta do personagem (Visão Tática / Mobile)
-    const dist = isAiming ? 2.0 : 11.0;
-    const heightOffset = isAiming ? 1.4 : 6.0;
-    
-    const camX = player.position.x + Math.sin(cameraAngleY) * dist;
-    const camZ = player.position.z + Math.cos(cameraAngleY) * dist;
-    const camY = player.position.y + heightOffset + (cameraAngleX * 5.0);
-
-    camera.position.set(camX, camY, camZ);
-    camera.lookAt(player.position.x, player.position.y + 1.1, player.position.z);
-
-    for(let i = bullets.length - 1; i >= 0; i--) {
-      const b = bullets[i];
-      b.mesh.position.x += b.dx * 2.5;
-      b.mesh.position.z += b.dz * 2.5;
-      b.life--;
-
-      bots.forEach((bot, bIdx) => {
-        if(b.mesh.position.distanceTo(bot.group.position) < 1.8) {
-          scene.remove(b.mesh);
-          bullets.splice(i, 1);
-          scene.remove(bot.group);
-          bots.splice(bIdx, 1);
-          killCount++;
-          aliveCount = Math.max(1, aliveCount - 1);
-          document.getElementById("killCount").innerText = killCount;
-          document.getElementById("aliveCount").innerText = aliveCount;
-        }
-      });
-
-      if(b.life <= 0 && b.mesh.parent) {
-        scene.remove(b.mesh);
-        bullets.splice(i, 1);
-      }
-    }
-  }
-}
-
-animate();
-</script>
-</body>
-</html>
+  
