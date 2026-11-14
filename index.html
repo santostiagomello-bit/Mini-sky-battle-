@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Free Fire Mobile - Aim Assist Edition</title>
+<title>Free Fire Mobile - Ultimate Anti-BlackScreen</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
@@ -23,6 +23,10 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 
 #playButton{width:100%;max-width:300px;padding:18px;background:linear-gradient(180deg,#f97316,#b91c1c);border:none;border-radius:14px;color:#fff;font-size:22px;font-weight:900;cursor:pointer;text-transform:uppercase;box-shadow:0 6px 0 #7f1d1d;outline:none;touch-action:manipulation;pointer-events:auto;z-index:1000000;}
 #playButton:active{transform:translateY(4px);box-shadow:0 2px 0 #7f1d1d}
+
+/* Aviso de Erro Gráfico (Caso ocorra) */
+#gpuError{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#1e293b;border:2px solid #ef4444;padding:20px;border-radius:12px;text-align:center;display:none;z-index:9999999;max-width:90%}
+#gpuError h3{color:#ef4444;margin-top:0}
 
 /* HUD */
 #gameHUD{display:none;position:fixed;inset:0;z-index:50;pointer-events:none}
@@ -47,5 +51,17 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 #fireButton{position:absolute;right:40px;bottom:30px;width:95px;height:95px;border:4px solid #ef4444;border-radius:50%;background:rgba(239,68,68,0.5);pointer-events:auto;z-index:45;display:flex;align-items:center;justify-content:center}
 .fire-inner{width:35px;height:35px;background:#fff;border-radius:50%;opacity:0.8}
 
-#aimButton{position:absolute;right:155px;bottom:130px;width:60px;height:60px;border:2px solid #fff;border-radius:50%;background:rgba(0,0,0,
-                                                                                                                                     
+#aimButton{position:absolute;right:155px;bottom:130px;width:60px;height:60px;border:2px solid #fff;border-radius:50%;background:rgba(0,0,0,0.5);pointer-events:auto;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px;z-index:45;touch-action:manipulation}
+#sprintButton{position:absolute;right:155px;bottom:45px;width:60px;height:60px;border:2px solid #facc15;border-radius:50%;background:rgba(234,179,8,0.4);pointer-events:auto;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px;z-index:45;touch-action:manipulation}
+#jumpButtonHud{position:absolute;right:65px;bottom:145px;width:65px;height:65px;border:2px solid #38bdf8;border-radius:50%;background:rgba(56,189,248,0.4);pointer-events:auto;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px;z-index:45;touch-action:manipulation}
+
+/* Painel de Loot Coletado */
+#lootNotification{position:absolute;top:70px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);border:1px solid #facc15;padding:6px 16px;border-radius:8px;font-size:13px;font-weight:bold;color:#facc15;display:none;z-index:60;pointer-events:none}
+
+/* Mira FPS */
+#crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:18px;height:18px;border:2px solid rgba(255,255,255,0.85);border-radius:50%;pointer-events:none;z-index:45;display:flex;align-items:center;justify-content:center;transition:border-color 0.1s}
+.cross-dot{width:2px;height:2px;background:#fff;border-radius:50%}
+
+/* Avião */
+#planeOverlay{position:fixed;inset
+              
