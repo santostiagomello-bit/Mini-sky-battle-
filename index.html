@@ -54,3 +54,182 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
   <button id="fireButton">ATIRAR</button>
   <button id="actionButton">PULAR</button>
 </div>
+<script type="module">
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xa0d2eb);
+scene.fog = new THREE.Fog(0xa0d2eb, 60, 180);
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 300);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+document.body.appendChild(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x4a7c59, 1.8));
+const sun = new THREE.DirectionalLight(0xfff5cc, 1.8);
+sun.position.set(40, 70, 40);
+sun.castShadow = true;
+scene.add(sun);
+
+const mat = (c, r = 0.8) => new THREE.MeshStandardMaterial({ color: c, roughness: r });
+const world = new THREE.Group();
+scene.add(world);
+
+function addMesh(parent, geo, material, x, y, z) {
+  const m = new THREE.Mesh(geo, material);
+  m.position.set(x, y, z);
+  m.castShadow = true; m.receiveShadow = true;
+  parent.add(m);
+  return m;
+}
+
+// Chão Estilo Battlelands (Grama Verde Viva)
+const ground = addMesh(world, new THREE.PlaneGeometry(250, 250), mat(0x56ab2f), 0, 0, 0);
+ground.rotation.x = -Math.PI / 2;
+
+// Árvores Low-Poly Estilizadas
+function stylizedTree(x, z) {
+  addMesh(world, new THREE.CylinderGeometry(0.3, 0.4, 1.8, 6), mat(0x8b5a2b), x, 0.9, z);
+  addMesh(world, new THREE.DodecahedronGeometry(1.4), mat(0x38a169), x, 2.4, z);
+}
+for(let i = -80; i <= 80; i += 25) {
+  stylizedTree(i, -60);
+  stylizedTree(i, 60);
+  stylizedTree(-80, i);
+  stylizedTree(80, i);
+}
+
+// Personagem Chibi / Cabeçudo (Estilo Personagens das Fotos)
+function createChibiHero() {
+  const g = new THREE.Group();
+  
+  // Corpo compacto
+  addMesh(g, new THREE.BoxGeometry(0.7, 0.8, 0.4), mat(0x1a202c), 0, 0.8, 0);
+  
+  // Cabeça grande estilo Chibi/Cartoon
+  const head = addMesh(g, new THREE.SphereGeometry(0.65, 16, 16), mat(0xf6ad55), 0, 1.8, 0);
+  head.scale.set(1, 1.1, 1);
+  
+  // Óculos / Máscara estilizada (lembrando a skin do ninja/gás das fotos)
+  addMesh(g, new THREE.BoxGeometry(0.7, 0.3, 0.3), mat(0x2d3748), 0, 1.85, 0.35);
+  
+  // Braços e Pernas
+  addMesh(g, new THREE.BoxGeometry(0.25, 0.6, 0.25), mat(0x2d3748), -0.5, 0.8, 0);
+  addMesh(g, new THREE.BoxGeometry(0.25, 0.6, 0.25), mat(0x2d3748), 0.5, 0.8, 0);
+  addMesh(g, new THREE.BoxGeometry(0.28, 0.6, 0.28), mat(0x1a202c), -0.2, 0.3, 0);
+  addMesh(g, new THREE.BoxGeometry(0.28, 0.6, 0.28), mat(0x1a202c), 0.2, 0.3, 0);
+
+  return g;
+}
+
+const player = createChibiHero();
+scene.add(player);
+
+const shots = [];
+let gameStarted = false, moveX = 0, moveY = 0, jumpV = 0, isJumping = false;
+let dropPhase = false, playerDropped = false, planeTime = 0, aimX = 0, aimZ = -1;
+
+const plane = addMesh(scene, new THREE.BoxGeometry(4, 1, 1.5), mat(0x4a5568), 0, 35, 0);
+plane.visible = false;
+
+// Controles de Tela (Joystick)
+const joystick = document.getElementById("joystick"), stick = document.getElementById("stick");
+let joyId = null, joyCenter = { x: 0, y: 0 };
+joystick.addEventListener("pointerdown", e => { joyId = e.pointerId; const r = joystick.getBoundingClientRect(); joyCenter = { x: r.left + r.width/2, y: r.top + r.height/2 }; updateJoy(e); joystick.setPointerCapture(joyId); });
+joystick.addEventListener("pointermove", e => { if(e.pointerId === joyId) updateJoy(e); });
+joystick.addEventListener("pointerup", e => { if(e.pointerId === joyId) { joyId = null; moveX = 0; moveY = 0; stick.style.transform = `translate(0px,0px)`; } });
+function updateJoy(e) {
+  const dx = e.clientX - joyCenter.x, dy = e.clientY - joyCenter.y, d = Math.hypot(dx, dy), maxR = 38;
+  const nx = d > maxR ? dx/d * maxR : dx, ny = d > maxR ? dy/d * maxR : dy;
+  stick.style.transform = `translate(${nx}px,${ny}px)`;
+  moveX = nx / maxR; moveY = ny / maxR;
+}
+
+// Controle de Mira (AimPad)
+const aimPad = document.getElementById("aimPad"), aimDot = document.getElementById("aimDot");
+let aimId = null, aimCenter = { x: 0, y: 0 };
+aimPad.addEventListener("pointerdown", e => { aimId = e.pointerId; const r = aimPad.getBoundingClientRect(); aimCenter = { x: r.left + r.width/2, y: r.top + r.height/2 }; updateAim(e); aimPad.setPointerCapture(aimId); });
+aimPad.addEventListener("pointermove", e => { if(e.pointerId === aimId) updateAim(e); });
+aimPad.addEventListener("pointerup", e => { if(e.pointerId === aimId) { aimId = null; aimDot.style.transform = `translate(0px,0px)`; } });
+function updateAim(e) {
+  const dx = e.clientX - aimCenter.x, dy = e.clientY - aimCenter.y, d = Math.hypot(dx, dy), maxR = 45;
+  const nx = d > maxR ? dx/d * maxR : dx, ny = d > maxR ? dy/d * maxR : dy;
+  aimDot.style.transform = `translate(${nx}px,${ny}px)`;
+  if(d > 5) { aimX = nx / maxR; aimZ = ny / maxR; }
+}
+
+// Botões de Ação
+document.getElementById("playButton").addEventListener("click", () => {
+  gameStarted = true;
+  document.getElementById("lobby").style.display = "none";
+  document.getElementById("gameHUD").style.display = "block";
+  dropPhase = true; player.visible = false;
+  document.getElementById("dropButton").style.display = "block";
+  document.getElementById("planeNotice").style.display = "block";
+});
+
+document.getElementById("backButton").addEventListener("click", () => {
+  gameStarted = false;
+  document.getElementById("gameHUD").style.display = "none";
+  document.getElementById("lobby").style.display = "block";
+});
+
+document.getElementById("dropButton").addEventListener("click", () => {
+  if(!dropPhase) return;
+  dropPhase = false; playerDropped = true;
+  player.visible = true; player.position.set(plane.position.x, 25, plane.position.z);
+  jumpV = -0.5;
+  document.getElementById("dropButton").style.display = "none";
+  document.getElementById("planeNotice").style.display = "none";
+});
+
+document.getElementById("fireButton").addEventListener("click", () => {
+  if(!gameStarted || dropPhase) return;
+  shots.push({ x: player.position.x, z: player.position.z, dx: aimX, dz: aimZ, life: 40 });
+});
+
+document.getElementById("actionButton").addEventListener("click", () => {
+  if(!gameStarted || dropPhase || isJumping) return;
+  isJumping = true; jumpV = 0.35;
+});
+
+// Loop Principal de Jogo
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+  if(!gameStarted) return;
+
+  if(dropPhase) {
+    planeTime += 0.012;
+    plane.position.set(Math.sin(planeTime) * 60, 25, Math.cos(planeTime * 0.8) * 60);
+    camera.position.set(plane.position.x, plane.position.y + 14, plane.position.z + 16);
+    camera.lookAt(plane.position);
+    return;
+  }
+
+  if(playerDropped) {
+    player.position.x += moveX * 0.5;
+    player.position.z += moveY * 0.5;
+    player.position.y += jumpV;
+    jumpV -= 0.015;
+    if(player.position.y <= 0) { player.position.y = 0; playerDropped = false; }
+  } else {
+    player.position.x += moveX * 0.4;
+    player.position.z += moveY * 0.4;
+    if(isJumping) {
+      player.position.y += jumpV; jumpV -= 0.03;
+      if(player.position.y <= 0) { player.position.y = 0; isJumping = false; }
+    }
+  }
+
+  // Câmera Isométrica Estilo Battlelands (Visão Diagonal Perfeita)
+  camera.position.set(player.position.x, player.position.y + 16, player.position.z + 14);
+  camera.lookAt(player.position.x, player.position.y, player.position.z);
+}
+
+animate();
+</script>
+</body>
+</html>
