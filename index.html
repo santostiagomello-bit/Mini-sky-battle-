@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Free Fire - FPS Aim & Red Crosshair Fix</title>
+<title>Free Fire - FPS Bullet & Pitch Fix</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
@@ -52,7 +52,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 #sprintButton{position:absolute;right:155px;bottom:45px;width:60px;height:60px;border:2px solid #facc15;border-radius:50%;background:rgba(234,179,8,0.4);pointer-events:auto;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px;z-index:45}
 #jumpButtonHud{position:absolute;right:65px;bottom:145px;width:65px;height:65px;border:2px solid #38bdf8;border-radius:50%;background:rgba(56,189,248,0.4);pointer-events:auto;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px;z-index:45}
 
-/* Mira Centralizada de FPS (Muda de cor dinamicamente) */
+/* Mira Centralizada de FPS */
 #crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:18px;height:18px;border:2px solid rgba(255,255,255,0.85);border-radius:50%;pointer-events:none;z-index:45;display:flex;align-items:center;justify-content:center;box-shadow:0 0 4px rgba(0,0,0,0.5);transition:border-color 0.1s}
 .cross-dot{width:2px;height:2px;background:#fff;border-radius:50%}
 
@@ -66,7 +66,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 <body>
 
 <div id="lobby">
-  <div class="lobby-header">🔥 FREE FIRE - PERFECT AIM & RED CROSSHAIR 🔥</div>
+  <div class="lobby-header">🔥 FREE FIRE - FIXED FPS & BULLET 🔥</div>
   
   <div class="char-container">
     <div class="char-card active">ALOK</div>
@@ -249,7 +249,7 @@ function getSensMultiplier() {
   return (sensitivity / 50) * 0.0035;
 }
 
-// Câmera Direita (Movimento estrito de FPS: Horizontal = Yaw, Vertical = Pitch)
+// Câmera Direita (Controle de FPS Estrito com Travamento Vertical Correto)
 const cameraArea = document.getElementById("cameraTouchArea");
 let camTouchId = null, lastCamX = 0, lastCamY = 0;
 
@@ -266,10 +266,10 @@ cameraArea.addEventListener("pointermove", e => {
     const sensFactor = getSensMultiplier();
 
     cameraAngleY -= deltaX * sensFactor;
-    cameraAngleX -= deltaY * sensFactor; // Apenas cima e baixo puro
+    cameraAngleX -= deltaY * sensFactor;
 
-    // Trava para não olhar de ponta-cabeça
-    cameraAngleX = Math.max(-1.2, Math.min(1.2, cameraAngleX));
+    // TRAVA RIGIDA: Impede que a tela vire de cabeça para baixo (-1.4 a 1.4 radianos)
+    cameraAngleX = Math.max(-1.4, Math.min(1.4, cameraAngleX));
 
     lastCamX = e.clientX;
     lastCamY = e.clientY;
@@ -279,206 +279,5 @@ cameraArea.addEventListener("pointerup", e => { if(e.pointerId === camTouchId) c
 
 // Sistema Drag Headshot e Disparo
 const fireBtn = document.getElementById("fireButton");
-let fireTouchId = null, fireStartX = 0, fireStartY = 0, totalDragY = 0;
-
-fireBtn.addEventListener("pointerdown", e => {
-  fireTouchId = e.pointerId;
-  fireStartX = e.clientX;
-  fireStartY = e.clientY;
-  totalDragY = 0;
-  fireBtn.setPointerCapture(fireTouchId);
-  fireAction();
-});
-
-fireBtn.addEventListener("pointermove", e => {
-  if(e.pointerId === fireTouchId) {
-    const moveX = e.clientX - fireStartX;
-    const moveY = e.clientY - fireStartY;
-    totalDragY += moveY;
-
-    const sensFactor = getSensMultiplier();
-    cameraAngleY -= moveX * sensFactor * 0.8;
-    cameraAngleX -= moveY * sensFactor * 2.0; // Puxadão de capa com o botão de tiro
-    cameraAngleX = Math.max(-1.2, Math.min(1.2, cameraAngleX));
-
-    fireStartX = e.clientX;
-    fireStartY = e.clientY;
-  }
-});
-
-fireBtn.addEventListener("pointerup", e => {
-  if(e.pointerId === fireTouchId) {
-    if (totalDragY < -10) {
-      bots.forEach(bot => {
-        if(player.position.distanceTo(bot.group.position) < 30) {
-          bot.isHeadshot = true;
-        }
-      });
-    }
-    fireTouchId = null;
-  }
-});
-
-function fireAction() {
-  if(phase !== "ground") return;
-  const mat = (c) => new THREE.MeshBasicMaterial({ color: c });
-  const bMesh = new THREE.Mesh(new THREE.SphereGeometry(0.22), mat(0xfacc15));
-  bMesh.position.set(player.position.x, player.position.y + 1.6, player.position.z);
-  scene.add(bMesh);
-
-  // Vetor de direção exato da câmera FPS (para onde a mira aponta)
-  const dir = new THREE.Vector3();
-  camera.getWorldDirection(dir);
-
-  bullets.push({ mesh: bMesh, dir: dir.clone(), life: 60 });
-}
-
-const sprintBtn = document.getElementById("sprintButton");
-sprintBtn.addEventListener("click", () => {
-  isSprinting = !isSprinting;
-  sprintBtn.style.background = isSprinting ? "rgba(234,179,8,0.85)" : "rgba(234,179,8,0.4)";
-});
-
-const aimButton = document.getElementById("aimButton");
-aimButton.addEventListener("click", () => {
-  isAiming = !isAiming;
-  aimButton.style.background = isAiming ? "rgba(250,204,21,0.85)" : "rgba(0,0,0,0.5)";
-  document.getElementById("crosshair").style.transform = isAiming ? "translate(-50%, -50%) scale(1.6)" : "translate(-50%, -50%) scale(1)";
-});
-
-// Transição de Início
-const startGame = (e) => {
-  if(e) e.stopPropagation();
+let fireTouch
   
-  const lobbyEl = document.getElementById("lobby");
-  lobbyEl.style.display = "none";
-  lobbyEl.style.pointerEvents = "none";
-  
-  document.getElementById("planeOverlay").style.display = "block";
-  gameStarted = true;
-  phase = "plane";
-  plane.visible = true;
-  if(renderer) { renderer.setSize(innerWidth, innerHeight); }
-};
-
-const playBtn = document.getElementById("playButton");
-playBtn.addEventListener("pointerdown", startGame);
-playBtn.addEventListener("click", startGame);
-
-const jumpPlane = (e) => {
-  if(e) e.stopPropagation();
-  if (phase !== "plane") return;
-  phase = "diving";
-  player.position.set(plane.position.x, 1.6, plane.position.z);
-  diveY = 60;
-  plane.visible = false;
-  document.getElementById("planeOverlay").style.display = "none";
-  document.getElementById("gameHUD").style.display = "block";
-};
-
-const jumpPlaneBtn = document.getElementById("jumpButtonPlane");
-jumpPlaneBtn.addEventListener("pointerdown", jumpPlane);
-jumpPlaneBtn.addEventListener("click", jumpPlane);
-
-function animate() {
-  requestAnimationFrame(animate);
-  
-  if (renderer && scene && camera) {
-    const targetFOV = isAiming ? 45 : 75;
-    camera.fov += (targetFOV - camera.fov) * 0.15;
-    camera.updateProjectionMatrix();
-    renderer.render(scene, camera);
-  }
-  if (!gameStarted) return;
-
-  if (phase === "plane") {
-    planeTime += 0.008;
-    plane.position.set(Math.sin(planeTime) * 110, 60, Math.cos(planeTime * 0.6) * 110);
-    camera.position.set(plane.position.x, plane.position.y + 4, plane.position.z + 10);
-    camera.lookAt(plane.position);
-  }
-  else if (phase === "diving") {
-    player.position.x += moveX * 0.8;
-    player.position.z += moveY * 0.8;
-    diveY -= 0.5;
-    player.position.y = Math.max(1.6, diveY);
-
-    camera.position.copy(player.position);
-    camera.rotation.set(0, 0, 0);
-    camera.rotation.order = 'YXZ';
-    camera.rotation.y = cameraAngleY;
-    camera.rotation.x = cameraAngleX;
-
-    if (player.position.y <= 1.6) phase = "ground";
-  }
-  else if (phase === "ground") {
-    if(moveX !== 0 || moveY !== 0) {
-      const moveAngle = Math.atan2(moveX, moveY) + cameraAngleY;
-      const speed = isSprinting ? 0.45 : 0.28;
-      player.position.x += Math.sin(moveAngle) * speed;
-      player.position.z += Math.cos(moveAngle) * speed;
-    }
-
-    camera.position.set(player.position.x, player.position.y + 1.6, player.position.z);
-    camera.rotation.set(0, 0, 0);
-    camera.rotation.order = 'YXZ';
-    camera.rotation.y = cameraAngleY;
-    camera.rotation.x = cameraAngleX;
-
-    // Assistência de mira, checagem de proximidade e cor vermelha da mira
-    let enemyInSight = false;
-    const camDir = new THREE.Vector3();
-    camera.getWorldDirection(camDir);
-
-    bots.forEach(bot => {
-      const dist = player.position.distanceTo(bot.group.position);
-      if(dist < 35) {
-        const toBot = bot.group.position.clone().sub(camera.position).normalize();
-        const dot = camDir.dot(toBot); // Verifica se o bot está na frente da câmera
-
-        if (dot > 0.85) { // Alvo na mira
-          enemyInSight = true;
-          // Puxadão suave de assistência de mira
-          const targetAngleY = Math.atan2(bot.group.position.x - player.position.x, bot.group.position.z - player.position.z);
-          cameraAngleY += (targetAngleY - cameraAngleY) * 0.05;
-        }
-      }
-    });
-
-    const crosshairEl = document.getElementById("crosshair");
-    if (enemyInSight) {
-      crosshairEl.style.borderColor = "#ef4444"; // Fica vermelha
-    } else {
-      crosshairEl.style.borderColor = "rgba(255,255,255,0.85)"; // Branca padrão
-    }
-
-    bots.forEach(bot => {
-      const dx = player.position.x - bot.group.position.x;
-      const dz = player.position.z - bot.group.position.z;
-      const dist = Math.hypot(dx, dz);
-      if(dist > 1.2) {
-        bot.group.position.x += (dx / dist) * bot.speed;
-        bot.group.position.z += (dz / dist) * bot.speed;
-        bot.group.rotation.y = Math.atan2(dx, dz);
-      }
-    });
-
-    for(let i = bullets.length - 1; i >= 0; i--) {
-      const b = bullets[i];
-      b.mesh.position.addScaledVector(b.dir, 3.0);
-      b.life--;
-
-      bots.forEach((bot, bIdx) => {
-        if(b.mesh.position.distanceTo(bot.group.position) < 1.8 || bot.isHeadshot) {
-          scene.remove(b.mesh);
-          bullets.splice(i, 1);
-          scene.remove(bot.group);
-          bots.splice(bIdx, 1);
-          killCount++;
-          aliveCount = Math.max(1, aliveCount - 1);
-          document.getElementById("killCount").innerText = killCount;
-          document.getElementById("aliveCount").innerText = aliveCount;
-        }
-      });
-
-      if(b.life <= 0 && b.mes
