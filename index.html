@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Free Fire - Free Look Edition</title>
+<title>Free Fire - Anti BlackScreen Edition</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
@@ -24,7 +24,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 #playButton{width:100%;max-width:300px;padding:18px;border:none;border-radius:14px;background:linear-gradient(180deg,#f97316,#b91c1c);color:#fff;font-size:22px;font-weight:900;box-shadow:0 6px 0 #7f1d1d;cursor:pointer;text-transform:uppercase;letter-spacing:1px;pointer-events:auto;z-index:100000;}
 #playButton:active{transform:translateY(4px);box-shadow:0 2px 0 #7f1d1d}
 
-#errorMsg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(15,23,42,0.95);border:2px solid #ef4444;padding:20px;border-radius:10px;color:#fff;text-align:center;display:none;z-index:999999;max-width:85%}
+#errorMsg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(15,23,42,0.95);border:2px solid #ef4444;padding:25px;border-radius:12px;color:#fff;text-align:center;display:none;z-index:999999;max-width:85%}
 
 /* HUD */
 #gameHUD{display:none;position:fixed;inset:0;z-index:50;pointer-events:none}
@@ -34,5 +34,6 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 #aliveCount{color:#facc15}
 
 /* Minimapa */
-#minimap{position:absolute;top:15px;right:15px;width:95px;height:95px;border-radius:50%;background:rgba(15,23,42,0.8);border:2px solid #facc15;overflow:hidden;pointer-events:auto;box-shadow
+#minimap{position:absolute;top:15px;right:15px;width:95px;height:95px;border-radius:50%;background:rgba(15,23,42,0.8);border:2px solid #facc15;overflow:hidden;pointer-events:auto;box-shadow:0 4px 10px rgba(0,0,0,0.5)}
+#minimapPlayer{position:absolute;top:50%;left:50%;width:8px;height:8px;margin:-4px;background:#3b82f6;border-radius:50%;border:1px solid #fff}
          
