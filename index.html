@@ -3,52 +3,212 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>MEGA BATTLE ROYALE 3D</title>
+<title>Free Fire 2020 - Web Edition</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#1a0b2e;color:#fff;font-family:'Segoe UI',Arial,sans-serif;touch-action:none}
-canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#05050a;color:#fff;font-family:'Segoe UI',Arial,sans-serif;touch-action:none}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 
-/* Lobby */
-#lobby{position:fixed;inset:0;z-index:10;background:linear-gradient(180deg,#2d1b4e 0%,#1a0b2e 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
-#logo{font-size:clamp(28px, 6vw, 48px);font-weight:900;color:#ffdf45;text-shadow:3px 4px 0 #713c18,-2px -2px 0 #fff;margin-bottom:20px;text-align:center}
-#playButton{width:100%;max-width:320px;padding:18px;border:4px solid #fff1a0;border-radius:18px;background:linear-gradient(180deg,#fff06b,#ff9c19);color:#572d00;font-size:24px;font-weight:1000;box-shadow:0 8px 0 #a85a12;cursor:pointer;pointer-events:auto;text-align:center}
-#playButton:active{transform:translateY(4px);box-shadow:0 4px 0 #a85a12}
+/* Lobby Clássico 2020 */
+#lobby{position:fixed;inset:0;z-index:100;background:radial-gradient(circle at center, #1e2538 0%, #090d16 100%);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:30px}
+.lobby-header{font-size:clamp(22px, 5vw, 36px);font-weight:900;color:#ffcc00;text-shadow:2px 2px 0 #b33600;letter-spacing:2px;margin-top:10px}
+.char-select{display:flex;gap:15px;margin:20px 0}
+.char-card{padding:12px 20px;background:rgba(255,255,255,0.1);border:2px solid #ffcc00;border-radius:10px;font-weight:bold;cursor:pointer}
+.char-card.active{background:#ffcc00;color:#000}
+#playButton{width:100%;max-width:280px;padding:16px;border:none;border-radius:12px;background:linear-gradient(180deg,#ff8800,#cc3300);color:#fff;font-size:22px;font-weight:900;box-shadow:0 6px 0 #801a00;cursor:pointer;margin-bottom:20px;text-transform:uppercase}
+#playButton:active{transform:translateY(4px);box-shadow:0 2px 0 #801a00}
 
-/* HUD do Jogo */
-#gameHUD{display:none;position:fixed;inset:0;z-index:5;pointer-events:none}
-#health{position:absolute;top:15px;left:15px;width:180px;padding:10px 12px;border-radius:12px;background:rgba(26,15,46,0.9);border:2px solid #5a3d8a;font-size:12px;font-weight:bold}
-#healthTrack{height:10px;margin-top:6px;border-radius:6px;background:#5b2630;overflow:hidden}
-#healthFill{height:100%;width:100%;background:#52df68}
-#backButton{position:absolute;top:15px;right:15px;padding:10px 16px;border:2px solid white;border-radius:12px;background:#174566;color:white;font-weight:bold;pointer-events:auto}
+/* HUD Clássica de Batalha 2020 */
+#gameHUD{display:none;position:fixed;inset:0;z-index:50;pointer-events:none}
+#topBar{position:absolute;top:15px;left:15px;display:flex;gap:10px;align-items:center}
+.badge{background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.3);padding:6px 12px;border-radius:8px;font-size:13px;font-weight:bold}
+#killCount{color:#ff5555}
+#aliveCount{color:#ffcc00}
 
-#joystick{position:absolute;bottom:25px;left:25px;width:120px;height:120px;border:3px solid rgba(255,255,255,0.4);border-radius:50%;background:rgba(23,59,88,0.4);pointer-events:auto;touch-action:none}
-#stick{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px;border:2px solid white;border-radius:50%;background:rgba(255,255,255,0.8)}
-#aimPad{position:absolute;right:25px;bottom:130px;width:130px;height:130px;border:2px dashed rgba(255,255,255,0.5);border-radius:50%;background:rgba(23,59,88,0.4);pointer-events:auto;touch-action:none}
-#aimDot{position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px;border:2px solid white;border-radius:50%;background:#ffdc55}
-#fireButton{position:absolute;right:25px;bottom:25px;width:85px;height:85px;border:3px solid white;border-radius:50%;background:linear-gradient(135deg,#e35a35,#9c2b11);color:white;font-weight:900;pointer-events:auto;box-shadow:0 6px 0 #611808}
+/* Controles Estilo Free Fire Mobile */
+#joystick{position:absolute;bottom:30px;left:30px;width:120px;height:120px;border:2px solid rgba(255,255,255,0.3);border-radius:50%;background:rgba(0,0,0,0.3);pointer-events:auto;touch-action:none}
+#stick{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px;border:2px solid #fff;border-radius:50%;background:rgba(255,255,255,0.7)}
 
-#planeNotice{position:absolute;top:18%;left:50%;transform:translateX(-50%);padding:10px 18px;border-radius:12px;background:rgba(16,47,80,0.9);font-weight:bold;font-size:14px;border:2px solid #ffdc51;display:none;white-space:nowrap}
-#jumpButton{position:absolute;left:50%;top:26%;transform:translateX(-50%);padding:14px 28px;border:3px solid #fff1a0;border-radius:14px;background:linear-gradient(180deg,#fff06b,#ff9c19);color:#572d00;font-weight:1000;font-size:18px;pointer-events:auto;display:none;box-shadow:0 6px 0 #a85a12}
+/* Botões de Ação Direita */
+#fireButton{position:absolute;right:30px;bottom:35px;width:80px;height:80px;border:3px solid #ff3333;border-radius:50%;background:rgba(204,0,0,0.6);pointer-events:auto;box-shadow:0 4px 10px rgba(0,0,0,0.5)}
+#gelButton{position:absolute;right:130px;bottom:45px;width:60px;height:60px;border:2px solid #00ccff;border-radius:50%;background:rgba(0,153,255,0.5);pointer-events:auto;font-weight:bold;font-size:12px;display:flex;align-items:center;justify-content:center}
+#aimButton{position:absolute;right:130px;bottom:120px;width:60px;height:60px;border:2px solid #fff;border-radius:50%;background:rgba(0,0,0,0.5);pointer-events:auto;display:flex;align-items:center;justify-content:center;font-weight:bold}
+
+/* Tela de Voo / Avião */
+#planeOverlay{position:fixed;inset:0;z-index:60;display:none;pointer-events:none}
+#planeNotice{position:absolute;top:20%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);border:2px solid #ffcc00;padding:10px 24px;border-radius:20px;font-weight:bold;font-size:16px}
+#jumpButton{position:absolute;left:50%;top:30%;transform:translateX(-50%);padding:14px 32px;background:linear-gradient(180deg,#ffcc00,#ff8800);border:none;border-radius:12px;color:#000;font-size:18px;font-weight:900;pointer-events:auto;box-shadow:0 5px 0 #995500}
 </style>
 </head>
 <body>
 
 <div id="lobby">
-  <div id="logo">🔥 MEGA BATTLE ROYALE 🔥</div>
-  <button id="playButton">JOGAR PARTIDA</button>
+  <div class="lobby-header">FREE FIRE 2020 (CLASSIC)</div>
+  <div class="char-select">
+    <div class="char-card active">ALOK</div>
+    <div class="char-card">KELLY</div>
+    <div class="char-card">ANDREW</div>
+  </div>
+  <button id="playButton">INICIAR PARTIDA</button>
 </div>
 
 <div id="gameHUD">
-  <div id="health">VIDA<div id="healthTrack"><div id="healthFill"></div></div></div>
-  <button id="backButton">SAIR</button>
-  <div id="planeNotice">✈️ AVIÃO NO AR — ESCOLHA O MOMENTO DE SALTAR!</div>
-  <button id="jumpButton">🪂 SALTAR DO AVIÃO</button>
+  <div id="topBar">
+    <div class="badge">VIVOS: <span id="aliveCount">50</span></div>
+    <div class="badge">ELIMINAÇÕES: <span id="killCount">0</span></div>
+  </div>
   <div id="joystick"><div id="stick"></div></div>
-  <div id="aimPad"><div id="aimDot"></div></div>
-  <button id="fireButton">ATIRAR</button>
+  <div id="gelButton">GELO</div>
+  <div id="aimButton">MIRA</div>
+  <button id="fireButton"></button>
+</div>
+
+<div id="planeOverlay">
+  <div id="planeNotice">✈️ ROTA DO AVIÃO — BEM-VINDO À BERMUDA</div>
+  <button id="jumpButton">SALTAR</button>
 </div>
 
 <script type="module">
-import * as THREE from "
-  
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x75b8e0);
+scene.fog = new THREE.Fog(0x75b8e0, 60, 220);
+
+const camera = new THREE.PerspectiveCamera(65, innerWidth / innerHeight, 0.1, 400);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+document.body.appendChild(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x445544, 1.4));
+const sun = new THREE.DirectionalLight(0xfffaed, 1.6);
+sun.position.set(40, 80, 40);
+sun.castShadow = true;
+scene.add(sun);
+
+const mat = (c, r = 0.8) => new THREE.MeshStandardMaterial({ color: c, roughness: r });
+const world = new THREE.Group();
+scene.add(world);
+
+// Chão da Ilha Clássica
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(350, 350), mat(0x438a3e));
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+world.add(ground);
+
+// Casas e Torres estilo Clock Tower / Factory de 2020
+function makeStructure(x, z, w, h, d, color) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(color));
+  m.position.set(x, h/2, z);
+  m.castShadow = true; m.receiveShadow = true;
+  world.add(m);
+}
+makeStructure(-30, -30, 10, 6, 10, 0x7c7c7c);
+makeStructure(30, 30, 8, 8, 8, 0x9c4141);
+makeStructure(-40, 30, 12, 5, 12, 0x546e7a);
+
+// Personagem Principal (Alok 2020)
+const player = new THREE.Group();
+const pBody = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.1, 0.4), mat(0x1a237e));
+pBody.position.y = 0.55; player.add(pBody);
+const pHead = new THREE.Mesh(new THREE.SphereGeometry(0.38, 16, 16), mat(0xf39c12));
+pHead.position.y = 1.3; player.add(pHead);
+player.visible = false;
+scene.add(player);
+
+// Avião
+const plane = new THREE.Mesh(new THREE.BoxGeometry(7, 2, 2.5), mat(0x37474f));
+plane.visible = false;
+scene.add(plane);
+
+let gameStarted = false;
+let phase = "lobby"; // "lobby", "plane", "diving", "ground"
+let planeTime = 0, moveX = 0, moveY = 0, diveY = 50;
+let kills = 0;
+
+// Joystick Touch
+const joystick = document.getElementById("joystick"), stick = document.getElementById("stick");
+let joyId = null, joyCenter = { x: 0, y: 0 };
+
+joystick.addEventListener("pointerdown", e => {
+  joyId = e.pointerId;
+  const r = joystick.getBoundingClientRect();
+  joyCenter = { x: r.left + r.width/2, y: r.top + r.height/2 };
+  updateJoy(e);
+  joystick.setPointerCapture(joyId);
+});
+joystick.addEventListener("pointermove", e => { if(e.pointerId === joyId) updateJoy(e); });
+joystick.addEventListener("pointerup", e => {
+  if(e.pointerId === joyId) {
+    joyId = null; moveX = 0; moveY = 0;
+    stick.style.transform = `translate(0px, 0px)`;
+  }
+});
+
+function updateJoy(e) {
+  const dx = e.clientX - joyCenter.x, dy = e.clientY - joyCenter.y;
+  const dist = Math.hypot(dx, dy), maxR = 38;
+  const nx = dist > maxR ? (dx/dist) * maxR : dx;
+  const ny = dist > maxR ? (dy/dist) * maxR : dy;
+  stick.style.transform = `translate(${nx}px, ${ny}px)`;
+  moveX = nx / maxR; moveY = ny / maxR;
+}
+
+// Botões de Menu e Jogo
+document.getElementById("playButton").addEventListener("click", () => {
+  document.getElementById("lobby").style.display = "none";
+  document.getElementById("planeOverlay").style.display = "block";
+  gameStarted = true;
+  phase = "plane";
+  plane.visible = true;
+});
+
+document.getElementById("jumpButton").addEventListener("click", () => {
+  if (phase !== "plane") return;
+  phase = "diving";
+  player.visible = true;
+  player.position.set(plane.position.x, 50, plane.position.z);
+  diveY = 50;
+  plane.visible = false;
+  document.getElementById("planeOverlay").style.display = "none";
+  document.getElementById("gameHUD").style.display = "block";
+});
+
+// Loop Principal do Jogo
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+  if (!gameStarted) return;
+
+  if (phase === "plane") {
+    planeTime += 0.009;
+    plane.position.set(Math.sin(planeTime) * 100, 50, Math.cos(planeTime * 0.6) * 100);
+    camera.position.set(plane.position.x, plane.position.y + 12, plane.position.z + 22);
+    camera.lookAt(plane.position);
+  }
+  else if (phase === "diving") {
+    player.position.x += moveX * 0.7;
+    player.position.z += moveY * 0.7;
+    diveY -= 0.4;
+    player.position.y = Math.max(0, diveY);
+
+    camera.position.set(player.position.x, player.position.y + 14, player.position.z + 18);
+    camera.lookAt(player.position);
+
+    if (player.position.y <= 0) phase = "ground";
+  }
+  else if (phase === "ground") {
+    player.position.x += moveX * 0.45;
+    player.position.z += moveY * 0.45;
+
+    // Câmera clássica em terceira pessoa logo atrás do boneco
+    camera.position.set(player.position.x, player.position.y + 10, player.position.z + 12);
+    camera.lookAt(player.position.x, player.position.y + 1, player.position.z);
+  }
+}
+
+animate();
+</script>
+</body>
+</html>
