@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Free Fire - Anti Black Screen Safe</title>
+<title>Free Fire - Drag Headshot & Blinded Edition</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#030712;color:#fff;font-family:'Segoe UI',Arial,sans-serif;touch-action:none}
@@ -23,6 +23,9 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 #playButton{width:100%;max-width:300px;padding:16px;border:none;border-radius:14px;background:linear-gradient(180deg,#f97316,#b91c1c);color:#fff;font-size:22px;font-weight:900;box-shadow:0 6px 0 #7f1d1d;cursor:pointer;text-transform:uppercase;letter-spacing:1px;pointer-events:auto;}
 #playButton:active{transform:translateY(4px);box-shadow:0 2px 0 #7f1d1d}
 
+/* Mensagem de Erro */
+#errorMsg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(15,23,42,0.95);border:2px solid #ef4444;padding:20px;border-radius:10px;color:#fff;text-align:center;display:none;z-index:99999;max-width:85%}
+
 /* HUD */
 #gameHUD{display:none;position:fixed;inset:0;z-index:50;pointer-events:none}
 #topBar{position:absolute;top:15px;left:15px;display:flex;gap:8px;pointer-events:auto}
@@ -41,7 +44,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 /* Área de Toque Direita para Câmera Livre 360° */
 #cameraTouchArea{position:absolute;right:0;top:0;width:55%;height:100%;pointer-events:auto;z-index:40}
 
-/* Botão de Atirar Estilo Free Fire */
+/* Botão de Atirar Estilo Free Fire (Com Drag Headshot) */
 #fireButton{position:absolute;right:40px;bottom:30px;width:95px;height:95px;border:4px solid #ef4444;border-radius:50%;background:rgba(239,68,68,0.5);pointer-events:auto;box-shadow:0 4px 15px rgba(0,0,0,0.5);z-index:45;touch-action:none;display:flex;align-items:center;justify-content:center}
 .fire-inner{width:35px;height:35px;background:#fff;border-radius:50%;opacity:0.8}
 
@@ -63,7 +66,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 <body>
 
 <div id="lobby">
-  <div class="lobby-header">🔥 FREE FIRE - SECURE LOBBY 🔥</div>
+  <div class="lobby-header">🔥 FREE FIRE - DRAG HEADSHOT 🔥</div>
   
   <div class="char-container">
     <div class="char-card active">ALOK</div>
@@ -77,6 +80,11 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
   </div>
 
   <button id="playButton">INICIAR PARTIDA</button>
+</div>
+
+<div id="errorMsg">
+  <h3>⚠️ Erro de Inicialização Gráfica</h3>
+  <p>Seu navegador encontrou um bloqueio no WebGL. Tente reabrir em aba anônima.</p>
 </div>
 
 <div id="gameHUD">
@@ -125,68 +133,74 @@ let isAiming = false, isSprinting = false;
 let killCount = 0, aliveCount = 50;
 
 function initEngine() {
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x60a5fa);
-  scene.fog = new THREE.Fog(0x60a5fa, 80, 280);
+  try {
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x60a5fa);
+    scene.fog = new THREE.Fog(0x60a5fa, 80, 280);
 
-  camera = new THREE.PerspectiveCamera(65, innerWidth / innerHeight, 0.1, 400);
-  renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
-  renderer.setSize(innerWidth, innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-  document.body.appendChild(renderer.domElement);
-
-  window.addEventListener('resize', () => {
-    if(!camera || !renderer) return;
-    camera.aspect = innerWidth / innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(innerWidth, innerHeight);
-  });
-
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x334155, 1.5));
-  const sun = new THREE.DirectionalLight(0xfffaed, 1.7);
-  sun.position.set(60, 100, 60);
-  scene.add(sun);
-
-  const mat = (c) => new THREE.MeshBasicMaterial({ color: c });
-  world = new THREE.Group();
-  scene.add(world);
-
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), mat(0x22c55e));
-  ground.rotation.x = -Math.PI / 2;
-  world.add(ground);
-
-  function makeBuilding(x, z, w, h, d, color) {
-    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(color));
-    m.position.set(x, h/2, z);
-    world.add(m);
-  }
-  makeBuilding(-35, -35, 12, 7, 12, 0x475569);
-  makeBuilding(35, 35, 10, 9, 10, 0x991b1b);
-  makeBuilding(-40, 35, 14, 5, 14, 0x334155);
-  makeBuilding(35, -35, 10, 6, 10, 0x0f172a);
-
-  player = new THREE.Group();
-  pTorso = new THREE.Mesh(new THREE.BoxGeometry(0.75, 1.1, 0.45), mat(0x1e293b));
-  pTorso.position.y = 0.55; player.add(pTorso);
-  pHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), mat(0xfde047));
-  pHead.position.y = 1.35; player.add(pHead);
-  player.visible = false;
-  scene.add(player);
-
-  plane = new THREE.Mesh(new THREE.BoxGeometry(8, 2.2, 3), mat(0x334155));
-  plane.visible = false;
-  scene.add(plane);
-
-  for(let i = 0; i < 6; i++) {
-    const bGroup = new THREE.Group();
-    const bTorso = new THREE.Mesh(new THREE.BoxGeometry(0.75, 1.1, 0.45), mat(0xdc2626));
-    bTorso.position.y = 0.55; bGroup.add(bTorso);
-    const bHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), mat(0xfde047));
-    bHead.position.y = 1.35; bGroup.add(bHead);
+    camera = new THREE.PerspectiveCamera(72, innerWidth / innerHeight, 0.1, 400);
     
-    bGroup.position.set((Math.random() - 0.5) * 120, 0, (Math.random() - 0.5) * 120);
-    scene.add(bGroup);
-    bots.push({ group: bGroup, speed: 0.14 });
+    renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance", failIfMajorPerformanceCaveat: false });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    document.body.appendChild(renderer.domElement);
+
+    window.addEventListener('resize', () => {
+      if(!camera || !renderer) return;
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x334155, 1.5));
+    const sun = new THREE.DirectionalLight(0xfffaed, 1.7);
+    sun.position.set(60, 100, 60);
+    scene.add(sun);
+
+    const mat = (c) => new THREE.MeshBasicMaterial({ color: c });
+    world = new THREE.Group();
+    scene.add(world);
+
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), mat(0x22c55e));
+    ground.rotation.x = -Math.PI / 2;
+    world.add(ground);
+
+    function makeBuilding(x, z, w, h, d, color) {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(color));
+      m.position.set(x, h/2, z);
+      world.add(m);
+    }
+    makeBuilding(-35, -35, 12, 7, 12, 0x475569);
+    makeBuilding(35, 35, 10, 9, 10, 0x991b1b);
+    makeBuilding(-40, 35, 14, 5, 14, 0x334155);
+    makeBuilding(35, -35, 10, 6, 10, 0x0f172a);
+
+    player = new THREE.Group();
+    pTorso = new THREE.Mesh(new THREE.BoxGeometry(0.75, 1.1, 0.45), mat(0x1e293b));
+    pTorso.position.y = 0.55; player.add(pTorso);
+    pHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), mat(0xfde047));
+    pHead.position.y = 1.35; player.add(pHead);
+    player.visible = false;
+    scene.add(player);
+
+    plane = new THREE.Mesh(new THREE.BoxGeometry(8, 2.2, 3), mat(0x334155));
+    plane.visible = false;
+    scene.add(plane);
+
+    for(let i = 0; i < 6; i++) {
+      const bGroup = new THREE.Group();
+      const bTorso = new THREE.Mesh(new THREE.BoxGeometry(0.75, 1.1, 0.45), mat(0xdc2626));
+      bTorso.position.y = 0.55; bGroup.add(bTorso);
+      const bHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), mat(0xfde047));
+      bHead.position.y = 1.35; bGroup.add(bHead);
+      
+      bGroup.position.set((Math.random() - 0.5) * 120, 0, (Math.random() - 0.5) * 120);
+      scene.add(bGroup);
+      bots.push({ group: bGroup, speed: 0.14, isHeadshot: false });
+    }
+  } catch(err) {
+    console.error("Erro ao iniciar WebGL:", err);
+    document.getElementById("errorMsg").style.display = "block";
   }
 }
 
@@ -245,30 +259,47 @@ cameraArea.addEventListener("pointermove", e => {
 });
 cameraArea.addEventListener("pointerup", e => { if(e.pointerId === camTouchId) camTouchId = null; });
 
-// Botão de Atirar (Com Puxar Capa)
+// SISTEMA DRAG HEADSHOT (Botão de Atirar Oficial)
 const fireBtn = document.getElementById("fireButton");
-let fireTouchId = null, fireStartX = 0, fireStartY = 0;
+let fireTouchId = null, fireStartX = 0, fireStartY = 0, totalDragY = 0;
 
 fireBtn.addEventListener("pointerdown", e => {
   fireTouchId = e.pointerId;
   fireStartX = e.clientX;
   fireStartY = e.clientY;
+  totalDragY = 0;
   fireBtn.setPointerCapture(fireTouchId);
   fireAction();
 });
+
 fireBtn.addEventListener("pointermove", e => {
   if(e.pointerId === fireTouchId) {
     const moveX = e.clientX - fireStartX;
     const moveY = e.clientY - fireStartY;
+    totalDragY += moveY;
+
     const sensFactor = getSensMultiplier();
     cameraAngleY -= moveX * sensFactor * 0.8;
-    cameraAngleX = Math.max(-0.8, Math.min(1.2, cameraAngleX + (moveY * sensFactor * 1.8)));
+    // Puxada de capa acentuada ao arrastar para cima no botão de tiro
+    cameraAngleX = Math.max(-0.8, Math.min(1.2, cameraAngleX + (moveY * sensFactor * 2.2)));
+
     fireStartX = e.clientX;
     fireStartY = e.clientY;
   }
 });
+
 fireBtn.addEventListener("pointerup", e => {
-  if(e.pointerId === fireTouchId) fireTouchId = null;
+  if(e.pointerId === fireTouchId) {
+    // Se o jogador puxou o dedo para cima com força, ativa o Headshot assistido
+    if (totalDragY < -15) {
+      bots.forEach(bot => {
+        if(player.position.distanceTo(bot.group.position) < 25) {
+          bot.isHeadshot = true; // Marca tiro na cabeça
+        }
+      });
+    }
+    fireTouchId = null;
+  }
 });
 
 function fireAction() {
@@ -296,23 +327,16 @@ aimButton.addEventListener("click", () => {
   document.getElementById("crosshair").style.transform = isAiming ? "translate(-50%, -50%) scale(1.4)" : "translate(-50%, -50%) scale(1)";
 });
 
-// Transição Segura do Lobby para o Jogo
+// Transição Segura
 const startGame = (e) => {
   if(e) e.stopPropagation();
-  
-  if(!scene) {
-    initEngine();
-  }
-
+  if(!scene) { initEngine(); }
   document.getElementById("lobby").style.display = "none";
   document.getElementById("planeOverlay").style.display = "block";
   gameStarted = true;
   phase = "plane";
   plane.visible = true;
-  
-  if(renderer) {
-    renderer.setSize(innerWidth, innerHeight);
-  }
+  if(renderer) { renderer.setSize(innerWidth, innerHeight); }
 };
 
 document.getElementById("playButton").addEventListener("click", startGame);
@@ -335,7 +359,11 @@ document.getElementById("jumpButtonPlane").addEventListener("touchend", jumpPlan
 
 function animate() {
   requestAnimationFrame(animate);
+  
   if (renderer && scene && camera) {
+    const targetFOV = isAiming ? 45 : 72;
+    camera.fov += (targetFOV - camera.fov) * 0.15;
+    camera.updateProjectionMatrix();
     renderer.render(scene, camera);
   }
   if (!gameStarted) return;
@@ -352,98 +380,5 @@ function animate() {
     diveY -= 0.5;
     player.position.y = Math.max(0, diveY);
 
-    camera.position.set(player.position.x, player.position.y + 16, player.position.z + 20);
-    camera.lookAt(player.position);
-
-    if (player.position.y <= 0) phase = "ground";
-  }
-  else if (phase === "ground") {
-    if(moveX !== 0 || moveY !== 0) {
-      const moveAngle = Math.atan2(moveX, moveY) + cameraAngleY;
-      const speed = isSprinting ? 0.45 : 0.28;
-      player.position.x += Math.sin(moveAngle) * speed;
-      player.position.z += Math.cos(moveAngle) * speed;
-      player.rotation.y = moveAngle;
-    }
-
-    let targetLocked = false;
-    bots.forEach(bot => {
-      const dist = player.position.distanceTo(bot.group.position);
-      if(dist < 32) {
-        const dx = player.position.x - bot.group.position.x;
-        const dz = player.position.z - bot.group.position.z;
-        const targetAngleY = Math.atan2(dx, dz);
-        let angleDiff = Math.abs(cameraAngleY - targetAngleY);
-        
-        if(angleDiff < 0.3) {
-          targetLocked = true;
-          cameraAngleY += (targetAngleY - cameraAngleY) * 0.1;
-        }
-      }
-    });
-
-    const crosshairEl = document.getElementById("crosshair");
-    if(targetLocked) {
-      crosshairEl.style.borderColor = "#ef4444";
-    } else {
-      crosshairEl.style.borderColor = "rgba(255,255,255,0.85)";
-    }
-
-    bots.forEach(bot => {
-      const dx = player.position.x - bot.group.position.x;
-      const dz = player.position.z - bot.group.position.z;
-      const dist = Math.hypot(dx, dz);
-      if(dist > 1.2) {
-        bot.group.position.x += (dx / dist) * bot.speed;
-        bot.group.position.z += (dz / dist) * bot.speed;
-        bot.group.rotation.y = Math.atan2(dx, dz);
-      }
-    });
-
-    // Câmera estilo Free Fire / Fortnite (Ombro Tático)
-    const dist = isAiming ? 1.5 : 4.2;
-    const heightOffset = isAiming ? 1.2 : 2.5;
-    const sideOffset = 0.8; 
-    
-    const camX = player.position.x + Math.sin(cameraAngleY) * dist + Math.cos(cameraAngleY) * sideOffset;
-    const camZ = player.position.z + Math.cos(cameraAngleY) * dist - Math.sin(cameraAngleY) * sideOffset;
-    const camY = player.position.y + heightOffset + (cameraAngleX * 3.5);
-
-    camera.position.set(camX, camY, camZ);
-    camera.lookAt(
-      player.position.x - Math.sin(cameraAngleY) * 2.0, 
-      player.position.y + 1.2, 
-      player.position.z - Math.cos(cameraAngleY) * 2.0
-    );
-
-    for(let i = bullets.length - 1; i >= 0; i--) {
-      const b = bullets[i];
-      b.mesh.position.x += b.dx * 2.5;
-      b.mesh.position.z += b.dz * 2.5;
-      b.life--;
-
-      bots.forEach((bot, bIdx) => {
-        if(b.mesh.position.distanceTo(bot.group.position) < 1.8) {
-          scene.remove(b.mesh);
-          bullets.splice(i, 1);
-          scene.remove(bot.group);
-          bots.splice(bIdx, 1);
-          killCount++;
-          aliveCount = Math.max(1, aliveCount - 1);
-          document.getElementById("killCount").innerText = killCount;
-          document.getElementById("aliveCount").innerText = aliveCount;
-        }
-      });
-
-      if(b.life <= 0 && b.mesh.parent) {
-        scene.remove(b.mesh);
-        bullets.splice(i, 1);
-      }
-    }
-  }
-}
-
-animate();
-</script>
-</body>
-</html>
+    camera.position.set(player.position.x, player.position.y + 16, player.position.z + 2
+                        
