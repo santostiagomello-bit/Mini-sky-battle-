@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>MINI ROYALE</title>
+<title>MINI ROYALE - Anti BlackScreen</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
@@ -29,5 +29,33 @@ button{color:white;font-weight:bold;cursor:pointer;touch-action:manipulation}
  position:relative;z-index:999;pointer-events:auto;
  width:min(300px,90%);padding:18px;border:0;
  border-radius:12px;background:linear-gradient(#f97316,#b91c1c);
- font-size:23px;box-shadow:0 5px #7f1d1d;margin-bottom:15px
- 
+ font-size:23px;box-shadow:0 5px #7f1d1d;margin-bottom:15px;
+ touch-action:manipulation
+}
+#loading{font-size:12px;color:#facc15}
+
+#game{display:none;position:fixed;inset:0;z-index:10;pointer-events:none}
+#top{position:absolute;top:12px;left:12px;display:flex;gap:6px}
+.badge{background:#000b;padding:8px 10px;border-radius:6px;border:1px solid #ffffff55;font-size:12px;font-weight:bold}
+#map{position:absolute;top:12px;right:12px;width:100px;height:100px;border-radius:50%;border:2px solid #facc15;background:#263b2d;overflow:hidden}
+#mini{width:100%;height:100%}
+#cross{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:18px;height:18px;border:2px solid white;border-radius:50%}
+#cross.hit{border-color:red}
+#joystick{position:absolute;left:25px;bottom:28px;width:125px;height:125px;border:2px solid #ffffff66;background:#0005;border-radius:50%;pointer-events:auto;touch-action:none}
+#stick{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:53px;height:53px;border-radius:50%;border:2px solid white;background:#ffffff88}
+#cameraArea{position:absolute;right:0;top:0;width:55%;height:100%;pointer-events:auto;touch-action:none}
+.action{position:absolute;display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #ffffff88;background:#101827cc;pointer-events:auto;z-index:20}
+#fire{right:22px;bottom:28px;width:88px;height:88px;border:4px solid #ef4444;background:#ef444477}
+#aim{right:125px;bottom:125px;width:59px;height:59px}
+#jump{right:42px;bottom:135px;width:62px;height:62px;border-color:#38bdf8}
+#crouch{right:112px;bottom:48px;width:52px;height:52px}
+#sprint{left:160px;bottom:38px;width:57px;height:57px;border-color:#facc15;font-size:10px}
+#reload{right:125px;bottom:205px;width:48px;height:48px;font-size:10px}
+#gel{right:25px;bottom:225px;width:55px;height:55px;border-color:#38bdf8;font-size:10px}
+#switch{right:195px;bottom:125px;width:53px;height:53px;font-size:10px}
+#medkit{right:195px;bottom:48px;width:48px;height:48px;font-size:10px}
+#healthBox{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);width:145px;padding:6px;background:#000b;border-radius:7px;text-align:center}
+#healthBar{height:9px;background:#22c55e;border-radius:5px;width:100%}
+#healthText{font-size:10px;margin-bottom:4px}
+#ammo{position:absolute;right:18px;bottom:325px;background:#000b;padding:7px;border-radius:6px;
+      
