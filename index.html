@@ -9,41 +9,40 @@
         body, html { width: 100%; height: 100%; overflow: hidden; background: #07090e; font-family: system-ui, -apple-system, sans-serif; color: #fff; }
         #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
         
-        /* MENU INICIAL */
+        /* MENU INICIAL COMPacto PARA NENHUM CORTE */
         #menu-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 999;
             background: radial-gradient(circle at center, #111827 0%, #030712 100%);
             display: flex; justify-content: center; align-items: center;
-            padding: 10px; overflow-y: auto;
+            padding: 5px; overflow-y: auto;
         }
         .menu-card {
             background: rgba(17, 24, 39, 0.98); border: 1px solid rgba(59, 130, 246, 0.5);
-            border-radius: 12px; padding: 15px; width: 100%; max-width: 500px; text-align: center;
+            border-radius: 10px; padding: 10px 14px; width: 100%; max-width: 480px; text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); backdrop-filter: blur(12px);
-            max-height: 98vh; overflow-y: auto;
         }
-        h1 { font-size: 1.3rem; font-weight: 900; letter-spacing: 1px; color: #3b82f6; margin-bottom: 2px; text-transform: uppercase; }
-        .subtitle { font-size: 0.65rem; color: #9ca3af; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        h1 { font-size: 1.1rem; font-weight: 900; letter-spacing: 1px; color: #3b82f6; margin-bottom: 1px; text-transform: uppercase; }
+        .subtitle { font-size: 0.55rem; color: #9ca3af; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
         
-        .section-title { font-size: 0.7rem; font-weight: bold; color: #60a5fa; margin: 6px 0 4px 0; text-align: left; text-transform: uppercase; }
+        .section-title { font-size: 0.6rem; font-weight: bold; color: #60a5fa; margin: 4px 0 2px 0; text-align: left; text-transform: uppercase; }
         
-        .options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 6px; }
+        .options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 4px; }
         .option-card {
             background: rgba(31, 41, 55, 0.9); border: 2px solid rgba(75, 85, 99, 0.5);
-            border-radius: 6px; padding: 6px 4px; cursor: pointer;
+            border-radius: 5px; padding: 4px 2px; cursor: pointer;
         }
         .option-card.selected { border-color: #3b82f6; background: rgba(59, 130, 246, 0.3); }
-        .option-card h3 { font-size: 0.75rem; color: #fff; margin-bottom: 1px; }
-        .option-card span { font-size: 0.55rem; color: #9ca3af; }
+        .option-card h3 { font-size: 0.65rem; color: #fff; margin-bottom: 0px; }
+        .option-card span { font-size: 0.5rem; color: #9ca3af; }
 
-        .toggle-row { display: flex; justify-content: space-between; align-items: center; background: rgba(31, 41, 55, 0.6); padding: 6px 10px; border-radius: 6px; margin-bottom: 6px; font-size: 0.75rem; }
-        .toggle-row input { accent-color: #2563eb; width: 16px; height: 16px; cursor: pointer; }
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; background: rgba(31, 41, 55, 0.6); padding: 4px 8px; border-radius: 5px; margin-bottom: 4px; font-size: 0.65rem; }
+        .toggle-row input { accent-color: #2563eb; width: 14px; height: 14px; cursor: pointer; }
 
         #start-btn {
             width: 100%; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            color: white; border: none; padding: 12px; font-size: 0.95rem; font-weight: bold;
-            border-radius: 6px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
-            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.5); margin-top: 5px;
+            color: white; border: none; padding: 10px; font-size: 0.85rem; font-weight: bold;
+            border-radius: 5px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.5); margin-top: 4px;
         }
 
         /* HUD DE JOGO & SISTEMA DE MIRA */
@@ -144,302 +143,5 @@
         <div id="top-bar">
             <div class="stat-box" id="hp-display">HP: 100</div>
             <div class="stat-box" id="ammo-display">MUNIÇÃO: 30/90</div>
-            <div class="stat-box" id="kills-display">ALVOS: 0</div>
-        </div>
-        
-        <div id="joystick-zone" class="hud-element">
-            <div id="joystick-knob"></div>
-        </div>
-        
-        <div id="action-buttons">
-            <div class="action-btn hud-element" id="btn-ads" ontouchstart="toggleADS()" onclick="toggleADS()">ADS</div>
-            <div class="action-btn hud-element" ontouchstart="reloadWeapon()" onclick="reloadWeapon()">REC</div>
-            <div class="action-btn hud-element" ontouchstart="playerJump()" onclick="playerJump()">PUL</div>
-            <div class="action-btn hud-element" id="btn-fire" ontouchstart="shootWeapon()" onmousedown="shootWeapon()">FOGO</div>
-        </div>
-    </div>
-
-    <script>
-        let scene, camera, renderer;
-        let player = {
-            pos: new THREE.Vector3(0, 1.7, 22),
-            speed: 0.085,
-            hp: 100,
-            ammo: 30,
-            maxAmmo: 90,
-            isJumping: false,
-            vy: 0,
-            isADS: false
-        };
-        let selectedWeapon = 'm4';
-        let botDifficulty = 'normal';
-        let useAimAssist = true;
-        let useSlowdown = true;
-        let gameStarted = false;
-        let bots = [];
-        let obstacles = [];
-        let kills = 0;
-        
-        let yaw = 0, pitch = 0;
-        let baseSensitivity = 0.003;
-
-        function selectWeapon(type, el) {
-            selectedWeapon = type;
-            document.querySelectorAll('#weapon-grid .option-card').forEach(o => o.classList.remove('selected'));
-            el.classList.add('selected');
-            if(type === 'awp') { player.ammo = 10; player.maxAmmo = 30; }
-            else if(type === 'mp5') { player.ammo = 30; player.maxAmmo = 120; }
-            else { player.ammo = 30; player.maxAmmo = 90; }
-        }
-
-        function selectDifficulty(diff, el) {
-            botDifficulty = diff;
-            document.querySelectorAll('#diff-grid .option-card').forEach(o => o.classList.remove('selected'));
-            el.classList.add('selected');
-        }
-
-        function startGame() {
-            if (gameStarted) return;
-            gameStarted = true;
-
-            useAimAssist = document.getElementById('setting-aimassist').checked;
-            useSlowdown = document.getElementById('setting-slowdown').checked;
-
-            const menu = document.getElementById('menu-overlay');
-            if (menu) menu.style.display = 'none';
-            
-            const hud = document.getElementById('hud');
-            if (hud) hud.style.display = 'block';
-            
-            // Inicializar o motor gráfico imediatamente após esconder o menu
-            initMap();
-            animate();
-        }
-
-        function toggleADS() {
-            player.isADS = !player.isADS;
-            const crosshair = document.getElementById('crosshair');
-            const btnAds = document.getElementById('btn-ads');
-            
-            if (player.isADS) {
-                crosshair.classList.add('ads-active');
-                btnAds.style.background = 'rgba(220, 38, 38, 0.8)';
-                camera.fov = selectedWeapon === 'awp' ? 25 : 45;
-            } else {
-                crosshair.classList.remove('ads-active');
-                btnAds.style.background = 'rgba(37, 99, 235, 0.6)';
-                camera.fov = 75;
-            }
-            camera.updateProjectionMatrix();
-        }
-
-        function initMap() {
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x07090e);
-            scene.fog = new THREE.FogExp2(0x07090e, 0.012);
-
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.copy(player.pos);
-
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.shadowMap.enabled = true;
-            
-            const container = document.getElementById('canvas-container');
-            container.innerHTML = ''; // Limpar qualquer resquício anterior
-            container.appendChild(renderer.domElement);
-
-            // Luzes
-            const ambientLight = new THREE.AmbientLight(0xdbeafe, 0.5);
-            scene.add(ambientLight);
-
-            const sunLight = new THREE.DirectionalLight(0xffedd5, 0.9);
-            sunLight.position.set(30, 50, 20);
-            sunLight.castShadow = true;
-            scene.add(sunLight);
-
-            // Chão
-            const floorGeo = new THREE.PlaneGeometry(120, 120);
-            const floorMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.85 });
-            const floor = new THREE.Mesh(floorGeo, floorMat);
-            floor.rotation.x = -Math.PI / 2;
-            floor.receiveShadow = true;
-            scene.add(floor);
-
-            const wallMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6 });
-            
-            function addObstacle(x, y, z, w, h, d) {
-                const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMat);
-                mesh.position.set(x, y + h/2, z);
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
-                scene.add(mesh);
-                obstacles.push(mesh);
-            }
-
-            addObstacle(0, 0, 0, 6, 4, 6);
-            addObstacle(-15, 0, -10, 8, 3, 4);
-            addObstacle(15, 0, -10, 4, 3, 8);
-            addObstacle(-25, 0, 10, 5, 5, 5);
-            addObstacle(25, 0, 10, 5, 5, 5);
-            addObstacle(0, 0, -25, 20, 4, 3);
-
-            let botCount = botDifficulty === 'easy' ? 4 : botDifficulty === 'normal' ? 6 : 8;
-            for (let i = 0; i < botCount; i++) {
-                createBot();
-            }
-
-            // Touch controls para câmera (Lado direito)
-            let isDragging = false;
-            let prevX = 0, prevY = 0;
-
-            window.addEventListener('touchstart', (e) => {
-                if (e.touches[0].clientX > window.innerWidth / 2) {
-                    isDragging = true;
-                    prevX = e.touches[0].clientX;
-                    prevY = e.touches[0].clientY;
-                }
-            });
-
-            window.addEventListener('touchmove', (e) => {
-                if (!isDragging) return;
-                let clientX = e.touches[0].clientX;
-                let clientY = e.touches[0].clientY;
-                if (clientX > window.innerWidth / 2) {
-                    let dx = clientX - prevX;
-                    let dy = clientY - prevY;
-
-                    let currentSens = baseSensitivity * (player.isADS ? 0.4 : 1.0);
-
-                    if (useSlowdown) {
-                        let nearestBot = getNearestVisibleBot();
-                        if (nearestBot && nearestBot.distance < 18) {
-                            currentSens *= 0.45;
-                        }
-                    }
-
-                    yaw -= dx * currentSens;
-                    pitch -= dy * currentSens;
-                    pitch = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, pitch));
-
-                    if (useAimAssist && player.isADS) {
-                        let targetBot = getNearestVisibleBot();
-                        if (targetBot && targetBot.distance < 20) {
-                            yaw += targetBot.angleDiffX * 0.08;
-                            pitch += targetBot.angleDiffY * 0.08;
-                        }
-                    }
-
-                    let qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
-                    let qX = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), pitch);
-                    camera.quaternion.multiplyQuaternions(qY, qX);
-
-                    prevX = clientX;
-                    prevY = clientY;
-                }
-            });
-
-            window.addEventListener('touchend', () => { isDragging = false; });
-
-            // Joystick virtual (Lado esquerdo)
-            let joystickActive = false;
-            let moveVector = { x: 0, z: 0 };
-            const joyZone = document.getElementById('joystick-zone');
-            const joyKnob = document.getElementById('joystick-knob');
-
-            joyZone.addEventListener('touchstart', () => { joystickActive = true; });
-            window.addEventListener('touchmove', (e) => {
-                if (!joystickActive) return;
-                let touch = e.touches[0];
-                let rect = joyZone.getBoundingClientRect();
-                let cx = rect.left + rect.width / 2;
-                let cy = rect.top + rect.height / 2;
-                let dx = touch.clientX - cx;
-                let dy = touch.clientY - cy;
-                let dist = Math.hypot(dx, dy);
-                let maxDist = 35;
-                if (dist > maxDist) { dx = (dx / dist) * maxDist; dy = (dy / dist) * maxDist; }
-                joyKnob.style.transform = `translate(${dx}px, ${dy}px)`;
-                moveVector.x = dx / maxDist;
-                moveVector.z = dy / maxDist;
-            });
-            window.addEventListener('touchend', () => {
-                joystickActive = false;
-                joyKnob.style.transform = `translate(0px, 0px)`;
-                moveVector.x = 0; moveVector.z = 0;
-            });
-
-            window.playerMove = moveVector;
-        }
-
-        function getNearestVisibleBot() {
-            let raycaster = new THREE.Raycaster();
-            raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-
-            let bestBot = null;
-            let minAngle = 0.35;
-
-            bots.forEach(bot => {
-                let botPos = bot.position.clone();
-                let dirToBot = botPos.clone().sub(camera.position).normalize();
-                let camDir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+            <div class="stat-box"
                 
-                let angle = camDir.angleTo(dirToBot);
-                let distance = camera.position.distanceTo(botPos);
-
-                if (angle < minAngle) {
-                    let rayToBot = new THREE.Raycaster(camera.position, dirToBot, 0.1, distance);
-                    let wallIntersects = rayToBot.intersectObjects(obstacles);
-
-                    if (wallIntersects.length === 0) {
-                        minAngle = angle;
-                        bestBot = {
-                            bot: bot,
-                            distance: distance,
-                            angleDiffX: (dirToBot.x / dirToBot.z) * 0.1,
-                            angleDiffY: (dirToBot.y / dirToBot.z) * 0.1
-                        };
-                    }
-                }
-            });
-            return bestBot;
-        }
-
-        function createBot() {
-            const botGeo = new THREE.CapsuleGeometry(0.4, 1.2, 4, 8);
-            let botColor = botDifficulty === 'easy' ? 0xf59e0b : botDifficulty === 'normal' ? 0xef4444 : 0x9333ea;
-            const botMat = new THREE.MeshStandardMaterial({ color: botColor });
-            const bot = new THREE.Mesh(botGeo, botMat);
-            
-            bot.position.set((Math.random() - 0.5) * 45, 1, -20 - Math.random() * 15);
-            bot.castShadow = true;
-            
-            let speed = botDifficulty === 'easy' ? 0.025 : botDifficulty === 'normal' ? 0.04 : 0.055;
-            let hp = botDifficulty === 'easy' ? 80 : botDifficulty === 'normal' ? 100 : 130;
-            bot.userData = { hp: hp, speed: speed };
-            
-            scene.add(bot);
-            bots.push(bot);
-        }
-
-        function checkCollision(nextPos) {
-            for (let obs of obstacles) {
-                let box = new THREE.Box3().setFromObject(obs);
-                if (box.containsPoint(nextPos)) return true;
-            }
-            return false;
-        }
-
-        function shootWeapon() {
-            if (player.ammo <= 0) return;
-            player.ammo--;
-            document.getElementById('ammo-display').innerText = `MUNIÇÃO: ${player.ammo}/${player.maxAmmo}`;
-
-            const raycaster = new THREE.Raycaster();
-            raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-            let intersects = raycaster.intersectObjects(bots);
-
-            if (intersects.length > 0) {
-                let hitBot = intersects[0].object;
-                let damage = selectedWeapon === 'awp' ?
