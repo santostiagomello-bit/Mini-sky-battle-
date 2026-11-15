@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -280,7 +279,7 @@ function createLoot(){
 }
 
 function init(){
- if(typeof THREE==="undefined")throw new Error("Three.js não carregou. Verifique sua conexão com a internet.");
+ if(typeof THREE==="undefined")throw new Error("Three.js não carregado. Verifique sua conexão com a internet.");
  if(!window.WebGLRenderingContext)throw new Error("Este navegador não oferece suporte ao WebGL.");
 
  scene=new THREE.Scene();
@@ -554,8 +553,8 @@ function stopCam(){camPointer=null;}
 cam.addEventListener("pointerup",stopCam);
 cam.addEventListener("pointercancel",stopCam);
 
-/* BOTÕES */
+/* BOTÕES DE AÇÃO DO HUD */
 $("exit").addEventListener("click",backLobby);
 $("backEnd").addEventListener("click",backLobby);
 
-$("fire").addEventLis
+$("fir
