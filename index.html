@@ -2,349 +2,183 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>VANGUARD 3D — Tactical Mobile FPS</title>
-    <!-- Three.js r128 via CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VANGUARD 3D - FPS Tático</title>
     <style>
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
+        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background: #0b0f19; font-family: system-ui, -apple-system, sans-serif; color: #fff; }
+        #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        
+        /* MENU INICIAL */
+        #menu-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;
+            background: radial-gradient(circle at center, #111827 0%, #030712 100%);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 20px; overflow-y: auto;
         }
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100dvh;
-            overflow: hidden;
-            background-color: #070b14;
-            font-family: 'Rajdhani', 'Inter', sans-serif;
-            color: #f8fafc;
+        .menu-card {
+            background: rgba(17, 24, 39, 0.9); border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 16px; padding: 25px; width: 100%; max-width: 600px; text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px);
         }
-        #game-canvas {
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            display: block;
-            z-index: 1;
-            touch-action: none;
+        h1 { font-size: 1.8rem; font-weight: 900; letter-spacing: 2px; color: #60a5fa; margin-bottom: 8px; text-transform: uppercase; }
+        p { font-size: 0.85rem; color: #9ca3af; margin-bottom: 20px; }
+        .weapons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .weapon-option {
+            background: rgba(31, 41, 55, 0.8); border: 2px solid rgba(75, 85, 99, 0.4);
+            border-radius: 10px; padding: 12px 8px; cursor: pointer; transition: all 0.2s;
         }
-        /* Vidro Tático */
-        .tactical-glass {
-            background: rgba(11, 17, 30, 0.82);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.14);
+        .weapon-option.selected { border-color: #3b82f6; background: rgba(59, 130, 246, 0.15); }
+        .weapon-option h3 { font-size: 0.95rem; color: #fff; margin-bottom: 4px; }
+        .weapon-option span { font-size: 0.7rem; color: #9ca3af; }
+        
+        #start-btn {
+            width: 100%; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white; border: none; padding: 16px; font-size: 1.1rem; font-weight: bold;
+            border-radius: 10px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4); transition: transform 0.1s;
         }
-        .tactical-btn {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1.5px solid rgba(255, 255, 255, 0.25);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.18);
-            backdrop-filter: blur(4px);
-            touch-action: none;
-            transition: transform 0.08s ease, background-color 0.1s ease, border-color 0.1s ease;
-        }
-        .tactical-btn:active, .tactical-btn.active {
-            transform: scale(0.92);
-            background: rgba(245, 158, 11, 0.35);
-            border-color: #f59e0b;
-        }
-        .fire-btn {
-            background: radial-gradient(circle, rgba(239, 68, 68, 0.5) 0%, rgba(153, 27, 27, 0.72) 100%);
-            border: 2px solid rgba(248, 113, 113, 0.7);
-            box-shadow: 0 0 20px rgba(239, 68, 68, 0.35);
-            touch-action: none;
-        }
-        .fire-btn:active, .fire-btn.active {
-            background: radial-gradient(circle, rgba(239, 68, 68, 0.85) 0%, rgba(185, 28, 28, 0.95) 100%);
-            transform: scale(0.94);
-        }
-        /* Retícula Dinâmica */
-        .crosshair-line {
-            position: absolute;
-            background-color: #ffffff;
-            box-shadow: 0 0 3px rgba(0,0,0,0.9);
-            transition: background-color 0.08s ease;
-        }
-        .crosshair-enemy .crosshair-line, .crosshair-enemy .crosshair-dot {
-            background-color: #ef4444 !important;
-            box-shadow: 0 0 6px rgba(239, 68, 68, 0.9);
-        }
-        /* Vinheta de Dano & Sniper */
-        #damage-vignette {
-            background: radial-gradient(circle, transparent 52%, rgba(220, 38, 38, 0.68) 100%);
-            opacity: 0;
-            transition: opacity 0.15s ease-out;
-            pointer-events: none;
-        }
-        #sniper-scope {
-            background: radial-gradient(circle, transparent 33%, #03060c 35%);
-            pointer-events: none;
-        }
-        /* Sliders */
-        input[type=range] {
-            -webkit-appearance: none;
-            background: rgba(255,255,255,0.16);
-            height: 6px;
-            border-radius: 4px;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #f59e0b;
-            cursor: pointer;
-            border: 2px solid #fff;
-        }
-        /* Modo Edição HUD */
-        .hud-editable {
-            outline: 2px dashed #38bdf8 !important;
-            background-color: rgba(56, 189, 248, 0.25) !important;
-            cursor: move !important;
-        }
-        .hud-selected {
-            outline: 2.5px solid #f59e0b !important;
-            box-shadow: 0 0 18px rgba(245, 158, 11, 0.7) !important;
-        }
+        #start-btn:active { transform: scale(0.98); }
 
-        /* =====================================================================
-           OTIMIZAÇÃO CRÍTICA PARA TELAS MOBILE EM PAISAGEM (ALTURA < 500px)
-           Garante que o menu inicial e o botão INICIAR MISSÃO caibam 100% na tela
-           ===================================================================== */
-        #start-screen {
-            height: 100dvh;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+        /* HUD DE JOGO */
+        #hud { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; display: none; }
+        .hud-element { pointer-events: auto; }
+        
+        #crosshair {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 8px; height: 8px; border: 2px solid rgba(255,255,255,0.8); border-radius: 50%;
         }
-        @media (max-height: 500px) {
-            #start-card {
-                padding: 0.75rem 1.25rem !important;
-                max-width: 660px !important;
-                border-radius: 1.1rem !important;
-            }
-            #start-badge {
-                margin-bottom: 0.2rem !important;
-                padding: 0.15rem 0.6rem !important;
-                font-size: 9px !important;
-            }
-            #start-title {
-                font-size: 1.65rem !important;
-                line-height: 1.1 !important;
-                margin-bottom: 0.2rem !important;
-            }
-            #start-desc {
-                font-size: 0.75rem !important;
-                line-height: 1.2 !important;
-                margin-bottom: 0.5rem !important;
-            }
-            #weapon-grid {
-                gap: 0.45rem !important;
-                margin-bottom: 0.55rem !important;
-            }
-            .weapon-select-card {
-                padding: 0.4rem 0.6rem !important;
-                border-radius: 0.65rem !important;
-            }
-            .weapon-select-card .w-sub {
-                display: none !important;
-            }
-            #btn-play {
-                padding-top: 0.55rem !important;
-                padding-bottom: 0.55rem !important;
-                font-size: 0.95rem !important;
-                border-radius: 0.75rem !important;
-            }
-            #start-footer {
-                margin-top: 0.35rem !important;
-                font-size: 10px !important;
-            }
+        
+        #top-bar {
+            position: absolute; top: 15px; left: 20px; right: 20px; display: flex; justify-content: space-between; align-items: center;
         }
+        .stat-box { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 8px; font-weight: bold; font-size: 0.9rem; }
+        
+        /* CONTROLES MOBILE */
+        #joystick-zone {
+            position: absolute; bottom: 30px; left: 30px; width: 120px; height: 120px;
+            background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.15); border-radius: 50%;
+        }
+        #joystick-knob {
+            position: absolute; top: 35px; left: 35px; width: 50px; height: 50px;
+            background: rgba(255,255,255,0.3); border-radius: 50%; pointer-events: none;
+        }
+        
+        #action-buttons {
+            position: absolute; bottom: 30px; right: 30px; display: flex; gap: 15px; align-items: flex-end;
+        }
+        .action-btn {
+            width: 65px; height: 65px; background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%; color: white; font-weight: bold; font-size: 0.8rem; display: flex;
+            align-items: center; justify-content: center; backdrop-filter: blur(4px);
+        }
+        #btn-fire { width: 80px; height: 80px; background: rgba(220, 38, 38, 0.6); border-color: #ef4444; font-size: 0.9rem; }
     </style>
+    <!-- Three.js Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-<!-- Canvas 3D Principal -->
-<canvas id="game-canvas"></canvas>
+    <div id="canvas-container"></div>
 
-<!-- Overlays de Dano e Mira Sniper -->
-<div id="damage-vignette" class="fixed inset-0 z-10"></div>
-<div id="sniper-scope" class="fixed inset-0 z-10 hidden flex items-center justify-center">
-    <div class="w-full h-[1px] bg-black/80 absolute"></div>
-    <div class="h-full w-[1px] bg-black/80 absolute"></div>
-    <div class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444]"></div>
-    <div class="absolute bottom-12 text-[11px] tracking-widest text-amber-400/90 font-mono">8X OPTIC // BALLISTIC COMPUTER</div>
-</div>
-
-<!-- Indicador Direcional de Dano -->
-<div id="damage-indicator" class="fixed inset-0 z-10 pointer-events-none flex items-center justify-center opacity-0 transition-opacity duration-200">
-    <div id="damage-arrow" class="w-44 h-44 relative">
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-b-[20px] border-b-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.9)]"></div>
-    </div>
-</div>
-
-<!-- Mira Central Dinâmica & Hitmarker -->
-<div id="crosshair-container" class="fixed inset-0 z-20 pointer-events-none flex items-center justify-center">
-    <div id="crosshair" class="relative w-12 h-12 flex items-center justify-center">
-        <div class="crosshair-dot w-1 h-1 rounded-full bg-white"></div>
-        <div id="ch-top" class="crosshair-line w-[2px] h-2.5 -translate-y-3"></div>
-        <div id="ch-bottom" class="crosshair-line w-[2px] h-2.5 translate-y-3"></div>
-        <div id="ch-left" class="crosshair-line h-[2px] w-2.5 -translate-x-3"></div>
-        <div id="ch-right" class="crosshair-line h-[2px] w-2.5 translate-x-3"></div>
-    </div>
-    <!-- Hitmarker X -->
-    <div id="hitmarker" class="absolute w-7 h-7 opacity-0 transition-opacity duration-75 flex items-center justify-center">
-        <div class="w-full h-[2px] bg-white rotate-45 absolute shadow"></div>
-        <div class="w-full h-[2px] bg-white -rotate-45 absolute shadow"></div>
-    </div>
-</div>
-
-<!-- HUD DE COMBATE -->
-<div id="hud-layer" class="fixed inset-0 z-30 pointer-events-none hidden">
-    
-    <!-- Barra Superior -->
-    <div class="absolute top-2 left-3 right-3 flex items-start justify-between pointer-events-auto">
-        <div class="flex items-center gap-2">
-            <div class="tactical-glass px-3 py-1 rounded-xl flex items-center gap-3">
-                <div>
-                    <div class="text-[10px] uppercase tracking-widest text-amber-400 font-bold">ONDA <span id="hud-wave">1</span></div>
-                    <div class="text-xs sm:text-sm font-bold leading-tight">ABATES: <span id="hud-kills" class="text-emerald-400">0</span></div>
+    <!-- MENU -->
+    <div id="menu-overlay">
+        <div class="menu-card">
+            <h1>VANGUARD 3D</h1>
+            <p>Selecione seu armamento tático</p>
+            <div class="weapons-grid">
+                <div class="weapon-option selected" onclick="selectWeapon('m4', this)">
+                    <h3>M4A1</h3><span>Assalto</span>
                 </div>
-                <div class="h-6 w-[1px] bg-white/15"></div>
-                <div>
-                    <div class="text-[10px] uppercase tracking-widest text-slate-400">HOSTIS</div>
-                    <div id="hud-enemies" class="text-xs sm:text-sm font-bold text-red-400 leading-tight">4</div>
+                <div class="weapon-option" onclick="selectWeapon('mp5', this)">
+                    <h3>MP5</h3><span>SMG Ágil</span>
+                </div>
+                <div class="weapon-option" onclick="selectWeapon('awp', this)">
+                    <h3>AWP</h3><span>Sniper 338</span>
                 </div>
             </div>
-            <div id="kill-banner" class="hidden tactical-glass px-3 py-1 rounded-lg border-l-4 border-amber-500 text-xs font-bold tracking-wider uppercase text-amber-300">
-                +100 ALVO ELIMINADO
-            </div>
-        </div>
-
-        <div class="flex items-center gap-2">
-            <div class="tactical-glass px-2.5 py-1 rounded-lg text-[11px] font-mono text-slate-300 hidden sm:block">
-                <span id="fps-counter">60</span> FPS
-            </div>
-            <button id="btn-fullscreen" title="Tela Cheia" class="tactical-btn w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-white">
-                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
-            </button>
-            <button id="btn-settings" title="Configurações" class="tactical-btn w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-amber-400">
-                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            </button>
+            <button id="start-btn" onclick="startGame()">▶ INICIAR MISSÃO</button>
         </div>
     </div>
 
-    <!-- Barra Inferior Central: Vida e Munição -->
-    <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-2.5 pointer-events-auto">
-        <div class="tactical-glass px-3 py-1 rounded-xl min-w-[135px] sm:min-w-[155px]">
-            <div class="flex justify-between items-center text-[11px] font-bold mb-0.5">
-                <span class="text-slate-300 flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span> HP
-                </span>
-                <span id="hud-hp-text" class="text-sm sm:text-base text-white">100</span>
-            </div>
-            <div class="w-full h-1.5 sm:h-2 bg-slate-800 rounded-full overflow-hidden">
-                <div id="hud-hp-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-300 transition-all duration-150" style="width: 100%"></div>
-            </div>
+    <!-- HUD -->
+    <div id="hud">
+        <div id="crosshair"></div>
+        <div id="top-bar">
+            <div class="stat-box" id="hp-display">HP: 100</div>
+            <div class="stat-box" id="ammo-display">MUNIÇÃO: 30/90</div>
+            <div class="stat-box" id="kills-display">ALVOS: 0/5</div>
         </div>
-
-        <div id="hud-weapon-box" class="tactical-glass px-3 py-1 rounded-xl flex items-center gap-2.5 cursor-pointer active:scale-95 transition">
-            <div>
-                <div id="hud-weapon-name" class="text-[10px] font-bold tracking-wider text-amber-400 uppercase">M4A1 TACTICAL</div>
-                <div class="flex items-baseline gap-1">
-                    <span id="hud-ammo-mag" class="text-lg sm:text-xl font-extrabold text-white">30</span>
-                    <span class="text-[11px] text-slate-400">/ <span id="hud-ammo-res">150</span></span>
-                </div>
-            </div>
-            <div class="px-1.5 py-0.5 rounded bg-white/10 text-[9px] font-bold text-slate-200 border border-white/15">
-                TROCAR
-            </div>
+        
+        <div id="joystick-zone" class="hud-element">
+            <div id="joystick-knob"></div>
+        </div>
+        
+        <div id="action-buttons">
+            <div class="action-btn hud-element" id="btn-reload" onclick="reloadWeapon()">REC</div>
+            <div class="action-btn hud-element" id="btn-jump" onclick="playerJump()">PULAR</div>
+            <div class="action-btn hud-element" id="btn-fire" ontouchstart="shootWeapon()" onmousedown="shootWeapon()">ATIRAR</div>
         </div>
     </div>
 
-    <!-- ÁREA DE CONTROLE DE TOQUE DIREITA (CÂMERA) -->
-    <div id="look-touch-zone" class="fixed top-0 right-0 w-1/2 h-full pointer-events-auto z-0" style="touch-action: none;"></div>
+    <script>
+        let scene, camera, renderer, clock;
+        let player = {
+            pos: new THREE.Vector3(0, 1.7, 15),
+            dir: new THREE.Vector3(0, 0, -1),
+            speed: 0.08,
+            hp: 100,
+            ammo: 30,
+            maxAmmo: 90,
+            isJumping: false,
+            vy: 0
+        };
+        let selectedWeaponType = 'm4';
+        let gameStarted = false;
+        let bots = [];
+        let kills = 0;
 
-    <!-- JOYSTICK VIRTUAL ESQUERDO -->
-    <div id="joystick-zone" class="fixed bottom-3 left-3 w-40 h-40 pointer-events-auto z-10 flex items-center justify-center" style="touch-action: none;">
-        <div id="joystick-base" class="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-2 border-white/20 bg-slate-900/35 backdrop-blur-sm relative flex items-center justify-center">
-            <div id="sprint-lock-indicator" class="absolute -top-5 text-[10px] font-bold tracking-widest uppercase text-amber-400 opacity-0 transition-opacity">
-                ▲ SPRINT
-            </div>
-            <div id="joystick-stick" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-b from-white/80 to-slate-300/60 shadow-lg border border-white pointer-events-none"></div>
-        </div>
-    </div>
+        function selectWeapon(type, el) {
+            selectedWeaponType = type;
+            document.querySelectorAll('.weapon-option').forEach(o => o.classList.remove('selected'));
+            el.classList.add('selected');
+        }
 
-    <!-- BOTÕES TÁTICOS PERSONALIZÁVEIS (MOBILE) -->
-    <button id="ctrl-fire" data-hud-id="ctrl-fire" class="hud-control fire-btn pointer-events-auto fixed bottom-6 right-6 w-18 h-18 sm:w-20 sm:h-20 p-4 rounded-full flex items-center justify-center z-20">
-        <svg class="w-8 h-8 sm:w-9 sm:h-9 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm0 18a8 8 0 118-8 8 8 0 01-8 8zm0-13a5 5 0 105 5 5 5 0 00-5-5zm0 8a3 3 0 113-3 3 3 0 01-3 3z"/></svg>
-    </button>
+        function startGame() {
+            document.getElementById('menu-overlay').style.display = 'none';
+            document.getElementById('hud').style.display = 'block';
+            gameStarted = true;
+            
+            // Entrar em tela cheia no Android
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            }
+            
+            initGameWorld();
+            animate();
+        }
 
-    <button id="ctrl-fire-left" data-hud-id="ctrl-fire-left" class="hud-control fire-btn pointer-events-auto fixed top-16 left-5 w-13 h-13 p-3 rounded-full flex items-center justify-center z-20">
-        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-    </button>
+        function initGameWorld() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0b0f19);
+            scene.fog = new THREE.FogExp2(0x0b0f19, 0.015);
 
-    <button id="ctrl-ads" data-hud-id="ctrl-ads" class="hud-control tactical-btn pointer-events-auto fixed bottom-28 right-7 w-13 h-13 p-3 rounded-full flex items-center justify-center text-white z-20">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v3m0 10v3m8-8h-3M7 12H4m8 5a5 5 0 100-10 5 5 0 000 10z"/></svg>
-    </button>
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.copy(player.pos);
 
-    <button id="ctrl-jump" data-hud-id="ctrl-jump" class="hud-control tactical-btn pointer-events-auto fixed bottom-20 right-28 w-12 h-12 rounded-full flex items-center justify-center text-white z-20">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
-    </button>
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-    <button id="ctrl-crouch" data-hud-id="ctrl-crouch" class="hud-control tactical-btn pointer-events-auto fixed bottom-5 right-28 w-12 h-12 rounded-full flex items-center justify-center text-white z-20">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
-    </button>
+            clock = new THREE.Clock();
 
-    <button id="ctrl-reload" data-hud-id="ctrl-reload" class="hud-control tactical-btn pointer-events-auto fixed bottom-36 right-20 w-11 h-11 rounded-full flex items-center justify-center text-amber-300 z-20">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-    </button>
+            // Luzes
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            scene.add(ambientLight);
 
-    <button id="ctrl-switch" data-hud-id="ctrl-switch" class="hud-control tactical-btn pointer-events-auto fixed top-16 right-5 w-11 h-11 rounded-xl flex items-center justify-center text-white z-20">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
-    </button>
-</div>
-
-<!-- BARRA FLUTUANTE DE EDIÇÃO DE HUD -->
-<div id="hud-editor-toolbar" class="fixed top-2 left-1/2 -translate-x-1/2 z-50 hidden tactical-glass px-3.5 py-2 rounded-2xl flex items-center gap-3 shadow-2xl border border-sky-400/50">
-    <span class="text-xs font-bold text-sky-300 uppercase tracking-wider">Editor HUD</span>
-    <div class="flex items-center gap-1.5">
-        <span class="text-[11px] text-slate-300">Tamanho:</span>
-        <input id="hud-scale-slider" type="range" min="0.7" max="1.5" step="0.05" value="1" class="w-24">
-    </div>
-    <button id="hud-reset-btn" class="px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs font-bold text-white">Resetar</button>
-    <button id="hud-save-btn" class="px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-xs font-bold text-slate-950">Salvar</button>
-</div>
-
-<!-- MENU INICIAL OTIMIZADO PARA CELULAR PAISAGEM (100dvh + COMPACTO) -->
-<div id="start-screen" class="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center p-3">
-    <div id="start-card" class="max-w-xl w-full tactical-glass rounded-3xl p-5 sm:p-7 text-center shadow-2xl border border-white/15 my-auto">
-        <div id="start-badge" class="inline-block px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-400 text-xs font-bold tracking-widest uppercase mb-2">
-            TACTICAL COMBAT ENGINE • MOBILE & DESKTOP
-        </div>
-        <h1 id="start-title" class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-1.5">
-            VANGUARD <span class="text-amber-500">3D</span>
-        </h1>
-        <p id="start-desc" class="text-slate-300 text-xs sm:text-sm mb-4 max-w-md mx-auto">
-            Combate tático em primeira pessoa com física 3D, IA adaptativa, áudio procedural e controles mobile personalizáveis.
-        </p>
-
-        <!-- Seleção de Arma Inicial -->
-        <div id="weapon-grid" class="grid grid-cols-3 gap-2.5 mb-5 text-left">
-            <button data-weapon="0" class="weapon-select-card p-3 rounded-xl border-2 border-amber-500 bg-amber-500/15 transition">
-                <div class="text-[10px] font-bold text-amber-400">ASSALTO</div>
-                <div class="text-sm font-extrabold text-white">M4A1</div>
-                <div class="w-sub text-[10px] text-slate-300 mt-0.5">Equilibrado • Auto</div>
-            </button>
-            <button data-weapon="1" class="weapon-select-card p-3 rounded-xl border border-white/15 bg-slate-900/60 hover:border-white/40 transition">
-                <div class="text-[10px] font-bold text-sky-400">SMG</div>
-                <div class="text-sm font-extrabold text-white">MP5-SD</div>
-                <di
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(20, 40, 20);
+            dir
+            
