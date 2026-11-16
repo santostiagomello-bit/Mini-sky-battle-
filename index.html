@@ -3,35 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tactical Ops - Jogo Jogável</title>
+    <title>Tactical Ops - Direto ao Ponto</title>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: none; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: sans-serif; color: #fff; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #111; font-family: sans-serif; color: #fff; }
         #canvas-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
         
-        #hud { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; display: none; flex-direction: column; justify-content: space-between; padding: 15px; }
-        .hud-top { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; }
-        .panel { background: rgba(10, 14, 23, 0.9); border-left: 3px solid #00ff66; padding: 8px 12px; border-radius: 4px; font-size: 12px; text-transform: uppercase; }
-        .stat-val { color: #00ff66; font-weight: bold; font-size: 15px; }
+        #hud { position: absolute; top: 0; left: 0; width: 100%; z-index: 5; pointer-events: none; display: flex; justify-content: space-between; padding: 15px; }
+        .panel { background: rgba(0,0,0,0.8); border: 2px solid #00ff66; padding: 10px 15px; border-radius: 6px; font-size: 14px; font-weight: bold; }
 
-        #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 16px; height: 16px; z-index: 4; pointer-events: none; display: none; }
+        #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20px; height: 20px; z-index: 4; pointer-events: none; }
         #crosshair::before, #crosshair::after { content: ''; position: absolute; background: #00ff66; }
-        #crosshair::before { top: 7px; left: 0; width: 16px; height: 2px; }
-        #crosshair::after { top: 0; left: 7px; width: 2px; height: 16px; }
+        #crosshair::before { top: 9px; left: 0; width: 20px; height: 2px; }
+        #crosshair::after { top: 0; left: 9px; width: 2px; height: 20px; }
 
-        #controls-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; display: none; }
-        .control-zone-left { position: absolute; bottom: 0; left: 0; width: 50%; height: 100%; pointer-events: auto; }
-        .control-zone-right { position: absolute; bottom: 0; right: 0; width: 50%; height: 100%; pointer-events: auto; }
-        
-        #joystick-base { position: absolute; bottom: 40px; left: 40px; width: 110px; height: 110px; background: rgba(255,255,255,0.05); border: 2px solid rgba(0,255,102,0.3); border-radius: 50%; display: none; }
-        #joystick-stick { position: absolute; top: 30px; left: 30px; width: 46px; height: 46px; background: rgba(0,255,102,0.4); border: 2px solid #00ff66; border-radius: 50%; }
+        #controls { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
+        .zone-left { position: absolute; bottom: 0; left: 0; width: 50%; height: 100%; pointer-events: auto; }
+        .zone-right { position: absolute; bottom: 0; right: 0; width: 50%; height: 100%; pointer-events: auto; }
 
-        .btn-group { position: absolute; bottom: 20px; right: 20px; display: flex; gap: 10px; pointer-events: auto; }
-        .action-btn { width: 70px; height: 70px; background: rgba(10, 18, 14, 0.85); border: 2px solid #00ff66; border-radius: 50%; color: #00ff66; font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+        #joystick { position: absolute; bottom: 40px; left: 40px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border: 2px solid #00ff66; border-radius: 50%; display: none; }
+        #stick { position: absolute; top: 25px; left: 25px; width: 50px; height: 50px; background: #00ff66; border-radius: 50%; }
 
-        #menu-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #07090f; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; pointer-events: auto; }
-        h1 { font-size: 26px; color: #00ff66; margin-bottom: 10px; text-transform: uppercase; }
-        .main-btn { background: #00ff66; color: #000; border: none; padding: 15px 40px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
+        #btn-fire { position: absolute; bottom: 40px; right: 40px; width: 80px; height: 80px; background: rgba(0,255,102,0.3); border: 3px solid #00ff66; border-radius: 50%; color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; pointer-events: auto; font-size: 14px; }
+
+        #menu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #070a10; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        h1 { color: #00ff66; margin-bottom: 20px; text-transform: uppercase; }
+        .btn-play { background: #00ff66; color: #000; border: none; padding: 15px 40px; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -41,55 +38,217 @@
     <div id="crosshair"></div>
 
     <div id="hud">
-        <div class="hud-top">
-            <div class="panel">HP: <span id="hp-val" class="stat-val">100</span></div>
-            <div class="panel">Placar 4x4: <span id="score-val" class="stat-val">0 - 0</span></div>
-            <div class="panel">Kills: <span id="kills-val" class="stat-val">0</span></div>
+        <div class="panel">HP: <span id="hp">100</span></div>
+        <div class="panel">Abates: <span id="kills">0</span></div>
+    </div>
+
+    <div id="controls">
+        <div id="zone-left" class="zone-left">
+            <div id="joystick"><div id="stick"></div></div>
+        </div>
+        <div id="zone-right" class="zone-right">
+            <div id="btn-fire">ATIRAR</div>
         </div>
     </div>
 
-    <div id="controls-layer">
-        <div id="move-zone" class="control-zone-left">
-            <div id="joystick-base"><div id="joystick-stick"></div></div>
-        </div>
-        <div id="look-zone" class="control-zone-right">
-            <div class="btn-group">
-                <div id="btn-fire" class="action-btn">ATIRAR</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="menu-overlay">
+    <div id="menu">
         <h1>Tactical Ops 3D</h1>
-        <p style="color:#8fa699; margin-bottom:20px; font-size:12px;">Visual Tático Neon • Pronto para Jogar</p>
-        <button id="start-btn" class="main-btn">Jogar</button>
+        <button class="btn-play" id="play-btn">Jogar Agora</button>
     </div>
 
     <script>
         let scene, camera, renderer;
-        let player = { x: 0, y: 1.7, z: 20, rotX: 0, rotY: 0, hp: 100, speed: 0.12, kills: 0 };
+        let player = { x: 0, y: 1.7, z: 15, rx: 0, ry: 0, hp: 100, kills: 0 };
         let bots = [];
-        let scoreBlue = 0, scoreRed = 0;
-        let gameActive = false;
-        const clock = new THREE.Clock();
+        let moveDir = { x: 0, z: 0 };
+        let running = false;
 
-        function startGame() {
-            const container = document.getElementById('canvas-container');
+        document.getElementById('play-btn').addEventListener('click', start);
+        document.getElementById('play-btn').addEventListener('touchstart', start);
+
+        function start(e) {
+            e.preventDefault();
+            document.getElementById('menu').style.display = 'none';
+            
+            // Inicializa o 3D diretamente
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x05080e);
+            scene.background = new THREE.Color(0x0b0f19);
 
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            
+
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            container.appendChild(renderer.domElement);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
 
             // Luzes
-            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-            let dirLight = new THREE.DirectionalLight(0x00ff66, 0.8);
-            dirLight.position.set(10, 30, 10);
-            scene.add(dirLight);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+            let light = new THREE.DirectionalLight(0xffffff, 0.8);
+            light.position.set(10, 20, 10);
+            scene.add(light);
 
-            //
-        
+            // Chão
+            let floor = new THREE.Mesh(
+                new THREE.PlaneGeometry(80, 80),
+                new THREE.MeshStandardMaterial({ color: 0x1a2233 })
+            );
+            floor.rotation.x = -Math.PI / 2;
+            scene.add(floor);
+
+            // Criar Bots (Visual Tático com Capuz/Casaco Escuro e Visor Neon Vermelho)
+            for(let i=0; i<4; i++) {
+                let group = new THREE.Group();
+                let body = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.4, 0.5), new THREE.MeshStandardMaterial({ color: 0x1c2538 }));
+                body.position.y = 0.7;
+                group.add(body);
+
+                let visor = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.1, 0.1), new THREE.MeshBasicMaterial({ color: 0xff3344 }));
+                visor.position.set(0, 1.4, 0.26);
+                group.add(visor);
+
+                group.position.set((Math.random() - 0.5) * 30, 0, -10 - Math.random() * 20);
+                scene.add(group);
+                bots.push({ mesh: group, hp: 100 });
+            }
+
+            setupControls();
+            running = true;
+            animate();
+        }
+
+        function setupControls() {
+            // Câmera (Lado Direito)
+            let rZone = document.getElementById('zone-right');
+            let tId = null, lx = 0, ly = 0;
+
+            rZone.addEventListener('touchstart', e => {
+                if(tId === null) {
+                    let t = e.changedTouches[0];
+                    tId = t.identifier;
+                    lx = t.clientX; ly = t.clientY;
+                }
+            });
+            rZone.addEventListener('touchmove', e => {
+                for(let i=0; i<e.changedTouches.length; i++) {
+                    let t = e.changedTouches[i];
+                    if(t.identifier === tId) {
+                        player.ry -= (t.clientX - lx) * 0.003;
+                        player.rx -= (t.clientY - ly) * 0.003;
+                        player.rx = Math.max(-1.2, Math.min(1.2, player.rx));
+                        lx = t.clientX; ly = t.clientY;
+                    }
+                }
+            });
+            rZone.addEventListener('touchend', e => {
+                for(let i=0; i<e.changedTouches.length; i++) {
+                    if(e.changedTouches[i].identifier === tId) tId = null;
+                }
+            });
+
+            // Joystick (Lado Esquerdo)
+            let lZone = document.getElementById('zone-left');
+            let jBase = document.getElementById('joystick');
+            let jStick = document.getElementById('stick');
+            let mId = null, cx = 0, cy = 0;
+
+            lZone.addEventListener('touchstart', e => {
+                if(mId === null) {
+                    let t = e.changedTouches[0];
+                    mId = t.identifier;
+                    cx = t.clientX; cy = t.clientY;
+                    jBase.style.display = 'block';
+                    jBase.style.left = (cx - 50) + 'px';
+                    jBase.style.top = (cy - 50) + 'px';
+                    jStick.style.transform = `translate(0px, 0px)`;
+                }
+            });
+            lZone.addEventListener('touchmove', e => {
+                for(let i=0; i<e.changedTouches.length; i++) {
+                    let t = e.changedTouches[i];
+                    if(t.identifier === mId) {
+                        let dx = t.clientX - cx, dy = t.clientY - cy;
+                        let dist = Math.sqrt(dx*dx + dy*dy);
+                        if(dist > 35) { dx = (dx/dist)*35; dy = (dy/dist)*35; }
+                        jStick.style.transform = `translate(${dx}px, ${dy}px)`;
+                        moveDir.x = dx / 35; moveDir.z = dy / 35;
+                    }
+                }
+            });
+            lZone.addEventListener('touchend', e => {
+                for(let i=0; i<e.changedTouches.length; i++) {
+                    if(e.changedTouches[i].identifier === mId) {
+                        mId = null;
+                        jBase.style.display = 'none';
+                        moveDir.x = 0; moveDir.z = 0;
+                    }
+                }
+            });
+
+            // Botão Atirar
+            document.getElementById('btn-fire').addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                let raycaster = new THREE.Raycaster();
+                raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+                let hits = raycaster.intersectObjects(bots.map(b => b.mesh), true);
+                if(hits.length > 0) {
+                    let target = bots.find(b => b.mesh === hits[0].object || b.mesh.children.includes(hits[0].object));
+                    if(target) {
+                        target.hp -= 50;
+                        if(target.hp <= 0) {
+                            scene.remove(target.mesh);
+                            bots = bots.filter(b => b !== target);
+                            player.kills++;
+                            document.getElementById('kills').innerText = player.kills;
+
+                            // Respawn automático do bot
+                            setTimeout(() => {
+                                let g = new THREE.Group();
+                                let bMesh = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.4, 0.5), new THREE.MeshStandardMaterial({ color: 0x1c2538 }));
+                                bMesh.position.y = 0.7;
+                                g.add(bMesh);
+                                let vMesh = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.1, 0.1), new THREE.MeshBasicMaterial({ color: 0xff3344 }));
+                                vMesh.position.set(0, 1.4, 0.26);
+                                g.add(vMesh);
+                                g.position.set((Math.random() - 0.5) * 30, 0, -10 - Math.random() * 20);
+                                scene.add(g);
+                                bots.push({ mesh: g, hp: 100 });
+                            }, 2000);
+                        }
+                    }
+                }
+            });
+        }
+
+        function animate() {
+            if(!running) return;
+            requestAnimationFrame(animate);
+
+            // Movimentação fluida baseada no joystick
+            let cos = Math.cos(player.ry), sin = Math.sin(player.ry);
+            player.x += (sin * moveDir.z + cos * moveDir.x) * 0.12;
+            player.z += (cos * moveDir.z - sin * moveDir.x) * 0.12;
+
+            camera.position.set(player.x, player.y, player.z);
+            camera.rotation.order = 'YXZ';
+            camera.rotation.y = player.ry;
+            camera.rotation.x = player.rx;
+
+            // IA dos bots caminhando para cima do jogador
+            bots.forEach(b => {
+                b.mesh.lookAt(camera.position.x, b.mesh.position.y, camera.position.z);
+                b.mesh.translateZ(0.035);
+
+                if(b.mesh.position.distanceTo(camera.position) < 6) {
+                    player.hp -= 1;
+                    document.getElementById('hp').innerText = Math.max(0, player.hp);
+                    if(player.hp <= 0) {
+                        alert('Você foi eliminado!');
+                        player.hp = 100; player.x = 0; player.z = 15;
+                    }
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+    </script>
+</body>
+</html>
