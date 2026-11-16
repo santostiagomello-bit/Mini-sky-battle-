@@ -3,265 +3,582 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>MINI ROYALE — Cartoon Edition</title>
+<title>MINI ROYALE 3.0 — NEXT GENERATION</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#38b6ff;font-family:Arial,sans-serif;color:#fff;touch-action:none}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#84979a;font-family:Arial,sans-serif;color:#fff;touch-action:none}
 #game{position:fixed;inset:0}
 canvas{display:block}
-#hud{position:fixed;inset:0;pointer-events:none;z-index:5}
-.panel{background:rgba(20,35,45,.9);border:3px solid #ff9100;border-radius:12px;padding:8px 12px;font-weight:900;text-shadow:0 2px 0 #000;box-shadow:0 4px 0 rgba(0,0,0,.5)}
+#hud{position:fixed;inset:0;pointer-events:none;z-index:15}
+.panel{background:rgba(12,24,30,.82);border:2px solid #ff7a16;border-radius:9px;padding:8px 12px;font-weight:700;text-shadow:0 1px 2px #000}
 #topbar{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:8px}
-#topbar .panel{font-size:14px;border-color:#36c7ef}
-#jumpInfo{position:absolute;top:12%;left:50%;transform:translateX(-50%);min-width:65%;text-align:center;font-size:18px;border-color:#ffb52e}
-#speed{position:absolute;bottom:12%;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:15px;background:rgba(20,35,45,.9);padding:8px 12px;border-radius:10px;border:2px solid #ff9100}
-
-/* Mira Reativa Estilo Cartoon */
-#crosshair{display:none;position:absolute;left:50%;top:50%;width:28px;height:28px;transform:translate(-50%,-50%);pointer-events:none}
-#crosshair:before,#crosshair:after{content:"";position:absolute;background:#fff;border:1px solid #000}
-#crosshair:before{width:4px;height:26px;left:12px;top:1px}
-#crosshair:after{height:4px;width:26px;top:12px;left:1px}
-#crosshair.locked:before,#crosshair.locked:after{background:#ff2828;box-shadow:0 0 10px #ff2828}
-
+#topbar .panel{font-size:13px}
+#jumpInfo{position:absolute;top:12%;left:50%;transform:translateX(-50%);min-width:65%;text-align:center;font-size:17px}
+#speed{position:absolute;bottom:12%;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:15px;background:rgba(12,24,30,.78);padding:8px 12px;border-radius:8px}
+#crosshair{display:none;position:absolute;left:50%;top:50%;width:24px;height:24px;transform:translate(-50%,-50%)}
+#crosshair:before,#crosshair:after{content:"";position:absolute;background:var(--crosshairColor,#fff);box-shadow:0 0 3px #000}
+#crosshair:before{width:2px;height:22px;left:11px;top:1px}
+#crosshair:after{height:2px;width:22px;top:11px;left:1px}
+#crosshair.locked:before,#crosshair.locked:after{background:#ff2828}
 #controls{position:fixed;inset:0;z-index:8;pointer-events:none}
 #lookZone{position:absolute;right:0;top:0;width:58%;height:100%;pointer-events:auto;touch-action:none}
 #moveZone{position:absolute;left:0;bottom:0;width:48%;height:52%;pointer-events:auto;touch-action:none}
-#joystick{display:none;position:absolute;width:120px;height:120px;border:3px solid rgba(255,255,255,.9);background:rgba(30,45,60,.3);border-radius:50%;pointer-events:none}
-#stick{position:absolute;width:52px;height:52px;left:34px;top:34px;border-radius:50%;background:#ff9100;border:3px solid #ffe0a0;box-shadow:0 3px 0 #000}
+#joystick{display:none;position:absolute;width:112px;height:112px;border:2px solid rgba(255,255,255,.75);background:rgba(20,30,35,.25);border-radius:50%;pointer-events:none}
+#stick{position:absolute;width:48px;height:48px;left:30px;top:30px;border-radius:50%;background:rgba(255,122,22,.9);border:2px solid #ffc078}
+.btn{position:absolute;pointer-events:auto;border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:700;color:white;background:rgba(255,130,0,.92);border:4px solid #ffb52e;box-shadow:0 4px 12px #0006;text-shadow:0 1px 2px #000}
+#action{right:22px;bottom:7%;width:104px;height:104px;font-size:16px}
+#fire{display:none;right:22px;bottom:7%;width:82px;height:82px;background:#d94137;border-color:#ff8177;font-size:13px}
+#aim{display:none;right:116px;bottom:9%;width:62px;height:62px;font-size:12px}
+#jump{display:none;right:22px;bottom:25%;width:68px;height:68px;font-size:12px;background:rgba(45,135,210,.94);border-color:#83caff}
+#mapButton{position:absolute;right:14px;top:68px;pointer-events:auto;border:1px solid #fff;background:#17252dcc;border-radius:8px;padding:8px 10px;font-weight:bold;color:white}
+#mapPanel{display:none;position:fixed;z-index:20;inset:8% 5%;background:#14232aee;border:2px solid #ff7a16;border-radius:12px;padding:12px;pointer-events:auto}
+#mapPanel h3{margin:0 0 8px;text-align:center}
+#mapCanvas{width:100%;height:calc(100% - 40px);background:#6eaa68;border-radius:8px}
+#mapClose{position:absolute;right:10px;top:8px;background:#ff7a16;color:white;border:0;border-radius:6px;padding:7px 10px;font-weight:bold}
+#message{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);padding:10px 14px;background:#14232add;border:2px solid #ff7a16;border-radius:8px;display:none;text-align:center}
+@media (orientation:portrait){#jumpInfo{top:12%;}#speed{bottom:13%}}
 
-.btn{position:absolute;pointer-events:auto;border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:1000;color:white;background:#ff8400;border:4px solid #ffd06c;box-shadow:0 6px 0 rgba(0,0,0,.6);text-shadow:0 2px 0 #000}
-.btn:active{transform:translateY(3px);box-shadow:0 3px 0 rgba(0,0,0,.6)}
-#action{right:22px;bottom:7%;width:110px;height:110px;font-size:16px}
-#fire{display:none;right:22px;bottom:7%;width:90px;height:90px;background:#e63946;border-color:#ff8177;font-size:14px}
-#aim{display:none;right:126px;bottom:9%;width:68px;height:68px;font-size:13px;background:#1d3557;border-color:#457b9d}
-#jump{display:none;right:22px;bottom:27%;width:74px;height:74px;font-size:13px;background:#1d70b8;border-color:#83caff}
-
-#mapButton{position:absolute;right:14px;top:68px;pointer-events:auto;border:3px solid #ff9100;background:#14232a;border-radius:10px;padding:9px 12px;font-weight:900;color:white;box-shadow:0 4px 0 #000}
-#mapPanel{display:none;position:fixed;z-index:20;inset:8% 5%;background:#14232ae8;border:3px solid #ff9100;border-radius:16px;padding:12px;pointer-events:auto;box-shadow:0 15px 40px #000}
-#mapPanel h3{margin:0 0 8px;text-align:center;color:#ffc15c}
-#mapCanvas{width:100%;height:calc(100% - 40px);background:#6eaa68;border-radius:10px;border:2px solid #35533f}
-#mapClose{position:absolute;right:12px;top:10px;background:#e63946;color:white;border:2px solid #ff8177;border-radius:8px;padding:7px 12px;font-weight:900}
-#message{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);padding:12px 18px;background:#14232af8;border:3px solid #ff9100;border-radius:12px;display:none;text-align:center;font-weight:900;font-size:16px;box-shadow:0 6px 0 #000}
-
-/* Lobby Estilizado Cartoon */
-#lobby{position:fixed;inset:0;z-index:30;overflow:hidden;color:#fff;background:radial-gradient(circle at 50% 40%,#1d3557 0%,#0b131e 100%);font-family:Arial,sans-serif}
-.lobby-wrap{width:100%;height:100%;max-width:1500px;margin:auto;padding:12px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:10px}
-.lobby-header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;background:#0f1e2de8;border:3px solid #2e4a68;border-radius:14px}
-.brand{font-weight:1000;letter-spacing:2px;color:#ffb34d;font-size:clamp(16px,2.2vw,26px);text-shadow:0 3px 0 #000}
-.header-right{display:flex;align-items:center;gap:6px}
-.currency,.head-btn,.level{background:#1a2b40;border:2px solid #3b506a;border-radius:10px;padding:6px 10px;font-weight:900;font-size:clamp(10px,1.1vw,13px)}
-.currency b{color:#ffc15c}
-.head-btn{color:#fff;cursor:pointer;background:#243b55}
-.level{min-width:100px}.level small{display:block;color:#aebdd0;margin-bottom:2px;font-size:9px}
-.level-bar{height:6px;background:#101924;border-radius:6px;overflow:hidden;border:1px solid #3b506a}.level-bar i{display:block;width:62%;height:100%;background:#ff9100}
-.lobby-layout{display:grid;grid-template-columns:150px minmax(0,1fr) 220px;gap:10px;min-height:0}
-.lobby-nav,.lobby-character,.weapon-card,.lobby-content{background:#0f1e2de8;border:3px solid #2e4a68;border-radius:14px;box-shadow:0 8px 0 #0005}
-.lobby-nav{padding:8px;display:flex;flex-direction:column;justify-content:center;gap:6px}
-.nav-btn{width:100%;padding:11px 8px;border:2px solid transparent;border-radius:10px;text-align:left;color:#c6d4e5;background:#172538;font-weight:900;font-size:11px;cursor:pointer}
-.nav-btn.active{color:#fff;background:#ff8400;border-color:#ffd06c;box-shadow:0 3px 0 #000}
-.lobby-center{display:grid;grid-template-rows:auto minmax(0,1fr);gap:8px;min-width:0;min-height:0}
-.lobby-content{padding:10px 14px;max-height:115px;overflow:auto}
-.lobby-content h2{margin:0 0 4px;color:#ffc16a;font-size:16px;text-shadow:0 2px 0 #000}
-.lobby-content p{margin:0;color:#b8c7d8;font-size:12px}
-.lobby-character{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 70%,#264653 0%,#101e2b 70%)}
-.character-glow{position:absolute;width:200px;height:200px;border-radius:50%;background:#ff910025;filter:blur(20px);bottom:10px}
-.character-placeholder{position:relative;width:110px;height:205px}
-.char-head{position:absolute;top:15px;left:36px;width:38px;height:42px;border-radius:42%;background:#e0a96d;border:3px solid #111}
-.char-hood{position:absolute;top:4px;left:26px;width:58px;height:62px;border:7px solid #111;border-radius:48%;box-shadow:inset 0 0 0 2px #ff9100}
-.char-body{position:absolute;top:60px;left:20px;width:70px;height:85px;background:#3a86ff;border-radius:12px;border:3px solid #111}
-.char-arm{position:absolute;top:68px;width:21px;height:78px;background:#2a69cb;border:3px solid #111;border-radius:10px}.char-arm.left{left:6px}.char-arm.right{right:6px}
-.char-leg{position:absolute;top:138px;width:27px;height:64px;background:#1d3557;border:3px solid #111;border-radius:8px}.char-leg.left{left:24px}.char-leg.right{right:24px}
-.character-label{position:absolute;bottom:10px;left:8px;right:8px;text-align:center;font-size:10px;color:#ffc15c;font-weight:900;text-shadow:0 1px 0 #000}
-.weapon-card{padding:10px;display:flex;flex-direction:column;justify-content:center;gap:8px}
-.weapon-card h3{margin:0;color:#ffc16a;font-size:13px}
-.weapon-visual{height:75px;border-radius:10px;background:#1a2b40;border:2px solid #3b506a;display:flex;align-items:center;justify-content:center;font-size:32px}
-.weapon-name{font-weight:1000;font-size:13px}.weapon-skin{font-size:10px;color:#aebed0}
-.stat{font-size:10px;color:#c6d4e5;font-weight:900}.stat-line{height:5px;background:#111;border-radius:4px;margin-top:3px;overflow:hidden;border:1px solid #3b506a}.stat-line i{display:block;height:100%;background:#ff9100}
-.lobby-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;background:#0f1e2de8;border:3px solid #2e4a68;border-radius:14px}
-.mode-area{display:flex;align-items:center;gap:10px}.mode-label{font-size:10px;color:#9fb0c4;font-weight:900}#modeName{font-size:13px;font-weight:1000;color:#fff}
-.mode-change,.start-match{border:3px solid #000;border-radius:10px;padding:11px 16px;font-weight:1000;cursor:pointer;white-space:nowrap;font-size:12px;box-shadow:0 4px 0 rgba(0,0,0,.5)}
-.mode-change{background:#24364c;color:#fff}
-.start-match{color:#201407;background:#ff9100;border-color:#ffe0a0;font-size:15px;animation:lobbyPulse 1.8s infinite}
-@keyframes lobbyPulse{50%{transform:scale(1.03);box-shadow:0 6px 0 rgba(0,0,0,.5)}}
-.lobby-toast{position:fixed;z-index:50;left:50%;bottom:16%;transform:translate(-50%,12px);padding:10px 16px;border-radius:10px;background:#102b25;border:3px solid #39c78a;color:#bfffe1;font-weight:1000;font-size:12px;opacity:0;pointer-events:none;transition:.2s;box-shadow:0 4px 0 #000}
+/* ===== LOBBY HORIZONTAL MINI ROYALE ===== */
+#lobby{position:fixed;inset:0;z-index:30;overflow:hidden;color:#eef5ff;background:radial-gradient(ellipse at 52% 42%,#293d52 0%,#111c2b 52%,#080e18 100%);font-family:Arial,sans-serif;touch-action:pan-y}
+#lobby *{box-sizing:border-box}
+.lobby-wrap{width:100%;height:100%;max-width:1500px;margin:auto;padding:clamp(7px,1.3vw,16px);display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:clamp(6px,1vh,12px)}
+.lobby-header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 12px;background:#0b1422e8;border:1px solid #35465c;border-radius:12px;min-height:48px}
+.brand{font-weight:1000;letter-spacing:2px;color:#ffb34d;font-size:clamp(15px,2vw,25px);white-space:nowrap;text-shadow:0 0 16px #ff8a263d}
+.header-right{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:nowrap}
+.currency,.head-btn,.level{background:#172538;border:1px solid #3b506a;border-radius:8px;padding:6px 9px;font-weight:800;font-size:clamp(9px,1vw,12px);white-space:nowrap}
+.currency b{color:#ffc15c;margin-left:3px}.head-btn{color:#eaf3ff;cursor:pointer}
+.level{min-width:95px}.level small{display:block;color:#aebdd0;margin-bottom:3px;font-size:9px}
+.level-bar{height:4px;background:#34465c;border-radius:9px;overflow:hidden}.level-bar i{display:block;width:62%;height:100%;background:linear-gradient(90deg,#ff8a26,#ffd16c)}
+.lobby-layout{display:grid;grid-template-columns:clamp(105px,13vw,165px) minmax(0,1fr) clamp(145px,19vw,235px);gap:clamp(6px,1vw,12px);min-height:0}
+.lobby-nav,.lobby-character,.weapon-card,.lobby-content{background:#0d1725df;border:1px solid #33475e;border-radius:13px;box-shadow:0 10px 24px #0004}
+.lobby-nav{padding:7px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.nav-btn{width:100%;padding:clamp(8px,1.4vh,13px) 7px;border:1px solid transparent;border-radius:8px;text-align:left;color:#c6d4e5;background:#172538;font-weight:800;font-size:clamp(9px,1vw,12px);cursor:pointer}
+.nav-btn.active{color:#fff;background:linear-gradient(100deg,#a94e1b,#e58a2d);border-color:#ffbd67;box-shadow:0 0 16px #ff8a2638}
+.lobby-center{display:grid;grid-template-rows:auto minmax(0,1fr);gap:7px;min-width:0;min-height:0}
+.lobby-content{padding:8px 11px;min-height:50px;max-height:105px;overflow:auto}
+.lobby-content h2{margin:0 0 4px;color:#ffc16a;font-size:clamp(12px,1.4vw,17px)}
+.lobby-content p{margin:0;color:#b8c7d8;font-size:clamp(9px,1vw,12px);line-height:1.35}
+.lobby-character{position:relative;overflow:hidden;min-height:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 72%,#34475a 0%,#182638 45%,#0d1725 78%)}
+.character-glow{position:absolute;width:min(28vh,220px);height:min(28vh,220px);border-radius:50%;background:#ff8b2420;filter:blur(18px);bottom:5px}
+.character-placeholder{position:relative;width:110px;height:205px;transform:scale(clamp(.65, .23 + 0.0012 * 100vh, 1));filter:drop-shadow(0 10px 14px #0009)}
+.char-head{position:absolute;top:15px;left:36px;width:38px;height:42px;border-radius:42% 42% 35% 35%;background:linear-gradient(135deg,#b9c5d0,#596b7c);border:3px solid #26384a}
+.char-hood{position:absolute;top:4px;left:26px;width:58px;height:62px;border:7px solid #111923;border-radius:48% 48% 35% 35%;box-shadow:inset 0 0 0 2px #a35cff}
+.char-body{position:absolute;top:60px;left:20px;width:70px;height:85px;background:linear-gradient(110deg,#121a27,#344357 55%,#111923);clip-path:polygon(20% 0,80% 0,100% 100%,0 100%);border-bottom:4px solid #a35cff}
+.char-arm{position:absolute;top:68px;width:21px;height:78px;background:#202d3d;border-radius:12px}.char-arm.left{left:8px;transform:rotate(9deg)}.char-arm.right{right:8px;transform:rotate(-9deg)}
+.char-leg{position:absolute;top:138px;width:27px;height:64px;background:linear-gradient(#29394b,#111923);border-radius:8px}.char-leg.left{left:25px}.char-leg.right{right:25px}
+.character-label{position:absolute;bottom:7px;left:8px;right:8px;text-align:center;font-size:9px;color:#b8c9dc;letter-spacing:1px}
+.weapon-card{padding:9px;display:flex;flex-direction:column;justify-content:center;gap:7px;min-height:0}
+.weapon-card h3{margin:0;color:#ffc16a;font-size:clamp(11px,1.2vw,15px)}
+ .weapon-visual{height:clamp(45px,10vh,95px);border-radius:9px;background:linear-gradient(135deg,#1d3045,#101a29);display:flex;align-items:center;justify-content:center;color:#e7edf5;font-size:30px;text-shadow:0 0 18px #64cfff}
+.weapon-name{font-weight:900;font-size:clamp(10px,1.1vw,14px)}.weapon-skin{font-size:clamp(8px,.9vw,11px);color:#aebed0}
+.stat{font-size:clamp(8px,.9vw,11px);color:#c6d4e5}.stat-line{height:4px;background:#293b50;border-radius:8px;margin-top:3px;overflow:hidden}.stat-line i{display:block;height:100%;background:linear-gradient(90deg,#ff8428,#ffd36d)}
+.lobby-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 10px;background:#0b1422e8;border:1px solid #35465c;border-radius:12px;min-height:48px}
+.mode-area{display:flex;align-items:center;gap:10px;min-width:0}.mode-label{font-size:9px;color:#9fb0c4;letter-spacing:1px}#modeName{font-size:clamp(10px,1.2vw,14px);font-weight:900;color:#fff}
+.mode-change,.start-match{border:0;border-radius:9px;padding:10px 13px;font-weight:1000;cursor:pointer;white-space:nowrap;font-size:clamp(9px,1vw,12px)}
+.mode-change{background:#24364c;color:#dce9f8;border:1px solid #4a607a}
+.start-match{min-width:clamp(145px,20vw,220px);color:#201407;background:linear-gradient(110deg,#ff8a26,#ffd16c);box-shadow:0 0 22px #ff982b55;animation:lobbyPulse 2s infinite}
+@keyframes lobbyPulse{50%{box-shadow:0 0 26px #ff982b99;transform:translateY(-1px)}}
+.lobby-toast{position:fixed;z-index:50;left:50%;bottom:16%;transform:translate(-50%,12px);padding:10px 14px;border-radius:9px;background:#102b25;border:1px solid #39c78a;color:#bfffe1;font-weight:800;font-size:11px;opacity:0;pointer-events:none;transition:.2s}
 .lobby-toast.show{opacity:1;transform:translate(-50%,0)}
 .arsenal-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:7px}
-.arsenal-item{padding:8px;border:2px solid #344a62;border-radius:8px;background:#142235;min-width:0}
-.arsenal-item strong{display:block;font-size:10px;margin-bottom:4px}.arsenal-item span{display:block;color:#aebed0;font-size:8px;margin-bottom:6px}
-.arsenal-item button{width:100%;padding:6px;border:2px solid #000;border-radius:6px;background:#ff9100;color:#1b1209;font-weight:1000;font-size:9px;cursor:pointer}
+.arsenal-item{padding:7px;border:1px solid #344a62;border-radius:8px;background:#142235;min-width:0}
+.arsenal-item strong{display:block;font-size:clamp(8px,.9vw,11px);margin-bottom:4px}.arsenal-item span{display:block;color:#aebed0;font-size:8px;margin-bottom:6px}
+.arsenal-item button{width:100%;padding:6px;border:0;border-radius:6px;background:#e88a32;color:#1b1209;font-weight:900;font-size:9px;cursor:pointer}
 #lobbyPortraitHint{display:none}
 @media (orientation:portrait){
- #lobbyPortraitHint{display:flex;position:absolute;inset:0;z-index:99;background:#080e18;color:#fff;align-items:center;justify-content:center;text-align:center;padding:24px;font-weight:1000;font-size:18px}
+ #lobbyPortraitHint{display:flex;position:absolute;inset:0;z-index:99;background:#080e18;color:#fff;align-items:center;justify-content:center;text-align:center;padding:24px;font-weight:900}
  .lobby-wrap{visibility:hidden}
 }
-</style>
-</head>
-<body>
+@media (max-height:420px) and (orientation:landscape){
+ .lobby-wrap{padding:5px;gap:5px}.lobby-header{min-height:38px;padding:4px 8px}.lobby-footer{min-height:39px;padding:4px 8px}
+ .nav-btn{padding:6px}.lobby-content{min-height:38px;padding:5px 8px}.lobby-content h2{font-size:12px}.lobby-content p{font-size:9px}
+ .weapon-card{gap:4px;padding:6px}.weapon-visual{height:42px}.character-label{font-size:8px}
+}
 
-<div id="lobby">
- <div class="lobby-wrap">
-  <header class="lobby-header">
-   <div class="brand">MINI ROYALE — CARTOON</div>
-   <div class="header-right">
-    <div class="currency">🪙 <b>12.500</b></div><div class="currency">💎 <b>850</b></div>
-    <div class="level"><small>NÍVEL 18 • 62%</small><div class="level-bar"><i></i></div></div>
-    <button class="head-btn" id="pingBtn">PING 32ms</button><button class="head-btn" id="settingsBtn">⚙</button><button class="head-btn" id="noticeBtn">🔔</button>
-   </div>
-  </header>
-  <div class="lobby-layout">
-   <nav class="lobby-nav">
-    <button class="nav-btn active" data-tab="home">⌂ INÍCIO</button><button class="nav-btn" data-tab="shop">▣ LOJA</button>
-    <button class="nav-btn" data-tab="character">♟ PERSONAGEM</button><button class="nav-btn" data-tab="arsenal">⚔ ARSENAL</button>
-    <button class="nav-btn" data-tab="missions">☷ MISSÕES</button><button class="nav-btn" data-tab="events">✦ EVENTOS</button>
-   </nav>
-   <main class="lobby-center">
-    <section class="lobby-content" id="tabContent"><h2>PRONTO PARA O COMBATE?</h2><p>Estilo Cartoon Vibrante Ativado.</p></section>
-    <section class="lobby-character" id="characterStage">
-     <div class="character-glow"></div>
-     <div class="character-placeholder"><div class="char-hood"></div><div class="char-head"></div><div class="char-body"></div><div class="char-arm left"></div><div class="char-arm right"></div><div class="char-leg left"></div><div class="char-leg right"></div></div>
-     <div class="character-label">OPERADOR • PADRÃO</div>
-    </section>
-   </main>
-   <aside class="weapon-card">
-    <h3>ARMA EQUIPADA</h3><div class="weapon-visual" id="weaponIcon">🔫</div>
-    <div><div class="weapon-name" id="equippedName">CARABINA TOON</div><div class="weapon-skin" id="equippedSkin">Visual Lendário</div></div>
-    <div class="stat">DANO<div class="stat-line"><i style="width:75%"></i></div></div>
-    <div class="stat">ALCANCE<div class="stat-line"><i style="width:70%"></i></div></div>
-    <div class="stat">PRECISÃO<div class="stat-line"><i style="width:85%"></i></div></div>
-   </aside>
-  </div>
-  <footer class="lobby-footer">
-   <div class="mode-area"><div><div class="mode-label">MODO DE JOGO</div><div id="modeName">BATTLE ROYALE CARTOON</div></div><button class="mode-change" id="modeChange">TROCAR MODO</button></div>
-   <button class="start-match" id="startMatch">▶ INICIAR PARTIDA</button>
-  </footer>
- </div>
- <div id="lobbyPortraitHint">GIRE O CELULAR PARA A POSIÇÃO HORIZONTAL.</div>
- <div class="lobby-toast" id="lobbyToast">Ação realizada com sucesso!</div>
-</div>
-<div id="game"></div>
-<div id="hud">
-  <div id="topbar" style="display:none">
-    <div class="panel">HP: <span id="hp" style="color:#39c78a">100</span></div>
-    <div class="panel">ABATES: <span id="kills" style="color:#ffc15c">0</span></div>
-    <div class="panel">CARTOON ROYALE</div>
-  </div>
-  <div id="jumpInfo" class="panel">ALTITUDE: 150m</div>
-  <div id="speed">VELOCIDADE: 190 km/h</div>
-  <div id="crosshair"></div>
-  <button id="mapButton">MAPA</button>
-  <div id="message"></div>
-  <div id="matchInfo" style="display:none; position:absolute; left:12px; top:68px; flex-direction:column; gap:6px;">
-    <div class="panel" style="font-size:11px;">REGIÃO: <span id="regionName">CIDADE CENTRAL</span></div>
-    <div class="panel" style="font-size:11px;">CRÉDITOS: <span id="credits">0</span> • MOCHILA: <span id="bagLoad">0/8</span></div>
-    <div class="panel" style="font-size:11px;">ZONA: <span id="zoneTimer">Preparando</span></div>
-  </div>
-  <div id="zoneNotice" style="display:none; position:absolute; top:56px; left:50%; transform:translateX(-50%); background:#172435; border:2px solid #36c7ef; border-radius:8px; padding:7px 12px; font-size:11px; font-weight:900;">A ZONA SEGURA ESTÁ DIMINUINDO</div>
-  <div id="lootHint" style="display:none; position:absolute; left:50%; bottom:22%; transform:translateX(-50%); background:#122436; border:2px solid #ffc15c; border-radius:8px; padding:8px 12px; font-size:12px; font-weight:900;">LOOT RECOLHIDO</div>
-</div>
 
-<div id="controls">
-  <div id="moveZone"></div>
-  <div id="lookZone"></div>
-  <div id="joystick"><div id="stick"></div></div>
-  <div id="action" class="btn">SALTAR</div>
-  <div id="fire" class="btn">ATIRAR</div>
-  <div id="aim" class="btn">MIRA</div>
-  <div id="jump" class="btn">PULAR</div>
-  <button id="bagButton" style="display:none;position:absolute;left:12px;top:150px;pointer-events:auto;border:3px solid #ff9100;background:#14232a;border-radius:10px;padding:8px 12px;color:white;font-weight:900;box-shadow:0 4px 0 #000">MOCHILA</button>
-  <button id="interactButton" style="display:none;position:absolute;left:50%;bottom:14%;transform:translateX(-50%);pointer-events:auto;border:3px solid #ffe0a0;background:#ff9100;color:#201407;border-radius:10px;padding:10px 16px;font-weight:1000;box-shadow:0 4px 0 #000">INTERAGIR</button>
-</div>
+/* ===== SISTEMAS MEGAMAPA / LOOT / ZONA ===== */
+#matchInfo{position:absolute;left:12px;top:66px;display:none;gap:6px;flex-direction:column;max-width:220px}
+#matchInfo .panel{font-size:11px;padding:6px 9px}
+#aliveHud{position:absolute;right:12px;top:112px;background:linear-gradient(135deg,#0a1a2beF,#152d45eF);border:1px solid #55d8f4;border-radius:10px;padding:8px 12px;font-weight:1000;box-shadow:0 0 18px #25c9f455;text-shadow:0 2px 3px #000;font-size:13px;z-index:13}
+#endMatchPanel{display:none;position:fixed;inset:0;z-index:150;background:#030914d9;align-items:center;justify-content:center;padding:18px;text-align:center}
+#endMatchCard{width:min(430px,92vw);padding:26px 20px;border:2px solid #55d8f4;border-radius:18px;background:linear-gradient(145deg,#102c47,#071321);box-shadow:0 0 45px #25c9f455}
+#endMatchCard h2{font-size:clamp(26px,5vw,42px);margin:0 0 8px;color:#ffe16b;text-shadow:0 0 18px #ffb52e66}
+#endMatchCard p{color:#d4e7f7}#returnLobby{border:0;border-radius:10px;padding:13px 22px;background:linear-gradient(100deg,#ff9a27,#ffe16b);font-weight:1000;color:#172638}
+#lootHint{position:absolute;left:50%;bottom:22%;transform:translateX(-50%);display:none;background:#122436eF;border:1px solid #ffc15c;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:bold;white-space:nowrap}
+#inventoryPanel{width:min(94vw,700px);background:linear-gradient(145deg,#172c43f5,#081522f8);border:2px solid #4acbe9}
+#inventoryPanel .bag-layout{display:grid;grid-template-columns:1.1fr 1fr;gap:10px;margin-top:12px}
+.bag-section{background:#0a1929;border:1px solid #34516b;border-radius:10px;padding:10px;min-width:0}
+.bag-section h4{margin:0 0 8px;color:#62dcf4;font-size:12px;letter-spacing:1px}
+.bag-weapon{display:flex;align-items:center;gap:9px;background:linear-gradient(100deg,#1a3853,#102237);border:1px solid #42647d;border-radius:8px;padding:9px;margin:6px 0;font-size:11px}
+.bag-weapon .bag-gun-icon{font-size:23px;color:#ffd76a}
+.bag-weapon small{display:block;color:#a9c0d5;margin-top:3px}
+.bag-item{background:#152b40;border:1px solid #34516b;border-radius:7px;padding:8px;font-size:10px;margin:5px 0}
+.bag-item button{float:right;background:#1c9bb7;color:#fff;border:0;border-radius:5px;padding:5px;font-size:9px;font-weight:900}
+@media(max-width:560px){#inventoryPanel .bag-layout{grid-template-columns:1fr}#aliveHud{top:105px;right:7px;font-size:10px;padding:6px 8px}}
+#inventoryPanel,#buyPanel{display:none;position:fixed;z-index:22;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,520px);max-height:82vh;overflow:auto;background:#101c2bea;border:2px solid #f2a343;border-radius:13px;padding:14px;color:#eef5ff;pointer-events:auto;box-shadow:0 15px 50px #0009}
+#inventoryPanel h3,#buyPanel h3{margin:0 0 10px;color:#ffc15c}
+.panel-close{float:right;background:#e88a32;color:#201407;border:0;border-radius:6px;padding:6px 10px;font-weight:bold}
+#inventoryList,.shop-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.skin-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.skin-card{background:linear-gradient(145deg,#203650,#101b2b);border:1px solid #49627c;border-radius:10px;padding:8px;text-align:center;min-width:0}
+.skin-preview{height:92px;border-radius:8px;margin-bottom:7px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;font-size:39px;text-shadow:0 3px 8px #0009}
+.skin-card b{display:block;font-size:10px;color:#fff;margin-bottom:4px}.skin-card small{display:block;color:#b9c9dc;font-size:8px;min-height:25px}
+.skin-card button{margin-top:7px;width:100%;padding:7px 3px;border:0;border-radius:6px;background:#f0a13e;color:#201407;font-weight:900;font-size:9px}
+.skin-card.equipped{border-color:#52e0a0;box-shadow:0 0 12px #35d99545}
+@media(max-width:650px){.skin-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.inv-item,.shop-item{background:#1a2b40;border:1px solid #40536a;border-radius:8px;padding:8px;font-size:11px}
+.inv-item b,.shop-item b{display:block;margin-bottom:3px}
+.shop-item button{margin-top:6px;width:100%;padding:7px;border:0;border-radius:6px;background:#f0a13e;color:#201407;font-weight:bold}
+#zoneNotice{position:absolute;top:56px;left:50%;transform:translateX(-50%);display:none;background:#172435eF;border:1px solid #79c9ff;border-radius:8px;padding:7px 12px;font-size:11px;font-weight:bold;white-space:nowrap}
+#mapLegend{position:absolute;bottom:10px;left:10px;background:#102033df;padding:7px 9px;border-radius:7px;font-size:10px;line-height:1.6}
+@media(max-width:650px){#matchInfo{top:60px;max-width:165px}#matchInfo .panel{font-size:9px}#inventoryList,.shop-list{grid-template-columns:1fr}}
 
-<div id="mapPanel"><h3>MAPA DO ARQUIPÉLAGO</h3><button id="mapClose">FECHAR</button><canvas id="mapCanvas"></canvas></div>
-<div id="inventoryPanel" style="display:none;position:fixed;z-index:22;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,500px);max-height:80vh;overflow:auto;background:#101c2bee;border:3px solid #ff9100;border-radius:14px;padding:14px;color:#fff;box-shadow:0 15px 40px #000"><button class="panel-close" id="inventoryClose" style="float:right;background:#e63946;color:#fff;border:0;border-radius:6px;padding:6px 10px;font-weight:900">X</button><h3 style="margin:0 0 10px;color:#ffc15c">MOCHILA</h3><p id="inventorySummary" style="font-size:12px">0/8 slots</p><div id="inventoryList" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px"></div></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
-(() => {
-'use strict';
-const $ = id => document.getElementById(id);
-let scene, camera, renderer, clock;
-let activeSkinKey = 'detective';
-try { activeSkinKey = localStorage.getItem('miniRoyaleEquippedSkin') || 'detective'; } catch(e) {}
-let state = 'plane', player = {x:-540, y:150, z:-500, yaw:0, pitch:0, hp:100, kills:0, ads:false, vy:0, grounded:false};
-let move = {x:0, z:0}, bots = [], airAvatar = null, airplane = null, flightPath = null, mapOpen = false;
-const MAP = 1200, HALF = MAP / 2;
-const FLIGHT_START = {x:-540, z:-500}, FLIGHT_END = {x:540, z:500}; let flightProgress = 0;
-const worldColliders = [];
-const lootDrops = [];
+/* Skins visíveis no lobby, com silhuetas e paletas distintas */
+.character-placeholder{animation:lobbyIdle 2.7s ease-in-out infinite;transform-origin:50% 100%}
+@keyframes lobbyIdle{0%,100%{translate:0 0}50%{translate:0 -4px}}
+#characterStage[data-skin="detective"] .char-body{background:linear-gradient(110deg,#080d16,#202a39 58%,#087fc1);clip-path:polygon(12% 0,88% 0,100% 100%,0 100%);border-bottom:5px solid #19bfff}
+#characterStage[data-skin="detective"] .char-hood{border-color:#19bfff;box-shadow:inset 0 0 0 2px #19bfff,0 0 13px #19bfff66}
+#characterStage[data-skin="bounty"] .char-body{background:linear-gradient(110deg,#0754b8,#1676d2 55%,#ff8b22);clip-path:none;border-radius:15px;border-bottom:5px solid #ff9a24}
+#characterStage[data-skin="bounty"] .char-hood{border-color:#ff8b22;box-shadow:inset 0 0 0 2px #8deaff,0 0 13px #ff8b2266}
+#characterStage[data-skin="bounty"] .char-head{background:#8deaff;border-radius:45%}
+#characterStage[data-skin="casual"] .char-body{background:linear-gradient(110deg,#54218b,#8a43cf 55%,#17a9a0);clip-path:none;border-radius:18px;border-bottom:5px solid #4de0d0}
+#characterStage[data-skin="casual"] .char-hood{border-color:#4de0d0;box-shadow:inset 0 0 0 2px #4de0d0,0 0 13px #4de0d066}
+#characterStage[data-skin="casual"] .char-head:before{content:"";position:absolute;left:-10px;top:-7px;width:12px;height:23px;background:#252b3b;clip-path:polygon(50% 0,100% 100%,0 100%)}
+#characterStage[data-skin="bounty"] .char-arm,#characterStage[data-skin="bounty"] .char-leg{background:#1676d2}
+#characterStage[data-skin="casual"] .char-arm,#characterStage[data-skin="casual"] .char-leg{background:#8a43cf}
+#characterStage[data-skin="detective"] .char-arm,#characterStage[data-skin="detective"] .char-leg{background:#172331}
 
-function mat(color) { return new THREE.MeshLambertMaterial({color, roughness:1}); }
-function addBoxCollider(x, z, w, d) { worldColliders.push({x, z, halfW:w/2, halfD:d/2}); }
-function resolveWorldCollision(x, z, radius = 0.85) {
-  let px = x, pz = z;
-  for(let pass = 0; pass < 3; pass++) {
-    for(const c of worldColliders) {
-      const dx = px - c.x, dz = pz - c.z;
-      const qx = Math.max(-c.halfW, Math.min(c.halfW, dx));
-      const qz = Math.max(-c.halfD, Math.min(c.halfD, dz));
-      let ox = dx - qx, oz = dz - qz, dist = Math.hypot(ox, oz);
-      if(dist < radius) {
-        if(dist < 0.0001) { ox = 1; oz = 0; dist = 1; }
-        const push = radius - dist;
-        px += (ox / dist) * push; pz += (oz / dist) * push;
+
+/* ===== MINI ROYALE 2.0 — HUD CARTOON VIBRANTE ===== */
+:root{--mr-orange:#ff8a00;--mr-yellow:#ffe16b;--mr-cyan:#38dcff;--mr-red:#ff4058;--mr-green:#42f59b}
+.panel{background:linear-gradient(135deg,rgba(13,28,43,.94),rgba(27,48,65,.88));border:2px solid var(--mr-yellow);border-radius:11px;padding:8px 12px;font-weight:900;text-shadow:0 2px 0 #07111b,0 0 7px #000;box-shadow:0 4px 0 #07111b,0 0 13px #ff9a2733}
+#topbar{gap:7px;align-items:flex-start}
+#topbar .panel{font-size:clamp(10px,1.3vw,14px);border-color:var(--mr-cyan);background:linear-gradient(135deg,#102c45ed,#1c4058ed);clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px)}
+#topbar .panel:nth-child(2){border-color:var(--mr-yellow)}
+#topbar .panel:nth-child(3){border-color:#a66cff;color:#d8c2ff}
+#jumpInfo{border-color:var(--mr-yellow);background:linear-gradient(110deg,#162b43f2,#28435bf2);font-size:clamp(12px,1.6vw,18px);box-shadow:0 4px 0 #07111b,0 0 18px #ffb52e55}
+#speed{border:2px solid var(--mr-orange);background:#142b40ed;font-weight:1000;box-shadow:0 4px 0 #07111b}
+#crosshair{width:34px;height:34px;filter:drop-shadow(0 1px 2px #000)}
+#crosshair:before{width:3px;height:30px;left:15px;top:2px;background:#fff;border:1px solid #17202a;transform:none}
+#crosshair:after{height:3px;width:30px;top:15px;left:2px;background:#fff;border:1px solid #17202a;transform:none}
+#crosshair.locked:before,#crosshair.locked:after{background:var(--mr-red);box-shadow:0 0 10px var(--mr-red)}
+#controls{z-index:9}
+#lookZone{width:55%;}
+#moveZone{width:47%;height:56%;}
+#joystick{width:120px;height:120px;border:3px solid #ffffffd9;background:radial-gradient(circle,#ffffff18,#0b1d2c66);box-shadow:0 0 18px #38dcff44}
+#stick{width:52px;height:52px;left:31px;top:31px;background:linear-gradient(145deg,#ffbd39,#ff7600);border:3px solid #fff0ad;box-shadow:0 4px 0 #713600,0 0 14px #ff9a00aa}
+.btn{font-weight:1000;border:4px solid #ffe08a;background:linear-gradient(145deg,#ffb52e,#ff7600);box-shadow:0 6px 0 #713600,0 0 16px #ff9a0044;text-shadow:0 2px 0 #713600;touch-action:none}
+#action{width:clamp(78px,12vw,108px);height:clamp(78px,12vw,108px);font-size:clamp(12px,1.5vw,16px)}
+#fire{width:clamp(76px,10vw,94px);height:clamp(76px,10vw,94px);background:linear-gradient(145deg,#ff6470,#d7193f);border-color:#ffc0c5;box-shadow:0 6px 0 #76152a,0 0 17px #ff405855}
+#aim{width:clamp(58px,8vw,72px);height:clamp(58px,8vw,72px);background:linear-gradient(145deg,#267dc2,#143b72);border-color:#9bdcff;box-shadow:0 6px 0 #092b4b}
+#jump{width:clamp(62px,8.5vw,78px);height:clamp(62px,8.5vw,78px
+                                                  renderer.outputEncoding=THREE.sRGBEncoding;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;renderer.physicallyCorrectLights=true;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.setClearColor(0x7895a1,1);
+  renderer.shadowMap.enabled=shadowEnabled; // opção de sombras controlada no menu
+  renderer.info.autoReset=true;
+  $('game').appendChild(renderer.domElement);clock=new THREE.Clock();
+  scene.add(new THREE.HemisphereLight(0xe4eceb,0x354333,0.76));
+  const sun=new THREE.DirectionalLight(0xfff3df,1.22);sun.position.set(180,300,120);
+  sun.castShadow=shadowEnabled;sun.shadow.mapSize.set(1024,1024);
+  sun.shadow.camera.left=-260;sun.shadow.camera.right=260;sun.shadow.camera.top=260;sun.shadow.camera.bottom=-260;
+  sun.shadow.bias=-0.00025;scene.add(sun);
+  buildMap();buildLootAndStations();buildBots();createAirAvatar();createAirplaneAndRoute();setupControls();drawMap();window.addEventListener('resize',resize);
+  animate();
+}
+function buildMap(){
+  const groundGeo=new THREE.PlaneGeometry(MAP,MAP,112,112);
+  const pos=groundGeo.attributes.position;
+  const colors=[];
+  const low=new THREE.Color(0x315b35),mid=new THREE.Color(0x557b40),high=new THREE.Color(0x887b5e),rock=new THREE.Color(0x77766d);
+  for(let i=0;i<pos.count;i++){
+    const x=pos.getX(i),z=pos.getY(i),height=terrainHeight(x,z); pos.setZ(i,height);
+    const blend=Math.max(0,Math.min(1,(height+5)/13));
+    const color=low.clone().lerp(mid,blend).lerp(high,Math.max(0,(height-3)/10));
+    const noise=(Math.sin(x*.071+z*.033)*Math.cos(z*.057-x*.021))*.055;
+    color.offsetHSL(noise*.22,noise,noise*1.5);
+    if(height>5) color.lerp(rock,Math.min(.38,(height-5)*.035));
+    colors.push(color.r,color.g,color.b);
+  }
+  groundGeo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
+  groundGeo.computeVertexNormals();
+  // Textura procedural discreta de solo: detalhe visual sem baixar arquivos externos.
+  const soilCanvas=document.createElement('canvas');soilCanvas.width=512;soilCanvas.height=512;
+  const soilCtx=soilCanvas.getContext('2d');soilCtx.fillStyle='#527b3e';soilCtx.fillRect(0,0,512,512);
+  for(let si=0;si<6500;si++){const v=92+Math.floor(Math.random()*65);soilCtx.fillStyle=`rgba(${v-18},${v},${v-35},${.12+Math.random()*.2})`;soilCtx.fillRect(Math.random()*512,Math.random()*512,1+Math.random()*3,1+Math.random()*2);}
+  const soilTexture=new THREE.CanvasTexture(soilCanvas);soilTexture.wrapS=soilTexture.wrapT=THREE.RepeatWrapping;soilTexture.repeat.set(18,18);soilTexture.encoding=THREE.sRGBEncoding;soilTexture.anisotropy=Math.min(2,renderer.capabilities.getMaxAnisotropy());
+  const ground=new THREE.Mesh(groundGeo,new THREE.MeshStandardMaterial({vertexColors:true,map:soilTexture,roughness:1,metalness:0}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;ground.castShadow=false;scene.add(ground);
+  // Grama em grupos instanciados: mais cobertura visual com apenas uma chamada de desenho.
+  const grassGeo=new THREE.ConeGeometry(.105,.72,3);
+  const grassMat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:1});
+  const grass=new THREE.InstancedMesh(grassGeo,grassMat,3200);
+  const grassDummy=new THREE.Object3D(),grassColor=new THREE.Color();
+  for(let gi=0;gi<3200;gi++){
+    const gx=(Math.random()-.5)*MAP,gz=(Math.random()-.5)*MAP;
+    if(gx>405 || (Math.abs(gx)<210 && Math.abs(gz)<210)){grassDummy.position.set(0,-100,0);grassDummy.scale.setScalar(0);grassDummy.updateMatrix();grass.setMatrixAt(gi,grassDummy.matrix);continue;}
+    const gh=terrainHeight(gx,gz),scale=.45+Math.random()*.9;
+    grassDummy.position.set(gx,gh+scale*.38,gz);
+    grassDummy.rotation.set((Math.random()-.5)*.18,Math.random()*Math.PI*2,(Math.random()-.5)*.18);
+    grassDummy.scale.set(.75+Math.random()*.7,scale,.75+Math.random()*.7);
+    grassDummy.updateMatrix();grass.setMatrixAt(gi,grassDummy.matrix);
+    grassColor.setHSL(.245+Math.random()*.035,.20+Math.random()*.10,.25+Math.random()*.10);
+    grass.setColorAt(gi,grassColor);
+  }
+  grass.instanceMatrix.needsUpdate=true;if(grass.instanceColor)grass.instanceColor.needsUpdate=true;scene.add(grass);
+  // Caminhos principais ligando as regiões.
+  const roadMat=mat(0x555b5d);
+  // Segmentos curtos seguem o relevo do terreno; evita grandes placas planas flutuando.
+  function road(x,z,w,d,rot=0){
+    const alongX=w>=d,len=Math.max(w,d),width=Math.min(w,d),steps=Math.max(8,Math.ceil(len/9));
+    for(let i=0;i<steps;i++){
+      const t=(i+.5)/steps-.5,localX=alongX?t*len:0,localZ=alongX?0:t*len;
+      const cx=x+localX*Math.cos(rot)-localZ*Math.sin(rot),cz=z+localX*Math.sin(rot)+localZ*Math.cos(rot);
+      const seg=new THREE.Mesh(new THREE.BoxGeometry(alongX?len/steps+0.5:width,.10,alongX?width:len/steps+0.5),roadMat);
+      seg.position.set(cx,terrainHeight(cx,cz)+.045,cz);
+      seg.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),terrainNormal(cx,cz));
+      seg.rotateY(rot);seg.receiveShadow=true;scene.add(seg);
+    }
+  }
+  road(0,0,1000,18,0);road(0,0,18,950,0);road(-220,-160,440,10,.55);road(230,180,430,10,-.6);
+  // Oceano em volta de toda a ilha; o relevo afunda gradualmente na costa.
+  const waterMat=new THREE.MeshStandardMaterial({color:0x1f7182,roughness:.22,metalness:.18,transparent:true,opacity:.94});
+  const water=new THREE.Mesh(new THREE.PlaneGeometry(2300,2300),waterMat);water.rotation.x=-Math.PI/2;water.position.y=-5.2;water.name='OCEANO_PERIMETRAL';scene.add(water);
+  const beachRing=new THREE.Mesh(new THREE.RingGeometry(728,766,144),new THREE.MeshStandardMaterial({color:0xb7a078,roughness:1,side:THREE.DoubleSide}));beachRing.rotation.x=-Math.PI/2;beachRing.position.y=-1.65;beachRing.name='FAIXA_DE_PRAIA';scene.add(beachRing);
+  const foamRing=new THREE.Mesh(new THREE.RingGeometry(765,769,144),new THREE.MeshBasicMaterial({color:0xd8e4d8,transparent:true,opacity:.48,side:THREE.DoubleSide}));foamRing.rotation.x=-Math.PI/2;foamRing.position.y=-4.35;scene.add(foamRing);
+  // Colinas e montanhas posicionadas em bordas e pontos estratégicos, sem invadir os bairros.
+  const cityClearance=[[0,-35,310],[430,-35,190],[-430,-35,190],[-430,-360,190],[-430,360,170],[430,-360,185],[430,360,185],[0,470,145],[80,550,130]];
+  const awayFromCity=(x,z)=>!cityClearance.some(([cx,cz,r])=>Math.hypot(x-cx,z-cz)<r);
+  for(let i=0;i<34;i++){const x=(Math.random()-.5)*1050,z=(Math.random()-.5)*1050;if(!awayFromCity(x,z))continue;
+    const radius=24+Math.random()*55,h=10+Math.random()*45;
+    const hill=new THREE.Mesh(new THREE.ConeGeometry(radius,h,7),mat(i%3?0x55b94c:0x8bcf55));
+    hill.position.set(x,terrainHeight(x,z)+h/2-1,z);hill.rotation.y=Math.random()*6.28;hill.castShadow=true;hill.receiveShadow=true;scene.add(hill);hillColliders.push({x,z,radius});}
+  // Distritos: cidade, industrial, vila, base militar, floresta e porto.
+  district('CIDADE CENTRAL',0,-35,15,0xb77b4d,0x754033);
+  district('BAIRRO RESIDENCIAL',430,-35,7,0xb38b51,0x315d87);
+  district('CENTRO COMERCIAL',-430,-35,7,0x477f8d,0x293e61);
+  district('ZONA INDUSTRIAL',-430,-360,7,0x68777b,0x3e4b54);
+  district('VILA',-430,360,6,0xb18b62,0x784033);
+  district('BASE MILITAR',430,-360,7,0x697c54,0x3c4c39);
+  district('PORTO',430,360,7,0xa98455,0x315d87);
+  // Regiões adicionais do megamapa: vale, ilha tropical e acesso subterrâneo.
+  district('VALE VERDE',0,470,5,0x6f934b,0x5d4c3c);
+  district('ILHA AURORA',80,550,4,0xb89a62,0x704039);
+  // Expansão do território: três áreas novas na faixa externa da ilha.
+  district('PRAIA DOS FARÓIS',585,55,3,0xb49a70,0x6b5140);
+  district('OBSERVATÓRIO',-575,-255,3,0x777f80,0x3d5365);
+  district('PÂNTANO AZUL',35,645,3,0x587b55,0x48594a);
+  // Entrada visual do complexo subterrâneo; acesso marcado como POI.
+  const bunker=box(18,2,14,mat(0x45515b),80,terrainHeight(80,-300)+1,-300);bunker.castShadow=true;
+  const bunkerDoor=box(5,4,.5,mat(0x26343f),80,terrainHeight(80,-300)+3,-307);bunkerDoor.castShadow=true;
+  addBoxCollider(80,-300,19,15);
+  // Floresta densa no noroeste e sudoeste.
+  const urbanZones=[[0,-35,300],[430,-35,165],[-430,-35,165],[-430,-360,165],[-430,360,145],[430,-360,160],[430,360,160],[0,470,120],[80,550,105]];
+  const outsideCity=(x,z)=>!urbanZones.some(([cx,cz,r])=>Math.hypot(x-cx,z-cz)<r);
+  for(let i=0;i<330;i++){let x,z,tries=0;do{x=-520+Math.random()*1040;z=-520+Math.random()*1040;tries++;}while((!outsideCity(x,z)||x>390||x< -490)&&tries<120);if(outsideCity(x,z)&&Math.abs(x)<490)tree(x,z);}
+  for(let i=0;i<180;i++){let x,z,tries=0;do{x=-520+Math.random()*1040;z=-520+Math.random()*1040;tries++;}while(!outsideCity(x,z)&&tries<120);if(outsideCity(x,z))tree(x,z);}
+  // Pequenas casas e rochas espalhadas dão escala ao mundo.
+  const placedHouses=[];
+  let houseAttempts=0;
+  while(placedHouses.length<135&&houseAttempts++<5200){
+    const x=(Math.random()-.5)*1080,z=(Math.random()-.5)*1080;
+    if(x>420||Math.abs(x)<145&&Math.abs(z)<145)continue;
+    const nearDistrict=[[0,-35,285],[430,-35,150],[-430,-35,150],[-430,-360,150],[-430,360,130],[430,-360,145],[430,360,145],[0,470,110],[80,550,95]];
+    if(nearDistrict.some(([cx,cz,r])=>Math.hypot(x-cx,z-cz)<r+35))continue;
+    if(placedHouses.some(([hx,hz])=>Math.hypot(x-hx,z-hz)<62))continue;
+    if(treeInstances.some(t=>Math.hypot(x-t.x,z-t.z)<19))continue;
+    placedHouses.push([x,z]);smallHouse(x,z);
+  }
+  for(let i=0;i<100;i++){let x,z,tries=0;do{x=(Math.random()-.5)*1100;z=(Math.random()-.5)*1100;tries++;}while(!awayFromCity(x,z)&&tries<80);if(!awayFromCity(x,z))continue;const rock=new THREE.Mesh(new THREE.DodecahedronGeometry(1.5+Math.random()*3,0),mat([0x777b72,0x8e887b,0x697b78,0xa39b87][Math.floor(Math.random()*4)]));rock.position.set(x,terrainHeight(x,z)+1,z);rock.scale.y=.6;rock.castShadow=true;scene.add(rock);worldColliders.push({x,z,halfW:2.5,halfD:2.5});}
+  // Limite visual distante do mapa.
+  const edge=new THREE.Mesh(new THREE.TorusGeometry(752,1.2,5,160),new THREE.MeshStandardMaterial({color:0xb6a27b,roughness:1}));edge.rotation.x=Math.PI/2;edge.position.y=-1.1;scene.add(edge);
+  // Folhagem e fachadas viram lotes instanciados: reduz milhares de draw calls.
+  buildTreeInstances();
+  batchStaticBoxes();
+}
+function district(name,cx,cz,count,color,roof){
+  const wallPalette=[color,0x92764f,0x55777b,0x62744e,0x965f4e,0x685c78,0x93834e,0x496783,0x865e6d];
+  const roofPalette=[roof,0x344f68,0x62506f,0x75483e,0x315e53,0x8b6840,0x3f5875,0x704c5b];
+  // Ruas internas claras entre os quarteirões, para separar visualmente as construções.
+  const roadMat=mat(0x4d5356), roadLine=mat(0xa99f8e), spacing=40, span=count*spacing;
+  function streetStrip(x1,z1,x2,z2,width,material,offset=0){
+    const dx=x2-x1,dz=z2-z1,len=Math.hypot(dx,dz),steps=Math.max(3,Math.ceil(len/8));
+    for(let q=0;q<steps;q++){
+      const t=(q+.5)/steps,x=x1+dx*t+(len?(-dz/len)*offset:0),z=z1+dz*t+(len?(dx/len)*offset:0);
+      const seg=new THREE.Mesh(new THREE.BoxGeometry(len/steps+.35,.085,width),material);
+      seg.position.set(x,terrainHeight(x,z)+.035,z);
+      seg.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),terrainNormal(x,z));
+      seg.rotateY(-Math.atan2(dz,dx));seg.receiveShadow=true;scene.add(seg);
+    }
+  }
+  for(let r=0;r<count;r++){
+    const offset=(r-(count-1)/2)*spacing;
+    streetStrip(cx+offset-span/2,cz,cx+offset+span/2,cz,4,roadMat);
+    streetStrip(cx-span/2,cz+offset,cx+span/2,cz+offset,4,roadMat);
+    for(const mark of [-1,1]){
+      streetStrip(cx+offset-span/2,cz,cx+offset+span/2,cz,.09,roadLine,mark*1.65);
+      streetStrip(cx-span/2,cz+offset,cx+span/2,cz+offset,.09,roadLine,mark*1.65);
+    }
+  }
+  for(let i=0;i<count;i++){for(let j=0;j<count;j++){
+    const x=cx+(i-(count-1)/2)*spacing+(Math.random()-.5)*2.2,z=cz+(j-(count-1)/2)*spacing+(Math.random()-.5)*2.2;
+    // Construções ampliadas e espaçadas para criar corredores e coberturas.
+    const w=19+Math.random()*5,d=19+Math.random()*5;
+    const h=(name==='CIDADE CENTRAL'?16+Math.random()*20:name==='CENTRO COMERCIAL'?13+Math.random()*14:11+Math.random()*10);
+        const baseY=terrainHeight(x,z),wallColor=wallPalette[Math.floor(Math.random()*wallPalette.length)];
+    const roofColor=roofPalette[Math.floor(Math.random()*roofPalette.length)];
+    const b=box(w,h,d,mat(wallColor),x,baseY+h/2,z);b.userData.building=true;b.castShadow=true;b.receiveShadow=true;
+    addBoxCollider(x,z,w+1.2,d+1.2,baseY+h+.9);
+    roofColliders.push({x,z,halfW:(w+0.7)/2,halfD:(d+0.7)/2,top:baseY+h+.9});
+    const roofMesh=box(w+0.7,.9,d+0.7,mat(roofColor),x,baseY+h+.4,z);roofMesh.castShadow=true;roofMesh.receiveShadow=true;
+    // Fachadas com fileiras de janelas, peitoris e molduras simples.
+    const glassMats=[0x6f9eae,0x9eaaad,0x7894a6].map(c=>new THREE.MeshStandardMaterial({color:c,emissive:0x182a30,emissiveIntensity:.08,roughness:.32,metalness:.12}));
+    const floors=Math.min(5,Math.max(1,Math.floor((h-2)/6)));
+    for(let floor=0;floor<floors;floor++){
+      const wy=baseY+3.4+floor*5.2;
+      for(const sideX of [-1,1]){
+        const wx=x+sideX*w*.25;
+        const pane=box(2.7,2.35,.16,glassMats[(i+j+floor+(sideX>0?1:0))%3],wx,wy,z+d/2+.09);pane.castShadow=true;
+        box(2.95,.18,.28,mat(0xc4b99f),wx,wy-1.08,z+d/2+.13);
       }
+      const sidePane=box(.16,2.35,2.7,glassMats[(i+j+floor+1)%3],x+w/2+.09,wy,z);
+      sidePane.castShadow=true;
+      box(.28,.18,2.95,mat(0xc4b99f),x+w/2+.13,wy-1.08,z);
+    }
+  }}
+}
+function tree(x,z){
+  const y=terrainHeight(x,z),variant=Math.floor(Math.random()*3),size=1.55+Math.random()*.65;
+  treeInstances.push({x,z,y,variant,size});
+  worldColliders.push({x,z,halfW:2.5*size,halfD:2.5*size});
+}
+function buildTreeInstances(){
+  if(!treeInstances.length)return;
+  const dummy=new THREE.Object3D();
+  const trunkGeo=new THREE.CylinderGeometry(.62,.9,10.8,8);
+  const trunkBatch=new THREE.InstancedMesh(trunkGeo,mat(0x65452f),treeInstances.length);
+  treeInstances.forEach((t,i)=>{dummy.position.set(t.x,t.y+5.4,t.z);dummy.scale.setScalar(t.size*.92);dummy.updateMatrix();trunkBatch.setMatrixAt(i,dummy.matrix);});
+  trunkBatch.instanceMatrix.needsUpdate=true;trunkBatch.frustumCulled=false;trunkBatch.castShadow=true;trunkBatch.receiveShadow=true;scene.add(trunkBatch);
+  const leafColors=[0x294f32,0x3b6338,0x587b43];
+  const crownGeo=new THREE.SphereGeometry(7.8,10,8);
+  for(let variant=0;variant<3;variant++){
+    const list=treeInstances.filter(t=>t.variant===variant);if(!list.length)continue;
+    for(let cluster=0;cluster<4;cluster++){
+      const batch=new THREE.InstancedMesh(crownGeo,mat(leafColors[(variant+cluster)%3]),list.length);
+      list.forEach((t,i)=>{const a=cluster*Math.PI/2+(variant*.31),rad=cluster===0?0:3.6*t.size;dummy.position.set(t.x+Math.cos(a)*rad,t.y+13.2*t.size+(cluster===0?0:(cluster%2?1.8:-1.1)),t.z+Math.sin(a)*rad);dummy.scale.set((cluster===0?1.18:.88)*t.size,(cluster===0?1.12:.82)*t.size,(cluster===0?1.16:.9)*t.size);dummy.updateMatrix();batch.setMatrixAt(i,dummy.matrix);});
+      batch.instanceMatrix.needsUpdate=true;batch.frustumCulled=false;batch.castShadow=true;batch.receiveShadow=true;scene.add(batch);
     }
   }
-  return {x: px, z: pz};
+  treeInstances.length=0;
 }
-function terrainHeight(x, z) { return Math.sin(x * .01) * 3 + Math.cos(z * .012) * 2.5; }
- </script>
- <script>
-function box(w, h, d, material, x, y, z) {
-  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
-  m.position.set(x, y, z);
-  scene.add(m);
-  return m;
+function batchStaticBoxes(){
+  scene.updateMatrixWorld(true);
+  const excludedRoots=new Set(houseDoors.map(d=>d.hinge));
+  const batches=new Map(),removeList=[];
+  scene.traverse(obj=>{
+    if(!obj.isMesh||!obj.geometry||obj.geometry.type!=='BoxGeometry'||!obj.material||Array.isArray(obj.material)||obj.userData.keepSeparate)return;
+    let parent=obj.parent,skip=false;while(parent&&parent!==scene){if(excludedRoots.has(parent)){skip=true;break;}parent=parent.parent;}if(skip)return;
+    const material=obj.material;if(!material.isMeshStandardMaterial||material.map||material.transparent||!material.color)return;
+    const par=obj.geometry.parameters||{};
+    const key=[material.color.getHex(),material.emissive?material.emissive.getHex():0,material.emissiveIntensity||0,material.roughness??'',material.metalness??'',material.side??''].join('|');
+    let entry=batches.get(key);if(!entry){entry={material:material.clone(),items:[]};batches.set(key,entry);}
+    obj.updateWorldMatrix(true,false);
+    const pos=new THREE.Vector3(),quat=new THREE.Quaternion(),scale=new THREE.Vector3();obj.matrixWorld.decompose(pos,quat,scale);
+    scale.multiply(new THREE.Vector3(par.width||1,par.height||1,par.depth||1));
+    const matrix=new THREE.Matrix4().compose(pos,quat,scale);
+    entry.items.push(matrix);removeList.push(obj);
+  });
+  if(!removeList.length)return;
+  for(const obj of removeList){if(obj.parent)obj.parent.remove(obj);if(obj.geometry)obj.geometry.dispose();}
+  const unitBox=new THREE.BoxGeometry(1,1,1);let batchCount=0;
+  for(const entry of batches.values()){
+    const batch=new THREE.InstancedMesh(unitBox,entry.material,entry.items.length);
+    entry.items.forEach((matrix,i)=>batch.setMatrixAt(i,matrix));
+    batch.instanceMatrix.needsUpdate=true;batch.frustumCulled=false;batch.castShadow=false;batch.receiveShadow=false;
+    batch.name='STATIC_BOX_BATCH_'+(++batchCount);scene.add(batch);
+  }
+}
+function smallHouse(x,z){
+  const h=10,w=20,d=20,y=terrainHeight(x,z);
+  const houseColors=[0xb8793d,0xa64d3d,0x367b87,0x527b3b,0x76529b,0xa18a37,0x315d91,0x98536f];
+  const roofColors=[0x1b477c,0x67317e,0x8d342b,0x126a58,0x9b5c1a,0x2d457d,0x873d5a];
+  const wall=mat(houseColors[Math.floor(Math.random()*houseColors.length)]),roofMat=mat(roofColors[Math.floor(Math.random()*roofColors.length)]);
+  const trim=mat(0x8f887b),glass=new THREE.MeshStandardMaterial({color:0x6d94a2,emissive:0x142c36,emissiveIntensity:.10,roughness:.3,metalness:.1});
+  const floor=box(w,.35,d,mat(0x9a805e),x,y+.18,z);floor.receiveShadow=true;
+  const back=box(w,h,.45,wall,x,y+h/2,z-d/2);back.castShadow=true;
+  for(const side of [-1,1]){
+    const sx=x+side*w/2;
+    box(.55,h,6.5,wall,sx,y+h/2,z-6.6);
+    box(.55,h,6.5,wall,sx,y+h/2,z+6.6);
+    box(.55,3.2,5.0,wall,sx,y+8.0,z);
+    const pane=box(.13,2.0,3.0,glass,sx-side*.24,y+5.2,z);pane.castShadow=true;
+    box(.7,.18,3.35,trim,sx,y+3.7,z);
+    box(.7,.18,3.35,trim,sx,y+6.8,z);
+  }
+  box(7.2,h,.55,wall,x-6.0,y+h/2,z+d/2);
+  box(7.2,h,.55,wall,x+6.0,y+h/2,z+d/2);
+  box(3.2,3.0,.55,wall,x,y+8.2,z+d/2);
+  for(const wx of [x-6.0,x+6.0]){
+    const pane=box(3.3,2.7,.16,glass,wx,y+5.2,z+d/2+.08);pane.castShadow=true;
+    box(3.6,.2,.6,trim,wx,y+3.7,z+d/2);
+    box(3.6,.2,.6,trim,wx,y+6.8,z+d/2);
+  }
+  const hinge=new THREE.Group();hinge.position.set(x-1.6,y+.2,z+d/2-.05);scene.add(hinge);
+  const door=new THREE.Mesh(new THREE.BoxGeometry(3.0,6.2,.26),mat(0x75472f));door.position.set(1.5,3.1,0);door.castShadow=true;hinge.add(door);
+  const knob=new THREE.Mesh(new THREE.SphereGeometry(.11,8,6),mat(0xffd16b));knob.position.set(2.7,3.1,-.17);hinge.add(knob);
+  houseDoors.push({hinge,x,z,open:false});
+  const roof=box(w+1.5,1.2,d+1.5,roofMat,x,y+h+.6,z);roof.castShadow=true;roof.receiveShadow=true;roof.userData.roof=true;roofColliders.push({x,z,halfW:(w+1.5)/2,halfD:(d+1.5)/2,top:y+h+1.2});
+  const n=2+Math.floor(Math.random()*3);
+  for(let k=0;k<n;k++)spawnLoot(x+(Math.random()-.5)*13,z+(Math.random()-.5)*13);
+  worldColliders.push({x,z:z-d/2,halfW:w/2,halfD:.45,roofTop:y+h+1.2});
+  worldColliders.push({x:x-w/2,z,halfW:.45,halfD:d/2,roofTop:y+h+1.2},{x:x+w/2,z,halfW:.45,halfD:d/2,roofTop:y+h+1.2});
+  worldColliders.push({x:x-6.0,z:z+d/2,halfW:3.6,halfD:.45,roofTop:y+h+1.2},{x:x+6.0,z:z+d/2,halfW:3.6,halfD:.45,roofTop:y+h+1.2});
 }
 
-function spawnLoot(x, z) {
-  const group = new THREE.Group();
-  const gem = new THREE.Mesh(new THREE.OctahedronGeometry(.8, 0), new THREE.MeshBasicMaterial({color: 0xffc342}));
-  gem.position.y = 1.0;
-  group.add(gem);
-  group.position.set(x, terrainHeight(x, z), z);
-  scene.add(group);
-  lootDrops.push({mesh: group, active: true});
+function buildBots(){
+  for(let i=0;i<22;i++){
+    const g=new THREE.Group(),uniform=mat(i%3===0?0x555f4c:i%3===1?0x53616b:0x74614f),skin=mat(0xb98f70),dark=mat(0x252c30),trim=mat(0x9b8b69);
+    const torso=new THREE.Mesh(new THREE.BoxGeometry(.78,1.08,.42),uniform);torso.position.y=1.25;torso.castShadow=true;g.add(torso);
+    const vest=new THREE.Mesh(new THREE.BoxGeometry(.84,.58,.46),dark);vest.position.set(0,1.34,-.025);g.add(vest);
+    const head=new THREE.Mesh(new THREE.SphereGeometry(.245,10,8),skin);head.position.y=2.02;head.castShadow=true;g.add(head);
+     $('jumpInfo').style.display='none';$('speed').style.display='none';$('action').style.display='none';
+  $('topbar').style.display='flex';$('settingsGameBtn').style.display='block';$('vitals').style.display='flex';$('crosshair').style.display='block';$('fire').style.display='flex';$('aim').style.display='flex';$('jump').style.display='flex';
+  $('message').textContent='POUSO CONCLUÍDO — BOA PARTIDA!';announce('Pouso concluído. Boa partida.');$('message').style.display='block';setTimeout(()=>$('message').style.display='none',2200);
+  if(parachute){scene.remove(parachute);parachute=null;}
+  createArms();if(playerArms)playerArms.visible=false;if(airAvatar)airAvatar.visible=true;if(!weaponSlots[0])weaponSlots[0]={name:'CARABINA',kind:'rifle',ammo:30,reserve:90,damage:25};activeWeaponSlot=weaponSlots[activeWeaponSlot]?activeWeaponSlot:0;makeHeldWeapon();updateWeaponHud();updateConsumableHud();updateEquipmentHud();
 }
+function createArms(){
+  playerArms=new THREE.Group();camera.add(playerArms);
+  const accent=activeSkinKey==='bounty'?0xff922e:activeSkinKey==='casual'?0x42e0c5:0x22c8ff;
+  const sleeve=mat(activeSkinKey==='bounty'?0x1769bd:activeSkinKey==='casual'?0x6334a8:0x202b3b),gun=mat(0x263442);
+  const arm1=new THREE.Mesh(new THREE.BoxGeometry(.17,.18,.62),sleeve);arm1.position.set(-.24,-.36,-.43);arm1.rotation.z=-.25;playerArms.add(arm1);
+  const arm2=new THREE.Mesh(new THREE.BoxGeometry(.17,.18,.62),sleeve);arm2.position.set(.22,-.39,-.4);arm2.rotation.z=.2;playerArms.add(arm2);
+  weapon=new THREE.Mesh(new THREE.BoxGeometry(.16,.15,.76),gun);weapon.position.set(.15,-.29,-.7);playerArms.add(weapon);
+  const rail=new THREE.Mesh(new THREE.BoxGeometry(.17,.045,.58),mat(accent));rail.position.set(.15,-.205,-.69);playerArms.add(rail);
+  const grip=new THREE.Mesh(new THREE.BoxGeometry(.13,.22,.17),mat(0x17212b));grip.position.set(.15,-.44,-.48);grip.rotation.x=-.18;playerArms.add(grip);
+  const barrel=new THREE.Mesh(new THREE.CylinderGeometry(.055,.065,.34,7),mat(0x657887));barrel.rotation.x=Math.PI/2;barrel.position.set(.15,-.29,-1.18);playerArms.add(barrel);
+  const muzzle=new THREE.Mesh(new THREE.CylinderGeometry(.078,.078,.07,8),mat(accent));muzzle.rotation.x=Math.PI/2;muzzle.position.set(.15,-.29,-1.37);playerArms.add(muzzle);
+  const stock=new THREE.Mesh(new THREE.BoxGeometry(.18,.16,.24),mat(0x34485a));stock.position.set(.15,-.29,-.25);playerArms.add(stock);
+  const sight=new THREE.Mesh(new THREE.BoxGeometry(.12,.09,.12),mat(0xffd94b));sight.position.set(.15,-.16,-.66);playerArms.add(sight);
+}
+function setupControls(){
+  const action=$('action');
+  $('bagButton').addEventListener('pointerdown',e=>{if(hudEditActive)return;e.preventDefault();updateInventoryUI();$('inventoryPanel').style.display='block';});
+  $('inventoryClose').addEventListener('pointerdown',()=>$('inventoryPanel').style.display='none');
+  $('weaponSlot1').addEventListener('pointerdown',e=>{if(hudEditActive)return;e.preventDefault();if(quickSwitch)switchWeapon(0);});
+  $('weaponSlot2').addEventListener('pointerdown',e=>{if(hudEditActive)return;e.preventDefault();if(quickSwitch)switchWeapon(1);});
+  $('swapConfirm').addEventListener('pointerdown',e=>{e.preventDefault();if(pendingWeapon){weaponSlots[activeWeaponSlot]=pendingWeapon;pendingWeapon=null;if(pendingWeaponDrop){pendingWeaponDrop.active=false;scene.remove(pendingWeaponDrop.mesh);pendingWeaponDrop=null;}$('lootHint').textContent='ARMA SUBSTITUÍDA';$('lootHint').style.display='block';setTimeout(()=>$('lootHint').style.display='none',1200);makeHeldWeapon();updateWeaponHud();}$('weaponSwapPrompt').style.display='none';});
+  $('swapCancel').addEventListener('pointerdown',e=>{e.preventDefault();pendingWeapon=null;if(pendingWeaponDrop)pendingWeaponDrop.ignoredUntilExit=true;pendingWeaponDrop=null;$('weaponSwapPrompt').style.display='none';});
+  $('useBandage').addEventListener('pointerdown',e=>{if(hudEditActive)return;e.preventDefault();useConsumable('bandage');});
+  $('useMedkit').addEventListener('pointerdown',e=>{if(hudEditActive)return;e.preventDefault();useConsumable('medkit');});
+  $('useShield').addEventListener('pointerdown',e=>{if(hudEditActive)return;e.preventDefault();useConsumable('shield');});
+  $('buyClose').addEventListener('pointerdown',()=>$('buyPanel').style.display='none');
+  $('interactButton').addEventListener('pointerdown',e=>{e.preventDefault();openBuyStation();});
+  $('mapClose').addEventListener('pointerdown',()=>{$('mapPanel').style.display='none';mapOpen=false;});
 
-function buildMap() {
-  const groundGeo = new THREE.PlaneGeometry(MAP, MAP, 32, 32);
-  const ground = new THREE.Mesh(groundGeo, new THREE.MeshLambertMaterial({color: 0x55aa33}));
-  ground.rotation.x = -Math.PI / 2;
-  scene.add(ground);
-
-  const colors = [0xff595e, 0xffca3a, 0x8ac926, 0x1982c4, 0x6a4c93];
-  for(let i = -2; i <= 2; i++) {
-    for(let j = -2; j <= 2; j++) {
-      const x = i * 35, z = j * 35, w = 14, d = 14, h = 15 + Math.random() * 20;
-      const col = colors[Math.abs(i + j) % colors.length];
-      box(w, h, d, mat(col), x, h / 2, z);
-      addBoxCollider(x, z, w + 1, d + 1);
-      spawnLoot(x + (Math.random() - .5) * 10, z + (Math.random() - .5) * 10);
+  action.addEventListener('pointerdown',e=>{e.preventDefault();if(state==='plane'){state='freefall';player.pitch=0;action.textContent='ABRIR PARAQUEDAS';if(airAvatar){airAvatar.visible=true;airAvatar.position.set(player.x,player.y-2.65,player.z);}playSfx('jump');}else if(state==='freefall'){openChute();}});
+  function openChute(){if(state!=='freefall')return;state='parachute';createParachute();action.style.display='none';}
+  let fireLoop=null;const stopFire=()=>{window.miniRoyaleFiring=false;if(fireLoop){clearInterval(fireLoop);fireLoop=null;}};
+  $('fire').addEventListener('pointerdown',e=>{if(hudEditActive)return;e.preventDefault();if(state==='ground'&&!consumeState){if(fireLoop)clearInterval(fireLoop);window.miniRoyaleFiring=true;shoot();fireLoop=setInterval(()=>{if(state==='ground'&&window.miniRoyaleFiring)shoot();else stopFire();},currentWeapon()?.kind==='smg'?115:currentWeapon()?.kind==='shotgun'?720:currentWeapon()?.kind==='precision'?850:currentWeapon()?.kind==='pistol'?340:currentWeapon()?.kind==='lmg'?145:230);}});
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>$('fire').addEventListener(ev,stopFire));
+  $('jump').addEventListener('pointerdown',e=>{if(hudEditActive)return;e.preventDefault();if(state==='ground'&&player.grounded){player.vy=14.5;player.grounded=false;}});
+  $('aim').addEventListener('pointerdown',e=>{if(hudEditActive)return;e.preventDefault();if(state==='ground'){player.ads=!player.ads;camera.fov=player.ads?38:fovSetting;camera.updateProjectionMatrix();$('aim').classList.toggle('aiming',player.ads);$('aim').style.borderColor=player.ads?'#8deaff':'#ffb52e';}});
+  $('mapButton').addEventListener('pointerdown',e=>{if(hudEditActive)return;e.preventDefault();mapOpen=true;$('mapPanel').style.display='block';drawMap();});
+  $('mapClose').addEventListener('pointerdown',()=>{$('mapPanel').style.display='none';mapOpen=false;});
+  const mz=$('moveZone'),j=$('joystick'),stick=$('stick');
+  mz.addEventListener('pointerdown',e=>{if(moveTouch!==null)return;moveTouch=e.pointerId;mz.setPointerCapture(e.pointerId);const r=mz.getBoundingClientRect();const x=e.clientX,y=e.clientY;j.style.display='block';j.style.left=(x-56)+'px';j.style.top=(y-56)+'px';j.dataset.cx=x;j.dataset.cy=y;});
+  mz.addEventListener('pointermove',e=>{if(e.pointerId!==moveTouch)return;const cx=+j.dataset.cx,cy=+j.dataset.cy;let dx=e.clientX-cx,dy=e.clientY-cy;const d=Math.hypot(dx,dy),max=38;if(d>max){dx=dx/d*max;dy=dy/d*max;}stick.style.transform=`translate(${dx}px,${dy}px)`;move.x=dx/max;move.z=dy/max;});
+  const endMove=e=>{if(e.pointerId!==moveTouch)return;moveTouch=null;move.x=move.z=0;j.style.display='none';stick.style.transform='translate(0,0)';};
+  mz.addEventListener('pointerup',endMove);mz.addEventListener('pointercancel',endMove);
+  const lz=$('lookZone');
+  lz.addEventListener('pointerdown',e=>{if(lookTouch!==null)return;lookTouch=e.pointerId;lastLook={x:e.clientX,y:e.clientY};lz.setPointerCapture(e.pointerId);});
+  lz.addEventListener('pointermove',e=>{if(e.pointerId!==lookTouch)return;const dx=e.clientX-lastLook.x,dy=e.clientY-lastLook.y;lastLook={x:e.clientX,y:e.clientY};if(state==='ground'){const s=(player.ads ? 0.0022*aimSensitivity : 0.0035)*cameraSensitivity;player.yaw-=dx*s;player.pitch-=dy*s*scopeSpeed*(invertY?-1:1);player.pitch=Math.max(-1.15,Math.min(1.15,player.pitch));}else{player.yaw-=dx*.0032*cameraSensitivity;player.pitch-=dy*.0032*cameraSensitivity*(invertY?-1:1);player.pitch=Math.max(-1.05,Math.min(.9,player.pitch));}});
+  const endLook=e=>{if(e.pointerId===lookTouch)lookTouch=null;};lz.addEventListener('pointerup',endLook);lz.addEventListener('pointercancel',endLook);
+}
+function updateAliveCount(){const n=(state==='eliminated'?0:1)+bots.length;$('aliveCount').textContent=n;return n;}
+function finishMatch(victory){if(matchEnded)return;matchEnded=true;announce(victory?'Vitória. Você é o último sobrevivente.':'Você foi eliminado.');state=victory?'victory':'eliminated';window.miniRoyaleFiring=false;$('endMatchTitle').textContent=victory?'VITÓRIA!':'ELIMINADO';$('endMatchText').textContent=victory?'Você é o último sobrevivente do MINI ROYALE.':'Sua partida terminou. Tente novamente no próximo salto.';$('endMatchStats').textContent='Abates: '+player.kills+' • Sobreviventes: '+(victory?1:0);$('endMatchPanel').style.display='flex';$('aliveCount').textContent=victory?'1':'0';if(victory)setTimeout(()=>{if(matchEnded)returnToLobby();},6500);}
+function returnToLobby(){ matchStarted=false;$('endMatchPanel').style.display='none';$('lobby').style.display='block';$('topbar').style.display='none';$('matchInfo').style.display='none';$('aliveHud').style.display='none';$('vitals').style.display='none';$('crosshair').style.display='none';$('fire').style.display='none';$('aim').style.display='none';$('jump').style.display='none';$('weaponHud').style.display='none';$('consumableHud').style.display='none';$('settingsGameBtn').style.display='none';$('bagButton').style.display='none';$('endMatchPanel').style.display='none';}
+window.returnToLobby=returnToLobby;
+window.isMiniRoyaleMatchEnded=()=>matchEnded;
+window.updateMiniRoyaleSettings=(settings)=>{try{const current=JSON.parse(localStorage.getItem('miniRoyaleSettings')||'{}');Object.assign(current,settings);localStorage.setItem('miniRoyaleSettings',JSON.stringify(current));applySettings();}catch(e){console.warn('Não foi possível aplicar as configurações',e);}};
+window.setMiniRoyaleHudEditing=(v)=>{hudEditActive=!!v;};window.isMiniRoyaleHudEditing=()=>hudEditActive;
+function shoot(){
+  const active=currentWeapon();playSfx('shoot_'+(active?active.kind:'rifle'));if(cameraShake&&camera){camera.position.x+=(Math.random()-.5)*.035*effectsIntensity*(effectPreset==='light'?.35:effectPreset==='balanced'?.7:1);camera.position.y+=(Math.random()-.5)*.025*effectsIntensity*(effectPreset==='light'?.35:effectPreset==='balanced'?.7:1);}if(vibrationEnabled&&navigator.vibrate)navigator.vibrate(12);
+  if(consumeState)return;if(active){if(active.ammo<=0){if(autoReload&&active.reserve>0){const reload=Math.min(30,active.reserve);active.ammo+=reload;active.reserve-=reload;updateWeaponHud();}else return;}active.ammo--;updateWeaponHud();}
+  const ray=new THREE.Raycaster();ray.setFromCamera(new THREE.Vector2(0,0),camera);
+  const targets=[];bots.forEach(b=>b.mesh.traverse(o=>{if(o.isMesh)targets.push(o);}));
+  const hits=ray.intersectObjects(targets,false);
+  if(hits.length){const bot=bots.find(b=>{let found=false;b.mesh.traverse(o=>{if(o===hits[0].object)found=true;});return found;});
+    if(bot){bot.hp-=(active?active.damage:25);const pushX=bot.mesh.position.x-player.x,pushZ=bot.mesh.position.z-player.z,pushLen=Math.hypot(pushX,pushZ)||1;bot.velocity.x+=(pushX/pushLen)*5.2;bot.velocity.z+=(pushZ/pushLen)*5.2;bot.verticalVelocity=Math.max(bot.verticalVelocity,2.1);bot.hitStun=.22;if(hitmarkerEnabled){const hm=$('hitmarker');hm.classList.remove('show');void hm.offsetWidth;hm.classList.add('show');}if(damageNumbers){const tag=document.createElement('div');tag.textContent='-'+(active?active.damage:25);tag.style.cssText='position:fixed;left:50%;top:43%;transform:translate(-50%,-50%);z-index:60;color:#ffe36b;font:bold 20px Arial;text-shadow:0 2px 4px #000;pointer-events:none';document.body.appendChild(tag);setTimeout(()=>tag.remove(),650);}if(bot.hp<=0){const bx=bot.mesh.position.x,bz=bot.mesh.position.z;scene.remove(bot.mesh);bots=bots.filter(b=>b!==bot);for(let k=0;k<2+Math.floor(Math.random()*3);k++)spawnLoot(bx+(Math.random()-.5)*8,bz+(Math.random()-.5)*8);player.kills++;$('kills').textContent=player.kills;updateAliveCount();announce('Eliminação confirmada');if(bots.length===0)finishMatch(true);}}}
+  if(weapon){weapon.position.z=-.58;setTimeout(()=>{if(weapon)weapon.position.z=-.7;},70);}const held=airAvatar?.userData.heldWeapon;if(held){held.position.z=-.47;setTimeout(()=>{if(held)held.position.z=-.55;},90);}
+}
+function drawMap(){
+  const c=$('mapCanvas'),ctx=c.getContext('2d'),w=c.clientWidth,h=c.clientHeight;if(!w||!h)return;const mapDpr=Math.min(devicePixelRatio||1,1.25);c.width=w*mapDpr;c.height=h*mapDpr;ctx.setTransform(mapDpr,0,0,mapDpr,0,0);
+  ctx.fillStyle='#286f80';ctx.fillRect(0,0,w,h);
+  const px=x=>(x+HALF)/MAP*w,py=z=>(z+HALF)/MAP*h;
+  ctx.save();ctx.beginPath();ctx.ellipse(px(0),py(0),ISLAND_LIMIT/MAP*w,ISLAND_LIMIT/MAP*h,0,0,Math.PI*2);ctx.fillStyle='#b7a078';ctx.fill();ctx.beginPath();ctx.ellipse(px(0),py(0),728/MAP*w,728/MAP*h,0,0,Math.PI*2);ctx.fillStyle='#527b45';ctx.fill();ctx.restore();
+  const areas=[['DISTRITO CENTRAL',0,-35],['FERROVIÁRIO',-260,-220],['VALE VERDE',-80,360],['SERRA',-430,210],['PORTO ÂNCORA',350,280],['ILHA AURORA',250,390],['SUBSOLO',80,-300],['FARÓIS',585,55],['OBSERVATÓRIO',-575,-255],['PÂNTANO AZUL',35,645]];
+  ctx.fillStyle='#858b8d';areas.forEach(([n,x,z])=>{ctx.fillRect(px(x-55),py(z-55),w*110/MAP,h*110/MAP);ctx.fillStyle='#fff';ctx.font='bold 9px Arial';ctx.fillText(n,px(x-42),py(z));ctx.fillStyle='#858b8d';});
+  lootDrops.forEach(d=>{if(d.active){ctx.fillStyle='#ffd15b';ctx.beginPath();ctx.arc(px(d.mesh.position.x),py(d.mesh.position.z),2.5,0,Math.PI*2);ctx.fill();}});
+  stations.forEach(st=>{ctx.fillStyle='#40d7f0';ctx.fillRect(px(st.x)-3,py(st.z)-3,6,6);});
+  if(zone){ctx.strokeStyle='#ff4d55';ctx.lineWidth=2;ctx.beginPath();ctx.arc(px(zone.x),py(zone.z),zone.radius/MAP*w,0,Math.PI*2);ctx.stroke();}
+  ctx.strokeStyle='#e6d5ad';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(px(0),py(0),ISLAND_LIMIT/MAP*w,ISLAND_LIMIT/MAP*h,0,0,Math.PI*2);ctx.stroke();
+  ctx.save();ctx.strokeStyle='#ffe06b';ctx.lineWidth=3;ctx.setLineDash([7,5]);ctx.beginPath();ctx.moveTo(px(FLIGHT_START.x),py(FLIGHT_START.z));ctx.lineTo(px(FLIGHT_END.x),py(FLIGHT_END.z));ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#fff1a6';ctx.beginPath();ctx.arc(px(FLIGHT_END.x),py(FLIGHT_END.z),4,0,Math.PI*2);ctx.fill();ctx.restore();
+  if(state==='plane'){ctx.fillStyle='#f5f5f5';ctx.beginPath();ctx.arc(px(player.x),py(player.z),5,0,Math.PI*2);ctx.fill();}else{ctx.fillStyle='#ff3b32';ctx.beginPath();ctx.arc(px(player.x),py(player.z),5,0,Math.PI*2);ctx.fill();}
+}
+function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);if(mapOpen)drawMap();}
+function animate(){
+  requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05);
+  frameSample+=dt;frameCount++;if(frameSample>=1){const fps=frameCount/frameSample;qualityTimer++;if(qualityTimer>=2){const current=renderer.getPixelRatio();let target=current;const qCap=(graphicsQuality==='low'?.72:graphicsQuality==='medium'?.9:1)*resolutionScale;const maxResolution=Math.min(devicePixelRatio||1,qCap);if(fps<38)target=Math.max(.58,current-.09);else if(fps>53)target=Math.min(maxResolution,current+.025);if(Math.abs(target-current)>.025){renderer.setPixelRatio(target);renderer.setSize(innerWidth,innerHeight,false);}qualityTimer=0;}frameSample=0;frameCount=0;}
+  updateBots(dt);if(state==='ground'&&!matchEnded)updateAliveCount();
+  if(state==='ground'){updateWorldItems(dt);updateStorm(dt);updateConsumableUse();updateWeaponHud();updateConsumableHud();if(Math.hypot(move.x,move.z)>.18){stepClock+=dt;if(stepClock>.42){stepClock=0;playSfx('step');}}else stepClock=0;}
+  if(state==='plane'){
+    updateFlight(dt);updateAirCamera(27,9);updateAirAvatar(dt);
+    $('jumpInfo').textContent='AVIÃO • 220m • ROTA DE VOO';$('speed').textContent='SALTE QUANDO QUISER • TRAJETÓRIA MARCADA';
+  }else if(state==='freefall'){
+    player.y-=52*dt;player.x+=Math.sin(player.yaw)*move.z*18*dt+Math.cos(player.yaw)*move.x*18*dt;player.z+=Math.cos(player.yaw)*move.z*18*dt-Math.sin(player.yaw)*move.x*18*dt;{const edge=clampToIsland(player.x,player.z,12);player.x=edge.x;player.z=edge.z;}
+    updateAirCamera(10,4.5);updateAirAvatar(dt);
+    $('jumpInfo').textContent=`ALTITUDE: ${Math.max(0,Math.round(player.y))}m`;$('speed').textContent='QUEDA LIVRE: 230 km/h • ARRASTE A TELA PARA OLHAR';
+    if(player.y<=40) {player.y=Math.max(player.y,terrainHeight(player.x,player.z)+8);state='parachute';createParachute();$('action').style.display='none';}
+  }else if(state==='parachute'){
+    player.y-=8*dt;player.x+=Math.sin(player.yaw)*move.z*10*dt+Math.cos(player.yaw)*move.x*10*dt;player.z+=Math.cos(player.yaw)*move.z*10*dt-Math.sin(player.yaw)*move.x*10*dt;{const edge=clampToIsland(player.x,player.z,12);player.x=edge.x;player.z=edge.z;}
+    const landingFloor=terrainHeight(player.x,player.z)+1.7;
+    if(player.y<landingFloor)player.y=landingFloor;
+    updateAirCamera(13,6);updateAirAvatar(dt);
+    if(parachute){parachute.position.set(player.x,player.y+1,player.z);parachute.rotation.y=player.yaw;}
+    $('jumpInfo').textContent=`ALTITUDE: ${Math.max(0,Math.round(player.y))}m (PARAQUEDAS)`;$('speed').textContent='PLANANDO: 25 km/h • ARRASTE PARA OLHAR';
+    if(player.y<=terrainHeight(player.x,player.z)+1.7){playSfx('land');const landing=safeLanding(player.x,player.z);player.x=landing.x;player.z=landing.z;player.y=terrainHeight(player.x,player.z)+1.7;startGround();}
+  }else if(state==='ground'){
+    const forward=new THREE.Vector3(-Math.sin(player.yaw),0,-Math.cos(player.yaw));
+    const right=new THREE.Vector3(Math.cos(player.yaw),0,-Math.sin(player.yaw));
+    const velocity=forward.multiplyScalar(-move.z).add(right.multiplyScalar(move.x));
+    if(velocity.lengthSq()>0){
+      velocity.normalize().multiplyScalar(10*dt);
+      const next=safeLanding(player.x+velocity.x,player.z+velocity.z);
+      player.x=next.x;player.z=next.z;
     }
+    {const edge=clampToIsland(player.x,player.z,12);player.x=edge.x;player.z=edge.z;}
+    let floorY=terrainHeight(player.x,player.z)+1.7;
+    player.vy-=24*dt;
+    const nextY=player.y+player.vy*dt;
+    if(player.vy<=0){for(const roof of roofColliders){if(Math.abs(player.x-roof.x)<=roof.halfW-.35&&Math.abs(player.z-roof.z)<=roof.halfD-.35){const roofFloor=roof.top+1.7;if(player.y>=roofFloor-.25&&nextY<=roofFloor)floorY=Math.max(floorY,roofFloor);}}}
+    if(nextY<=floorY){player.y=floorY;player.vy=0;player.grounded=true;}
+    else{player.y=nextY;player.grounded=false;}
+    // Colisão vertical contínua: o centro da câmera nunca pode ficar abaixo do solo.
+    if(player.y<floorY){player.y=floorY;player.vy=0;player.grounded=true;}
+    if(airAvatar){airAvatar.visible=true;airAvatar.position.set(player.x,player.y-1.7,player.z);airAvatar.rotation.y=player.yaw;}
+    updateAirAvatar(dt);
+    // Câmera de terceira pessoa com órbita livre em yaw/pitch, sem rotação lateral.
+    placeOrbitCamera(player.ads?4.6:cameraDistance,player.ads?1.42:1.35);
+    if(playerArms)playerArms.visible=false;
+    $('hp').textContent=player.hp;$('shieldValue').textContent=Math.round(player.shield||0);$('shieldFill').style.width=(player.shield||0)+'%';
+    const hpPct=Math.max(0,Math.min(100,player.hp));$('hpValue').textContent=Math.round(hpPct);$('hpFill').style.width=hpPct+'%';
+    $('crosshair').style.setProperty('--spread','0px');$('crosshair').style.transform=`translate(-50%,-50%) scale(${player.ads ? .72 : 1})`;
   }
+  if(mapOpen&&Math.floor(performance.now()/250)!==lastMapFrame){lastMapFrame=Math.floor(performance.now()/250);drawMap();}
+  renderer.render(scene,camera);
 }
-
-function buildBots() {
-  for(let i = 0; i < 8; i++) {
-    const g = new THREE.Group();
-    const body = new THREE.Mesh(new THREE.BoxGeometry(.8, 1.2, .4), mat(0xd90429));
-    body.position.y = 1.1;
-    g.add(body);
-    const head = new THREE.Mesh(new THREE.BoxGeometry(.5, .5, .5), mat(0xffb703));
-    head.position.y = 1.9;
-    g.add(head);
-    let x = (Math.random() - .5) * 300, z = (Math.random() - .5) * 300;
-    g.position.set(x, terrainHeight(x, z), z);
-    scene.add(g);
-    bots.push({mesh: g, hp: 100, phase: Math.random() * 5});
-  }
-}
-
-function createAirAvatar() {
-  if(airAvatar) scene.remove
- 
+window.startMiniRoyaleMatch=function(){
+  matchStarted=true;matchEnded=false;announce('O avião está sobrevoando a ilha. Escolha onde pousar.');state='plane';flightProgress=0;zone=null;zoneStarted=false;zoneElapsed=0;zonePhase=0;
+  player.x=FLIGHT_START.x;player.z=FLIGHT_START.z;player.y=220;player.yaw=0;player.pitch=0;player.ads=false;camera.fov=fovSetting;c
