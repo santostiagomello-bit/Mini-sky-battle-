@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tactical Desert - Shinobi vs Baraka</title>
     <style>
-        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #c2b280; font-family: sans-serif; color: #fff; }
+        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: none; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #d4bc8e; font-family: sans-serif; color: #fff; }
         #canvas-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
         
         /* HUD Superior */
-        #hud { position: absolute; top: 0; left: 0; width: 100%; z-index: 5; pointer-events: none; display: none; justify-content: space-between; padding: 15px; }
+        #hud { position: absolute; top: 0; left: 0; width: 100%; z-index: 5; pointer-events: none; display: flex; justify-content: space-between; padding: 15px; }
         .panel { background: rgba(45, 35, 25, 0.85); border: 2px solid #ff6600; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: bold; color: #ffdfba; }
 
-        /* Mira Dinâmica */
-        #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 22px; height: 22px; z-index: 4; pointer-events: none; display: none; }
+        /* Mira Dinâmica (Fica vermelha no alvo) */
+        #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 22px; height: 22px; z-index: 4; pointer-events: none; }
         .cross-line { position: absolute; background: #ffffff; box-shadow: 0 0 4px rgba(0,0,0,0.9); transition: background 0.1s; }
         #c-top { top: 0; left: 10px; width: 2px; height: 8px; }
         #c-bottom { bottom: 0; left: 10px; width: 2px; height: 8px; }
@@ -22,23 +22,17 @@
         #c-right { top: 10px; right: 0; width: 8px; height: 2px; }
         #crosshair.locked .cross-line { background: #ff1e1e; box-shadow: 0 0 8px #ff1e1e; }
 
-        /* Camada de Controles Mobile */
-        #controls { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; display: none; }
+        /* Controles Mobile */
+        #controls { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
         .zone-left { position: absolute; bottom: 0; left: 0; width: 50%; height: 100%; pointer-events: auto; }
         .zone-right { position: absolute; bottom: 0; right: 0; width: 50%; height: 100%; pointer-events: auto; }
 
-        #joystick { position: absolute; bottom: 40px; left: 40px; width: 100px; height: 100px; background: rgba(255,255,255,0.12); border: 2px solid #ff6600; border-radius: 50%; display: none; }
+        #joystick { position: absolute; bottom: 40px; left: 40px; width: 100px; height: 100px; background: rgba(255,255,255,0.15); border: 2px solid #ff6600; border-radius: 50%; display: none; }
         #stick { position: absolute; top: 25px; left: 25px; width: 50px; height: 50px; background: #ff6600; border-radius: 50%; }
 
         .btn-action { position: absolute; border-radius: 50%; color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; pointer-events: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
-        #btn-fire { right: 30px; bottom: 35px; width: 78px; height: 78px; background: rgba(255, 50, 50, 0.45); border: 3px solid #ff3333; font-size: 13px; }
-        #btn-ads { right: 120px; bottom: 45px; width: 58px; height: 58px; background: rgba(255, 102, 0, 0.4); border: 2px solid #ff6600; font-size: 11px; }
-
-        /* Tela Inicial com ponteiro ativo garantido */
-        #menu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #261d18; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; pointer-events: auto; }
-        h1 { color: #ff6600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 2px; font-size: 26px; }
-        p { color: #d6b885; margin-bottom: 25px; font-size: 13px; }
-        .btn-play { background: #ff6600; color: #fff; border: none; padding: 18px 45px; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 15px rgba(255, 102, 0, 0.4); z-index: 10000; }
+        #btn-fire { right: 30px; bottom: 35px; width: 78px; height: 78px; background: rgba(255, 50, 50, 0.5); border: 3px solid #ff3333; font-size: 13px; }
+        #btn-ads { right: 120px; bottom: 45px; width: 58px; height: 58px; background: rgba(255, 102, 0, 0.45); border: 2px solid #ff6600; font-size: 11px; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -51,4 +45,403 @@
         <div id="c-bottom" class="cross-line"></div>
         <div id="c-left" class="cross-line"></div>
         <div id="c-right" class="cross-line"></div>
-        
+    </div>
+
+    <div id="hud">
+        <div class="panel">HP: <span id="hp">100</span></div>
+        <div class="panel">ABATES: <span id="kills">0</span></div>
+    </div>
+
+    <div id="controls">
+        <div id="zone-left" class="zone-left">
+            <div id="joystick"><div id="stick"></div></div>
+        </div>
+        <div id="zone-right" class="zone-right">
+            <div id="btn-fire" class="btn-action">ATIRAR</div>
+            <div id="btn-ads" class="btn-action">MIRA</div>
+        </div>
+    </div>
+
+    <script>
+        let scene, camera, renderer;
+        let player = { x: 0, y: 1.7, z: 18, rx: 0, ry: 0, hp: 100, kills: 0, isADS: false };
+        let bots = [];
+        let moveDir = { x: 0, z: 0 };
+        let lockedTarget = null;
+        let playerArms, weaponMesh;
+        let walkTime = 0;
+
+        window.onload = function() {
+            if (typeof THREE === 'undefined') {
+                alert('Erro ao carregar motor 3D. Verifique sua conexão.');
+                return;
+            }
+            initGame();
+        };
+
+        function initGame() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xd4bc8e);
+            scene.fog = new THREE.FogExp2(0xd4bc8e, 0.015);
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            scene.add(camera);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // Luzes Deserto
+            scene.add(new THREE.AmbientLight(0xffeedd, 0.75));
+            let sun = new THREE.DirectionalLight(0xfffaed, 0.9);
+            sun.position.set(30, 50, 30);
+            scene.add(sun);
+
+            // Chão
+            let floor = new THREE.Mesh(
+                new THREE.PlaneGeometry(100, 100),
+                new THREE.MeshStandardMaterial({ color: 0xc2a66b, roughness: 0.9 })
+            );
+            floor.rotation.x = -Math.PI / 2;
+            scene.add(floor);
+
+            // Muros estilo Dust
+            let wallMat = new THREE.MeshStandardMaterial({ color: 0xd6b885, roughness: 0.8 });
+            let walls = [
+                {x: 0, z: -20, w: 26, h: 8, d: 3},
+                {x: -18, z: 0, w: 3, h: 8, d: 26},
+                {x: 18, z: 0, w: 3, h: 8, d: 26},
+                {x: -8, z: -6, w: 5, h: 5, d: 5},
+                {x: 8, z: -10, w: 5, h: 6, d: 5}
+            ];
+            walls.forEach(wp => {
+                let wall = new THREE.Mesh(new THREE.BoxGeometry(wp.w, wp.h, wp.d), wallMat);
+                wall.position.set(wp.x, wp.h / 2, wp.z);
+                scene.add(wall);
+            });
+
+            initFirstPersonArms();
+
+            for (let i = 0; i < 4; i++) {
+                spawnBarakaBot();
+            }
+
+            setupControls();
+            window.addEventListener('resize', onResize);
+            animate();
+        }
+
+        function initFirstPersonArms() {
+            playerArms = new THREE.Group();
+            camera.add(playerArms);
+
+            const sleeveMat = new THREE.MeshStandardMaterial({ color: 0xff5500, roughness: 0.5 });
+            const cuffMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.6 });
+            const weaponMat = new THREE.MeshStandardMaterial({ color: 0x2b2b2b, metalness: 0.7, roughness: 0.3 });
+
+            const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.055, 0.65, 8), sleeveMat);
+            leftArm.rotation.set(Math.PI / 3, 0, Math.PI / 4);
+            leftArm.position.set(-0.22, -0.28, -0.38);
+            playerArms.add(leftArm);
+
+            const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.055, 0.65, 8), sleeveMat);
+            rightArm.rotation.set(Math.PI / 3, 0, -Math.PI / 5);
+            rightArm.position.set(0.24, -0.32, -0.32);
+            playerArms.add(rightArm);
+
+            const rightCuff = new THREE.Mesh(new THREE.CylinderGeometry(0.056, 0.056, 0.08, 8), cuffMat);
+            rightCuff.rotation.set(Math.PI / 3, 0, -Math.PI / 5);
+            rightCuff.position.set(0.19, -0.25, -0.45);
+            playerArms.add(rightCuff);
+
+            weaponMesh = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.11, 0.75), weaponMat);
+            weaponMesh.position.set(0.16, -0.22, -0.52);
+            playerArms.add(weaponMesh);
+
+            const barrel = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.018, 0.018, 0.35, 8),
+                new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.9 })
+            );
+            barrel.rotation.x = Math.PI / 2;
+            barrel.position.set(0.16, -0.20, -0.88);
+            playerArms.add(barrel);
+        }
+
+        function spawnBarakaBot() {
+            let group = new THREE.Group();
+
+            const skinMat = new THREE.MeshStandardMaterial({ color: 0xc2b59b, roughness: 0.6 });
+            const vestMat = new THREE.MeshStandardMaterial({ color: 0x1e1e24, roughness: 0.5 });
+            const redClothMat = new THREE.MeshStandardMaterial({ color: 0x8a1c1c, roughness: 0.7 });
+            const bladeMat = new THREE.MeshStandardMaterial({ color: 0xd9e2ec, metalness: 0.9, roughness: 0.15 });
+            const teethMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc });
+            const eyeMat = new THREE.MeshBasicMaterial({ color: 0xff2200 });
+
+            const leftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.75, 0.3), vestMat);
+            leftLeg.position.set(-0.18, 0.375, 0);
+            group.add(leftLeg);
+
+            const rightLeg = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.75, 0.3), vestMat);
+            rightLeg.position.set(0.18, 0.375, 0);
+            group.add(rightLeg);
+
+            const belt = new THREE.Mesh(new THREE.BoxGeometry(0.74, 0.14, 0.46), redClothMat);
+            belt.position.y = 0.78;
+            group.add(belt);
+
+            const torso = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.68, 0.44), skinMat);
+            torso.position.y = 1.15;
+            group.add(torso);
+
+            const strapLeft = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.72, 0.48), vestMat);
+            strapLeft.position.set(-0.22, 1.15, 0);
+            group.add(strapLeft);
+
+            const strapRight = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.72, 0.48), vestMat);
+            strapRight.position.set(0.22, 1.15, 0);
+            group.add(strapRight);
+
+            const head = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.46, 0.42), skinMat);
+            head.position.y = 1.72;
+            group.add(head);
+
+            const leftEye = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.05, 0.04), eyeMat);
+            leftEye.position.set(-0.1, 1.78, 0.21);
+            group.add(leftEye);
+
+            const rightEye = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.05, 0.04), eyeMat);
+            rightEye.position.set(0.1, 1.78, 0.21);
+            group.add(rightEye);
+
+            const mouthCavity = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.14, 0.04), new THREE.MeshBasicMaterial({ color: 0x3b0a0a }));
+            mouthCavity.position.set(0, 1.61, 0.21);
+            group.add(mouthCavity);
+
+            for (let t = -0.11; t <= 0.11; t += 0.055) {
+                const toothTop = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.06, 0.05), teethMat);
+                toothTop.position.set(t, 1.65, 0.22);
+                group.add(toothTop);
+
+                const toothBot = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.06, 0.05), teethMat);
+                toothBot.position.set(t + 0.02, 1.57, 0.22);
+                group.add(toothBot);
+            }
+
+            [-1, 1].forEach(side => {
+                const arm = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.55, 0.24), skinMat);
+                arm.position.set(side * 0.48, 1.25, 0.15);
+                arm.rotation.x = -Math.PI / 3;
+                group.add(arm);
+
+                const bracer = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.22, 0.26), vestMat);
+                bracer.position.set(side * 0.48, 1.12, 0.35);
+                bracer.rotation.x = -Math.PI / 3;
+                group.add(bracer);
+
+                const blade = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.11, 0.85), bladeMat);
+                blade.position.set(side * 0.48, 1.05, 0.72);
+                group.add(blade);
+            });
+
+            group.position.set((Math.random() - 0.5) * 28, 0, -10 - Math.random() * 18);
+            scene.add(group);
+            bots.push({ mesh: group, hp: 100 });
+        }
+
+        function setupControls() {
+            let rZone = document.getElementById('zone-right');
+            let tId = null, lx = 0, ly = 0;
+
+            rZone.addEventListener('touchstart', e => {
+                if (tId === null) {
+                    let t = e.changedTouches[0];
+                    tId = t.identifier;
+                    lx = t.clientX; ly = t.clientY;
+                }
+            });
+
+            rZone.addEventListener('touchmove', e => {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    let t = e.changedTouches[i];
+                    if (t.identifier === tId) {
+                        let dx = t.clientX - lx;
+                        let dy = t.clientY - ly;
+                        
+                        let sens = player.isADS ? 0.0016 : 0.0032;
+                        if (lockedTarget) sens *= 0.55;
+
+                        player.ry -= dx * sens;
+                        player.rx -= dy * sens;
+                        player.rx = Math.max(-1.2, Math.min(1.2, player.rx));
+                        lx = t.clientX; ly = t.clientY;
+                    }
+                }
+            });
+
+            rZone.addEventListener('touchend', e => {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === tId) tId = null;
+                }
+            });
+
+            const adsBtn = document.getElementById('btn-ads');
+            adsBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                player.isADS = !player.isADS;
+                camera.fov = player.isADS ? 48 : 75;
+                camera.updateProjectionMatrix();
+                adsBtn.style.borderColor = player.isADS ? '#ff3333' : '#ff6600';
+                playerArms.position.x = player.isADS ? -0.11 : 0;
+                playerArms.position.y = player.isADS ? 0.04 : 0;
+            });
+
+            let lZone = document.getElementById('zone-left');
+            let jBase = document.getElementById('joystick');
+            let jStick = document.getElementById('stick');
+            let mId = null, cx = 0, cy = 0;
+
+            lZone.addEventListener('touchstart', e => {
+                if (mId === null) {
+                    let t = e.changedTouches[0];
+                    mId = t.identifier;
+                    cx = t.clientX; cy = t.clientY;
+                    jBase.style.display = 'block';
+                    jBase.style.left = (cx - 50) + 'px';
+                    jBase.style.top = (cy - 50) + 'px';
+                    jStick.style.transform = `translate(0px, 0px)`;
+                }
+            });
+
+            lZone.addEventListener('touchmove', e => {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    let t = e.changedTouches[i];
+                    if (t.identifier === mId) {
+                        let dx = t.clientX - cx, dy = t.clientY - cy;
+                        let dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist > 35) { dx = (dx / dist) * 35; dy = (dy / dist) * 35; }
+                        jStick.style.transform = `translate(${dx}px, ${dy}px)`;
+                        moveDir.x = dx / 35; moveDir.z = dy / 35;
+                    }
+                }
+            });
+
+            lZone.addEventListener('touchend', e => {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === mId) {
+                        mId = null;
+                        jBase.style.display = 'none';
+                        moveDir.x = 0; moveDir.z = 0;
+                    }
+                }
+            });
+
+            document.getElementById('btn-fire').addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (playerArms) {
+                    playerArms.position.z = 0.07;
+                    setTimeout(() => { if (playerArms) playerArms.position.z = 0; }, 75);
+                }
+
+                let raycaster = new THREE.Raycaster();
+                raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+                let hits = raycaster.intersectObjects(bots.map(b => b.mesh), true);
+                
+                if (hits.length > 0) {
+                    let target = bots.find(b => b.mesh === hits[0].object || b.mesh.children.includes(hits[0].object));
+                    if (target) {
+                        target.hp -= 50;
+                        if (target.hp <= 0) {
+                            scene.remove(target.mesh);
+                            bots = bots.filter(b => b !== target);
+                            player.kills++;
+                            document.getElementById('kills').innerText = player.kills;
+                            setTimeout(spawnBarakaBot, 2000);
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateAimAssist() {
+            let closestBot = null;
+            let minScreenDist = 999;
+            let center = new THREE.Vector2(0, 0);
+
+            bots.forEach(b => {
+                let targetPos = b.mesh.position.clone();
+                targetPos.y += 1.1;
+                let screenPos = targetPos.clone().project(camera);
+
+                if (screenPos.z < 1) {
+                    let dist = new THREE.Vector2(screenPos.x, screenPos.y).distanceTo(center);
+                    let radius = player.isADS ? 0.32 : 0.18;
+                    if (dist < radius && dist < minScreenDist) {
+                        minScreenDist = dist;
+                        closestBot = b;
+                    }
+                }
+            });
+
+            const crosshairEl = document.getElementById('crosshair');
+
+            if (closestBot) {
+                lockedTarget = closestBot;
+                crosshairEl.classList.add('locked');
+
+                let targetWorldPos = closestBot.mesh.position.clone();
+                targetWorldPos.y += 1.1;
+
+                let currentDir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+                let targetDir = targetWorldPos.clone().sub(camera.position).normalize();
+
+                let strength = player.isADS ? 0.11 : 0.055;
+                currentDir.lerp(targetDir, strength);
+
+                let targetRotY = Math.atan2(-currentDir.x, -currentDir.z);
+                let targetRotX = Math.asin(currentDir.y);
+
+                player.ry = player.ry * 0.9 + targetRotY * 0.1;
+                player.rx = player.rx * 0.9 + targetRotX * 0.1;
+            } else {
+                lockedTarget = null;
+                crosshairEl.classList.remove('locked');
+            }
+        }
+
+        function onResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            updateAimAssist();
+
+            let isMoving = Math.abs(moveDir.x) > 0.05 || Math.abs(moveDir.z) > 0.05;
+            if (isMoving) {
+                let cos = Math.cos(player.ry), sin = Math.sin(player.ry);
+                player.x += (sin * moveDir.z + cos * moveDir.x) * 0.12;
+                player.z += (cos * moveDir.z - sin * moveDir.x) * 0.12;
+
+                walkTime += 0.15;
+                if (playerArms) {
+                    playerArms.position.y = (player.isADS ? 0.04 : 0) + Math.sin(walkTime) * 0.015;
+                }
+            }
+
+            camera.position.set(player.x, player.y, player.z);
+            camera.rotation.order = 'YXZ';
+            camera.rotation.y = player.ry;
+            camera.rotation.x = player.rx;
+
+            bots.forEach(b => {
+                b.mesh.lookAt(camera.position.x, b.mesh.position.y, camera.position.z);
+                b.mesh.translateZ(0.038);
+
+   
