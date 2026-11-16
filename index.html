@@ -172,100 +172,96 @@ canvas{display:block}
 </div>
 
 <div id="mapPanel"><h3>MAPA DO ARQUIPÉLAGO</h3><button id="mapClose">FECHAR</button><canvas id="mapCanvas"></canvas></div>
-<div id="inventoryPanel" style="display:none;position:fixed;z-index:22;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,500px);max-height:80vh;overflow:auto;background:#101c2bee;border
-          <script>
-function box(w,h,d,material,x,y,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);m.position.set(x,y,z);scene.add(m);return m;}
+<div id="inventoryPanel" style="display:none;position:fixed;z-index:22;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,500px);max-height:80vh;overflow:auto;background:#101c2bee;border:3px solid #ff9100;border-radius:14px;padding:14px;color:#fff;box-shadow:0 15px 40px #000"><button class="panel-close" id="inventoryClose" style="float:right;background:#e63946;color:#fff;border:0;border-radius:6px;padding:6px 10px;font-weight:900">X</button><h3 style="margin:0 0 10px;color:#ffc15c">MOCHILA</h3><p id="inventorySummary" style="font-size:12px">0/8 slots</p><div id="inventoryList" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px"></div></div>
 
-function spawnLoot(x,z){
-  const group=new THREE.Group();
-  const gem=new THREE.Mesh(new THREE.OctahedronGeometry(.8,0),new THREE.MeshBasicMaterial({color:0xffc342}));
-  gem.position.y=1.0;group.add(gem);
-  group.position.set(x,terrainHeight(x,z),z);scene.add(group);
-  lootDrops.push({mesh:group,active:true});
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+let scene, camera, renderer, clock;
+let activeSkinKey = 'detective';
+try { activeSkinKey = localStorage.getItem('miniRoyaleEquippedSkin') || 'detective'; } catch(e) {}
+let state = 'plane', player = {x:-540, y:150, z:-500, yaw:0, pitch:0, hp:100, kills:0, ads:false, vy:0, grounded:false};
+let move = {x:0, z:0}, bots = [], airAvatar = null, airplane = null, flightPath = null, mapOpen = false;
+const MAP = 1200, HALF = MAP / 2;
+const FLIGHT_START = {x:-540, z:-500}, FLIGHT_END = {x:540, z:500}; let flightProgress = 0;
+const worldColliders = [];
+const lootDrops = [];
+
+function mat(color) { return new THREE.MeshLambertMaterial({color, roughness:1}); }
+function addBoxCollider(x, z, w, d) { worldColliders.push({x, z, halfW:w/2, halfD:d/2}); }
+function resolveWorldCollision(x, z, radius = 0.85) {
+  let px = x, pz = z;
+  for(let pass = 0; pass < 3; pass++) {
+    for(const c of worldColliders) {
+      const dx = px - c.x, dz = pz - c.z;
+      const qx = Math.max(-c.halfW, Math.min(c.halfW, dx));
+      const qz = Math.max(-c.halfD, Math.min(c.halfD, dz));
+      let ox = dx - qx, oz = dz - qz, dist = Math.hypot(ox, oz);
+      if(dist < radius) {
+        if(dist < 0.0001) { ox = 1; oz = 0; dist = 1; }
+        const push = radius - dist;
+        px += (ox / dist) * push; pz += (oz / dist) * push;
+      }
+    }
+  }
+  return {x: px, z: pz};
+}
+function terrainHeight(x, z) { return Math.sin(x * .01) * 3 + Math.cos(z * .012) * 2.5; }
+ </script>
+ <script>
+function box(w, h, d, material, x, y, z) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+  m.position.set(x, y, z);
+  scene.add(m);
+  return m;
 }
 
-function buildMap(){
-  const groundGeo=new THREE.PlaneGeometry(MAP,MAP,32,32);
-  const ground=new THREE.Mesh(groundGeo,new THREE.MeshLambertMaterial({color:0x55aa33}));
-  ground.rotation.x=-Math.PI/2;scene.add(ground);
+function spawnLoot(x, z) {
+  const group = new THREE.Group();
+  const gem = new THREE.Mesh(new THREE.OctahedronGeometry(.8, 0), new THREE.MeshBasicMaterial({color: 0xffc342}));
+  gem.position.y = 1.0;
+  group.add(gem);
+  group.position.set(x, terrainHeight(x, z), z);
+  scene.add(group);
+  lootDrops.push({mesh: group, active: true});
+}
 
-  const colors=[0xff595e,0xffca3a,0x8ac926,0x1982c4,0x6a4c93];
-  for(let i=-2;i<=2;i++){
-    for(let j=-2;j<=2;j++){
-      const x=i*35,z=j*35,w=14,d=14,h=15+Math.random()*20;
-      const col=colors[Math.abs(i+j)%colors.length];
-      box(w,h,d,mat(col),x,h/2,z);
-      addBoxCollider(x,z,w+1,d+1);
-      spawnLoot(x+(Math.random()-.5)*10,z+(Math.random()-.5)*10);
+function buildMap() {
+  const groundGeo = new THREE.PlaneGeometry(MAP, MAP, 32, 32);
+  const ground = new THREE.Mesh(groundGeo, new THREE.MeshLambertMaterial({color: 0x55aa33}));
+  ground.rotation.x = -Math.PI / 2;
+  scene.add(ground);
+
+  const colors = [0xff595e, 0xffca3a, 0x8ac926, 0x1982c4, 0x6a4c93];
+  for(let i = -2; i <= 2; i++) {
+    for(let j = -2; j <= 2; j++) {
+      const x = i * 35, z = j * 35, w = 14, d = 14, h = 15 + Math.random() * 20;
+      const col = colors[Math.abs(i + j) % colors.length];
+      box(w, h, d, mat(col), x, h / 2, z);
+      addBoxCollider(x, z, w + 1, d + 1);
+      spawnLoot(x + (Math.random() - .5) * 10, z + (Math.random() - .5) * 10);
     }
   }
 }
 
-function buildBots(){
-  for(let i=0;i<8;i++){
-    const g=new THREE.Group();
-    const body=new THREE.Mesh(new THREE.BoxGeometry(.8,1.2,.4),mat(0xd90429));body.position.y=1.1;g.add(body);
-    const head=new THREE.Mesh(new THREE.BoxGeometry(.5,.5,.5),mat(0xffb703));head.position.y=1.9;g.add(head);
-    let x=(Math.random()-.5)*300,z=(Math.random()-.5)*300;
-    g.position.set(x,terrainHeight(x,z),z);scene.add(g);
-    bots.push({mesh:g,hp:100,phase:Math.random()*5});
+function buildBots() {
+  for(let i = 0; i < 8; i++) {
+    const g = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.BoxGeometry(.8, 1.2, .4), mat(0xd90429));
+    body.position.y = 1.1;
+    g.add(body);
+    const head = new THREE.Mesh(new THREE.BoxGeometry(.5, .5, .5), mat(0xffb703));
+    head.position.y = 1.9;
+    g.add(head);
+    let x = (Math.random() - .5) * 300, z = (Math.random() - .5) * 300;
+    g.position.set(x, terrainHeight(x, z), z);
+    scene.add(g);
+    bots.push({mesh: g, hp: 100, phase: Math.random() * 5});
   }
 }
 
-function createAirAvatar(){
-  if(airAvatar)scene.remove(airAvatar);
-  airAvatar=new THREE.Group();
-  const body=new THREE.Mesh(new THREE.BoxGeometry(1,1.2,.5),mat(0x3a86ff));body.position.y=1.5;airAvatar.add(body);
-  const head=new THREE.Mesh(new THREE.BoxGeometry(.5,.5,.5),mat(0xffb703));head.position.y=2.3;airAvatar.add(head);
-  scene.add(airAvatar);
-}
-
-function placeOrbitCamera(distance,targetHeight){
-  const pitch=Math.max(-1.05,Math.min(1.05,player.pitch));
-  const cp=Math.cos(pitch),sp=Math.sin(pitch);
-  const sy=Math.sin(player.yaw),cy=Math.cos(player.yaw);
-  const tx=player.x,ty=player.y+targetHeight,tz=player.z;
-  camera.up.set(0,1,0);
-  camera.position.set(tx+sy*cp*distance,ty-sp*distance,tz+cy*cp*distance);
-  camera.lookAt(tx,ty,tz);
-}
-
-function init(){
-  scene=new THREE.Scene();scene.background=new THREE.Color(0x38b6ff);
-  camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,1000);scene.add(camera);
-  renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:'high-performance'});
-  renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.25));renderer.setSize(innerWidth,innerHeight);
-  $('game').appendChild(renderer.domElement);clock=new THREE.Clock();
-
-  scene.add(new THREE.AmbientLight(0xffffff,0.9));
-  const sun=new THREE.DirectionalLight(0xffffff,0.8);sun.position.set(100,200,100);scene.add(sun);
-
-  buildMap();
-  buildBots();
-  createAirAvatar();
-
-  const pts=[new THREE.Vector3(FLIGHT_START.x,120,FLIGHT_START.z),new THREE.Vector3(FLIGHT_END.x,120,FLIGHT_END.z)];
-  flightPath=new THREE.Line(pts,new THREE.LineBasicMaterial({color:0xff9100,linewidth:5}));
-  scene.add(flightPath);
-  airplane=new THREE.Mesh(new THREE.BoxGeometry(3,2,10),mat(0xffb703));
-  airplane.position.set(FLIGHT_START.x,120,FLIGHT_START.z);scene.add(airplane);
-
-  setupControls();
-  window.addEventListener('resize',()=> {
-    camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);
-  });
-  animate();
-}
-
-function setupControls(){
-  $('startMatch').onclick=()=>{
-    $('lobby').style.display='none';$('topbar').style.display='flex';
-    $('crosshair').style.display='block';$('bagButton').style.display='block';
-    $('matchInfo').style.display='flex';$('action').style.display='flex';
-    state='plane';
-  };
-  $('mapButton').onclick=()=>{ mapOpen=true;$('mapPanel').style.display='block'; };
-  $('mapClose').onclick=()=>{ mapOpen=false;$('mapPanel').style.display='none'; };
-
-  $('action').onclick=()=>{
-          
+function createAirAvatar() {
+  if(airAvatar) scene.remove
+ 
