@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tactical Ops - Deserto 3D</title>
+    <title>Tactical Ops - Aim Assist FF Style</title>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: none; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #c2b280; font-family: sans-serif; color: #fff; }
@@ -12,10 +12,16 @@
         #hud { position: absolute; top: 0; left: 0; width: 100%; z-index: 5; pointer-events: none; display: flex; justify-content: space-between; padding: 15px; }
         .panel { background: rgba(50, 40, 30, 0.85); border: 2px solid #e0a96d; padding: 10px 15px; border-radius: 6px; font-size: 14px; font-weight: bold; color: #ffdfba; }
 
-        #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20px; height: 20px; z-index: 4; pointer-events: none; }
-        #crosshair::before, #crosshair::after { content: ''; position: absolute; background: #ffdfba; }
-        #crosshair::before { top: 9px; left: 0; width: 20px; height: 2px; }
-        #crosshair::after { top: 0; left: 9px; width: 2px; height: 20px; }
+        /* Crosshair dinâmica (Muda de cor para Vermelho igual ao Free Fire) */
+        #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 22px; height: 22px; z-index: 4; pointer-events: none; transition: transform 0.1s; }
+        .cross-line { position: absolute; background: #ffdfba; box-shadow: 0 0 4px rgba(0,0,0,0.8); }
+        #c-top { top: 0; left: 10px; width: 2px; height: 9px; }
+        #c-bottom { bottom: 0; left: 10px; width: 2px; height: 9px; }
+        #c-left { top: 10px; left: 0; width: 9px; height: 2px; }
+        #c-right { top: 10px; right: 0; width: 9px; height: 2px; }
+        
+        /* Estado Vermelho Alinhado */
+        #crosshair.locked .cross-line { background: #ff2222; box-shadow: 0 0 8px #ff2222; }
 
         #controls { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
         .zone-left { position: absolute; bottom: 0; left: 0; width: 50%; height: 100%; pointer-events: auto; }
@@ -24,7 +30,9 @@
         #joystick { position: absolute; bottom: 40px; left: 40px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border: 2px solid #e0a96d; border-radius: 50%; display: none; }
         #stick { position: absolute; top: 25px; left: 25px; width: 50px; height: 50px; background: #e0a96d; border-radius: 50%; }
 
-        #btn-fire { position: absolute; bottom: 40px; right: 40px; width: 80px; height: 80px; background: rgba(224, 169, 109, 0.3); border: 3px solid #e0a96d; border-radius: 50%; color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; pointer-events: auto; font-size: 14px; }
+        .btn-action { position: absolute; bottom: 40px; width: 75px; height: 75px; border-radius: 50%; color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; pointer-events: auto; font-size: 13px; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+        #btn-fire { right: 30px; background: rgba(255, 50, 50, 0.4); border: 3px solid #ff3333; }
+        #btn-ads { right: 120px; bottom: 50px; width: 60px; height: 60px; background: rgba(224, 169, 109, 0.4); border: 2px solid #e0a96d; font-size: 11px; }
 
         #menu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #2c221e; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         h1 { color: #e0a96d; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
@@ -35,7 +43,12 @@
 <body>
 
     <div id="canvas-container"></div>
-    <div id="crosshair"></div>
+    <div id="crosshair">
+        <div id="c-top" class="cross-line"></div>
+        <div id="c-bottom" class="cross-line"></div>
+        <div id="c-left" class="cross-line"></div>
+        <div id="c-right" class="cross-line"></div>
+    </div>
 
     <div id="hud">
         <div class="panel">HP: <span id="hp">100</span></div>
@@ -48,20 +61,22 @@
         </div>
         <div id="zone-right" class="zone-right">
             <div id="btn-fire">ATIRAR</div>
+            <div id="btn-ads">MIRA</div>
         </div>
     </div>
 
     <div id="menu">
-        <h1>Tactical Desert Arena</h1>
+        <h1>Tactical Desert - Aim Assist FF</h1>
         <button class="btn-play" id="play-btn">Jogar Agora</button>
     </div>
 
     <script>
         let scene, camera, renderer;
-        let player = { x: 0, y: 1.7, z: 15, rx: 0, ry: 0, hp: 100, kills: 0 };
+        let player = { x: 0, y: 1.7, z: 15, rx: 0, ry: 0, hp: 100, kills: 0, isADS: false };
         let bots = [];
         let moveDir = { x: 0, z: 0 };
         let running = false;
+        let lockedTarget = null;
 
         document.getElementById('play-btn').addEventListener('click', start);
         document.getElementById('play-btn').addEventListener('touchstart', start);
@@ -71,7 +86,6 @@
             document.getElementById('menu').style.display = 'none';
             
             scene = new THREE.Scene();
-            // Cor de fundo do céu estilo deserto claro/claro-amarelado
             scene.background = new THREE.Color(0xd4bc8e);
             scene.fog = new THREE.FogExp2(0xd4bc8e, 0.015);
 
@@ -81,13 +95,11 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-            // Luz solar quente e forte (estilo mapa deserto)
             scene.add(new THREE.AmbientLight(0xffeedd, 0.7));
             let sun = new THREE.DirectionalLight(0xfffaed, 0.9);
             sun.position.set(30, 50, 30);
             scene.add(sun);
 
-            // Chão textura tom de areia/terra batida
             let floor = new THREE.Mesh(
                 new THREE.PlaneGeometry(90, 90),
                 new THREE.MeshStandardMaterial({ color: 0xc2a66b, roughness: 0.9 })
@@ -95,21 +107,15 @@
             floor.rotation.x = -Math.PI / 2;
             scene.add(floor);
 
-            // Muros / Construções em tons de argila/adobe (estilo Dust)
+            // Muros estilo Dust
             let wallMat = new THREE.MeshStandardMaterial({ color: 0xd6b885, roughness: 0.8 });
-            let wallPositions = [
-                {x: 0, z: -15, w: 20, h: 8, d: 3},
-                {x: -15, z: 0, w: 3, h: 8, d: 20},
-                {x: 15, z: 0, w: 3, h: 8, d: 20},
-                {x: -8, z: -8, w: 6, h: 6, d: 6}
-            ];
-            wallPositions.forEach(wp => {
+            [{x: 0, z: -15, w: 20, h: 8, d: 3}, {x: -15, z: 0, w: 3, h: 8, d: 20}, {x: 15, z: 0, w: 3, h: 8, d: 20}].forEach(wp => {
                 let wall = new THREE.Mesh(new THREE.BoxGeometry(wp.w, wp.h, wp.d), wallMat);
                 wall.position.set(wp.x, wp.h / 2, wp.z);
                 scene.add(wall);
             });
 
-            // Bots Inimigos (com o visual tático e cores combinando com o cenário)
+            // Bots Inimigos
             for(let i=0; i<4; i++) {
                 let group = new THREE.Group();
                 let body = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.4, 0.5), new THREE.MeshStandardMaterial({ color: 0x544333 }));
@@ -145,8 +151,15 @@
                 for(let i=0; i<e.changedTouches.length; i++) {
                     let t = e.changedTouches[i];
                     if(t.identifier === tId) {
-                        player.ry -= (t.clientX - lx) * 0.003;
-                        player.rx -= (t.clientY - ly) * 0.003;
+                        let dx = t.clientX - lx;
+                        let dy = t.clientY - ly;
+                        
+                        // Aim Slowdown (Reduz sensibilidade levemente quando o alvo está travado/vermelho)
+                        let sensitivity = (player.isADS ? 0.0015 : 0.003);
+                        if(lockedTarget) sensitivity *= 0.5; // Slowdown magnético característico do Free Fire
+
+                        player.ry -= dx * sensitivity;
+                        player.rx -= dy * sensitivity;
                         player.rx = Math.max(-1.2, Math.min(1.2, player.rx));
                         lx = t.clientX; ly = t.clientY;
                     }
@@ -158,6 +171,16 @@
                 }
             });
 
+            // Botão ADS (Mira)
+            document.getElementById('btn-ads').addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                player.isADS = !player.isADS;
+                camera.fov = player.isADS ? 45 : 75;
+                camera.updateProjectionMatrix();
+                document.getElementById('btn-ads.style.borderColor') = player.isADS ? '#ff3333' : '#e0a96d';
+            });
+
+            // Joystick esquerdo
             let lZone = document.getElementById('zone-left');
             let jBase = document.getElementById('joystick');
             let jStick = document.getElementById('stick');
@@ -196,6 +219,7 @@
                 }
             });
 
+            // Botão Atirar
             document.getElementById('btn-fire').addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 let raycaster = new THREE.Raycaster();
@@ -229,9 +253,69 @@
             });
         }
 
+        function updateAimAssist() {
+            let closestBot = null;
+            let minScreenDist = 999;
+            let crosshairCenter = new THREE.Vector2(0, 0);
+
+            // 1. Rastreamento e Priorização de Inimigos (Target Tracking)
+            bots.forEach(b => {
+                let botPos = b.mesh.position.clone();
+                botPos.y += 0.8; // Altura do peito/cabeça
+                
+                // Projeta a posição 3D do bot para a tela 2D
+                let screenPos = botPos.clone().project(camera);
+                
+                // Verifica se está na frente da câmera e dentro do campo de visão
+                if(screenPos.z < 1) {
+                    let dist = new THREE.Vector2(screenPos.x, screenPos.y).distanceTo(crosshairCenter);
+                    // Raio de detecção magnética da assistência
+                    let detectionRadius = player.isADS ? 0.35 : 0.20; 
+
+                    if(dist < detectionRadius && dist < minScreenDist) {
+                        minScreenDist = dist;
+                        closestBot = b;
+                    }
+                }
+            });
+
+            const crosshairEl = document.getElementById('crosshair');
+
+            if(closestBot) {
+                lockedTarget = closestBot;
+                crosshairEl.classList.add('locked'); // Muda a cor da mira para VERMELHO (Estilo Free Fire)
+
+                // 2. Mira Magnética (Aim Magnetism / Atração Suave)
+                let targetWorldPos = closestBot.mesh.position.clone();
+                targetWorldPos.y += 0.8;
+
+                // Cria uma matriz temporária para guiar a rotação suavemente até o alvo
+                let currentDir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+                let targetDir = targetWorldPos.clone().sub(camera.position).normalize();
+
+                // Fator de suavização magnética (quanto menor, mais suave)
+                let magnetismStrength = player.isADS ? 0.12 : 0.06;
+                currentDir.lerp(targetDir, magnetismStrength);
+
+                // Atualiza os ângulos da câmera gradualmente em direção ao inimigo
+                let targetRotY = Math.atan2(-currentDir.x, -currentDir.z);
+                let targetRotX = Math.asin(currentDir.y);
+
+                player.ry = player.ry * 0.9 + targetRotY * 0.1;
+                player.rx = player.rx * 0.9 + targetRotX * 0.1;
+
+            } else {
+                lockedTarget = null;
+                crosshairEl.classList.remove('locked'); // Retorna a cor original da mira
+            }
+        }
+
         function animate() {
             if(!running) return;
             requestAnimationFrame(animate);
+
+            // Atualiza a assistência de mira inteligente a cada frame
+            updateAimAssist();
 
             let cos = Math.cos(player.ry), sin = Math.sin(player.ry);
             player.x += (sin * moveDir.z + cos * moveDir.x) * 0.12;
