@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tactical Ops - Direto ao Ponto</title>
+    <title>Tactical Ops - Deserto 3D</title>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: none; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #111; font-family: sans-serif; color: #fff; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #c2b280; font-family: sans-serif; color: #fff; }
         #canvas-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
         
         #hud { position: absolute; top: 0; left: 0; width: 100%; z-index: 5; pointer-events: none; display: flex; justify-content: space-between; padding: 15px; }
-        .panel { background: rgba(0,0,0,0.8); border: 2px solid #00ff66; padding: 10px 15px; border-radius: 6px; font-size: 14px; font-weight: bold; }
+        .panel { background: rgba(50, 40, 30, 0.85); border: 2px solid #e0a96d; padding: 10px 15px; border-radius: 6px; font-size: 14px; font-weight: bold; color: #ffdfba; }
 
         #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20px; height: 20px; z-index: 4; pointer-events: none; }
-        #crosshair::before, #crosshair::after { content: ''; position: absolute; background: #00ff66; }
+        #crosshair::before, #crosshair::after { content: ''; position: absolute; background: #ffdfba; }
         #crosshair::before { top: 9px; left: 0; width: 20px; height: 2px; }
         #crosshair::after { top: 0; left: 9px; width: 2px; height: 20px; }
 
@@ -21,14 +21,14 @@
         .zone-left { position: absolute; bottom: 0; left: 0; width: 50%; height: 100%; pointer-events: auto; }
         .zone-right { position: absolute; bottom: 0; right: 0; width: 50%; height: 100%; pointer-events: auto; }
 
-        #joystick { position: absolute; bottom: 40px; left: 40px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border: 2px solid #00ff66; border-radius: 50%; display: none; }
-        #stick { position: absolute; top: 25px; left: 25px; width: 50px; height: 50px; background: #00ff66; border-radius: 50%; }
+        #joystick { position: absolute; bottom: 40px; left: 40px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border: 2px solid #e0a96d; border-radius: 50%; display: none; }
+        #stick { position: absolute; top: 25px; left: 25px; width: 50px; height: 50px; background: #e0a96d; border-radius: 50%; }
 
-        #btn-fire { position: absolute; bottom: 40px; right: 40px; width: 80px; height: 80px; background: rgba(0,255,102,0.3); border: 3px solid #00ff66; border-radius: 50%; color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; pointer-events: auto; font-size: 14px; }
+        #btn-fire { position: absolute; bottom: 40px; right: 40px; width: 80px; height: 80px; background: rgba(224, 169, 109, 0.3); border: 3px solid #e0a96d; border-radius: 50%; color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; pointer-events: auto; font-size: 14px; }
 
-        #menu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #070a10; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        h1 { color: #00ff66; margin-bottom: 20px; text-transform: uppercase; }
-        .btn-play { background: #00ff66; color: #000; border: none; padding: 15px 40px; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
+        #menu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #2c221e; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        h1 { color: #e0a96d; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
+        .btn-play { background: #e0a96d; color: #2c221e; border: none; padding: 15px 40px; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -52,7 +52,7 @@
     </div>
 
     <div id="menu">
-        <h1>Tactical Ops 3D</h1>
+        <h1>Tactical Desert Arena</h1>
         <button class="btn-play" id="play-btn">Jogar Agora</button>
     </div>
 
@@ -70,9 +70,10 @@
             e.preventDefault();
             document.getElementById('menu').style.display = 'none';
             
-            // Inicializa o 3D diretamente
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x0b0f19);
+            // Cor de fundo do céu estilo deserto claro/claro-amarelado
+            scene.background = new THREE.Color(0xd4bc8e);
+            scene.fog = new THREE.FogExp2(0xd4bc8e, 0.015);
 
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
@@ -80,32 +81,46 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-            // Luzes
-            scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-            let light = new THREE.DirectionalLight(0xffffff, 0.8);
-            light.position.set(10, 20, 10);
-            scene.add(light);
+            // Luz solar quente e forte (estilo mapa deserto)
+            scene.add(new THREE.AmbientLight(0xffeedd, 0.7));
+            let sun = new THREE.DirectionalLight(0xfffaed, 0.9);
+            sun.position.set(30, 50, 30);
+            scene.add(sun);
 
-            // Chão
+            // Chão textura tom de areia/terra batida
             let floor = new THREE.Mesh(
-                new THREE.PlaneGeometry(80, 80),
-                new THREE.MeshStandardMaterial({ color: 0x1a2233 })
+                new THREE.PlaneGeometry(90, 90),
+                new THREE.MeshStandardMaterial({ color: 0xc2a66b, roughness: 0.9 })
             );
             floor.rotation.x = -Math.PI / 2;
             scene.add(floor);
 
-            // Criar Bots (Visual Tático com Capuz/Casaco Escuro e Visor Neon Vermelho)
+            // Muros / Construções em tons de argila/adobe (estilo Dust)
+            let wallMat = new THREE.MeshStandardMaterial({ color: 0xd6b885, roughness: 0.8 });
+            let wallPositions = [
+                {x: 0, z: -15, w: 20, h: 8, d: 3},
+                {x: -15, z: 0, w: 3, h: 8, d: 20},
+                {x: 15, z: 0, w: 3, h: 8, d: 20},
+                {x: -8, z: -8, w: 6, h: 6, d: 6}
+            ];
+            wallPositions.forEach(wp => {
+                let wall = new THREE.Mesh(new THREE.BoxGeometry(wp.w, wp.h, wp.d), wallMat);
+                wall.position.set(wp.x, wp.h / 2, wp.z);
+                scene.add(wall);
+            });
+
+            // Bots Inimigos (com o visual tático e cores combinando com o cenário)
             for(let i=0; i<4; i++) {
                 let group = new THREE.Group();
-                let body = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.4, 0.5), new THREE.MeshStandardMaterial({ color: 0x1c2538 }));
+                let body = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.4, 0.5), new THREE.MeshStandardMaterial({ color: 0x544333 }));
                 body.position.y = 0.7;
                 group.add(body);
 
-                let visor = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.1, 0.1), new THREE.MeshBasicMaterial({ color: 0xff3344 }));
+                let visor = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.1, 0.1), new THREE.MeshBasicMaterial({ color: 0xffaa00 }));
                 visor.position.set(0, 1.4, 0.26);
                 group.add(visor);
 
-                group.position.set((Math.random() - 0.5) * 30, 0, -10 - Math.random() * 20);
+                group.position.set((Math.random() - 0.5) * 30, 0, -12 - Math.random() * 20);
                 scene.add(group);
                 bots.push({ mesh: group, hp: 100 });
             }
@@ -116,7 +131,6 @@
         }
 
         function setupControls() {
-            // Câmera (Lado Direito)
             let rZone = document.getElementById('zone-right');
             let tId = null, lx = 0, ly = 0;
 
@@ -144,7 +158,6 @@
                 }
             });
 
-            // Joystick (Lado Esquerdo)
             let lZone = document.getElementById('zone-left');
             let jBase = document.getElementById('joystick');
             let jStick = document.getElementById('stick');
@@ -183,7 +196,6 @@
                 }
             });
 
-            // Botão Atirar
             document.getElementById('btn-fire').addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 let raycaster = new THREE.Raycaster();
@@ -199,16 +211,15 @@
                             player.kills++;
                             document.getElementById('kills').innerText = player.kills;
 
-                            // Respawn automático do bot
                             setTimeout(() => {
                                 let g = new THREE.Group();
-                                let bMesh = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.4, 0.5), new THREE.MeshStandardMaterial({ color: 0x1c2538 }));
+                                let bMesh = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.4, 0.5), new THREE.MeshStandardMaterial({ color: 0x544333 }));
                                 bMesh.position.y = 0.7;
                                 g.add(bMesh);
-                                let vMesh = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.1, 0.1), new THREE.MeshBasicMaterial({ color: 0xff3344 }));
+                                let vMesh = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.1, 0.1), new THREE.MeshBasicMaterial({ color: 0xffaa00 }));
                                 vMesh.position.set(0, 1.4, 0.26);
                                 g.add(vMesh);
-                                g.position.set((Math.random() - 0.5) * 30, 0, -10 - Math.random() * 20);
+                                g.position.set((Math.random() - 0.5) * 30, 0, -12 - Math.random() * 20);
                                 scene.add(g);
                                 bots.push({ mesh: g, hp: 100 });
                             }, 2000);
@@ -222,7 +233,6 @@
             if(!running) return;
             requestAnimationFrame(animate);
 
-            // Movimentação fluida baseada no joystick
             let cos = Math.cos(player.ry), sin = Math.sin(player.ry);
             player.x += (sin * moveDir.z + cos * moveDir.x) * 0.12;
             player.z += (cos * moveDir.z - sin * moveDir.x) * 0.12;
@@ -232,7 +242,6 @@
             camera.rotation.y = player.ry;
             camera.rotation.x = player.rx;
 
-            // IA dos bots caminhando para cima do jogador
             bots.forEach(b => {
                 b.mesh.lookAt(camera.position.x, b.mesh.position.y, camera.position.z);
                 b.mesh.translateZ(0.035);
