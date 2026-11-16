@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tactical Desert - Skydiving Battle Royale</title>
+    <title>Tactical Desert - Skydiving</title>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: none; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #c2b280; font-family: sans-serif; color: #fff; }
@@ -13,9 +13,9 @@
         #hud { position: absolute; top: 0; left: 0; width: 100%; z-index: 5; pointer-events: none; display: none; justify-content: space-between; padding: 15px; }
         .panel { background: rgba(45, 35, 25, 0.85); border: 2px solid #ff6600; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: bold; color: #ffdfba; }
 
-        /* HUD Específico do Salto (Avião / Queda / Paraquedas) */
+        /* HUD do Salto */
         #skydive-hud { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 8; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 25px; }
-        .skydive-info { background: rgba(0,0,0,0.6); border: 1px solid #ff6600; padding: 10px 18px; border-radius: 8px; font-size: 15px; font-weight: bold; text-align: center; width: 220px; margin: 0 auto; color: #fff; }
+        .skydive-info { background: rgba(0,0,0,0.75); border: 2px solid #ff6600; padding: 10px 18px; border-radius: 8px; font-size: 15px; font-weight: bold; text-align: center; width: 240px; margin: 0 auto; color: #fff; }
         
         /* Mira Estilo FF */
         #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 22px; height: 22px; z-index: 4; pointer-events: none; display: none; }
@@ -35,7 +35,7 @@
         #stick { position: absolute; top: 25px; left: 25px; width: 50px; height: 50px; background: #ff6600; border-radius: 50%; }
 
         .btn-action { position: absolute; border-radius: 50%; color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; pointer-events: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.4); text-transform: uppercase; }
-        #btn-jump { right: 40px; bottom: 40px; width: 95px; height: 95px; background: rgba(255, 130, 0, 0.7); border: 4px solid #ffaa00; font-size: 16px; z-index: 12; }
+        #btn-jump { right: 40px; bottom: 40px; width: 95px; height: 95px; background: rgba(255, 130, 0, 0.85); border: 4px solid #ffaa00; font-size: 16px; z-index: 12; }
         #btn-fire { right: 30px; bottom: 35px; width: 78px; height: 78px; background: rgba(255, 50, 50, 0.5); border: 3px solid #ff3333; font-size: 13px; display: none; }
         #btn-ads { right: 120px; bottom: 45px; width: 58px; height: 58px; background: rgba(255, 102, 0, 0.45); border: 2px solid #ff6600; font-size: 11px; display: none; }
     </style>
@@ -52,17 +52,17 @@
         <div id="c-right" class="cross-line"></div>
     </div>
 
-    <!-- HUD em Jogo (Tiro) -->
-    <div id="hud" style="display:none;">
+    <!-- HUD em Jogo -->
+    <div id="hud">
         <div class="panel">HP: <span id="hp">100</span></div>
         <div class="panel">ABATES: <span id="kills">0</span></div>
     </div>
 
-    <!-- HUD do Salto de Paraquedas -->
+    <!-- HUD do Salto -->
     <div id="skydive-hud">
-        <div class="skydive-info" id="altitude-display">ALTITUDE: 500m</div>
+        <div class="skydive-info" id="altitude-display">ALTITUDE: 120m</div>
         <div style="text-align: center; width: 100%;">
-            <div id="speed-display" style="font-size: 14px; color: #ffaa00; font-weight: bold; margin-bottom: 10px;">VELOCIDADE: 180 km/h</div>
+            <div id="speed-display" style="font-size: 15px; color: #ffffff; font-weight: bold; background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 6px; display: inline-block; text-shadow: 1px 1px 2px #000;">VELOCIDADE: 190 km/h</div>
         </div>
     </div>
 
@@ -85,22 +85,18 @@
         let playerArms, weaponMesh;
         let walkTime = 0;
 
-        // Estados do Battle Royale (0: No Avião, 1: Queda Livre, 2: De Paraquedas, 3: Combate em Solo)
+        // Estados: 0 = Pronto para Saltar | 1 = Queda Livre | 2 = Paraquedas | 3 = Combate Solo
         let gameState = 0; 
         
-        // Dados do Jogador no Salto
-        let skydivePlayer = {
-            x: 0, y: 150, z: 0,
-            speedY: 0,
-            horizontalSpeed: 0.6,
+        let player = {
+            x: 0, y: 120, z: 0,
+            horizontalSpeed: 0.5,
             rotY: 0,
+            rx: 0,
             hp: 100,
             kills: 0,
             isADS: false
         };
-
-        // Avião de Transporte
-        let transportPlane;
 
         window.addEventListener('DOMContentLoaded', () => {
             try {
@@ -113,7 +109,6 @@
         function initGame() {
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0xd4bc8e);
-            scene.fog = new THREE.FogExp2(0xd4bc8e, 0.012);
 
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             scene.add(camera);
@@ -122,9 +117,177 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             
-            const container = document.getElementById('canvas-container');
-            container.appendChild(renderer.domElement);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
 
             // Luzes
-            scene.add(new THREE.AmbientLight(0xffeedd, 0.8));
-            
+            scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+            let sun = new THREE.DirectionalLight(0xffffff, 0.9);
+            sun.position.set(20, 40, 20);
+            scene.add(sun);
+
+            // Chão de areia
+            let floor = new THREE.Mesh(
+                new THREE.PlaneGeometry(200, 200),
+                new THREE.MeshBasicMaterial({ color: 0xc2a66b })
+            );
+            floor.rotation.x = -Math.PI / 2;
+            scene.add(floor);
+
+            // Muros e estruturas no mapa
+            let wallMat = new THREE.MeshBasicMaterial({ color: 0xd6b885 });
+            for (let i = -60; i <= 60; i += 30) {
+                let wall = new THREE.Mesh(new THREE.BoxGeometry(20, 6, 2), wallMat);
+                wall.position.set(i, 3, i);
+                scene.add(wall);
+            }
+
+            // Inimigos Baraka no solo
+            for (let i = 0; i < 5; i++) {
+                spawnBarakaBot();
+            }
+
+            setupControls();
+            window.addEventListener('resize', onResize);
+            animate();
+        }
+
+        function spawnBarakaBot() {
+            let group = new THREE.Group();
+            const skinMat = new THREE.MeshBasicMaterial({ color: 0xc2b59b });
+            const vestMat = new THREE.MeshBasicMaterial({ color: 0x1e1e24 });
+            const bladeMat = new THREE.MeshBasicMaterial({ color: 0xd9e2ec });
+
+            let body = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.3, 0.4), skinMat);
+            body.position.y = 0.65;
+            group.add(body);
+
+            [-1, 1].forEach(side => {
+                let blade = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.1, 0.7), bladeMat);
+                blade.position.set(side * 0.45, 1.0, 0.5);
+                group.add(blade);
+            });
+
+            group.position.set((Math.random() - 0.5) * 80, 0, (Math.random() - 0.5) * 80);
+            scene.add(group);
+            bots.push({ mesh: group, hp: 100 });
+        }
+
+        function setupControls() {
+            let rZone = document.getElementById('zone-right');
+            let tId = null, lx = 0, ly = 0;
+
+            rZone.addEventListener('touchstart', e => {
+                if (tId === null) {
+                    let t = e.changedTouches[0];
+                    tId = t.identifier;
+                    lx = t.clientX; ly = t.clientY;
+                }
+            });
+
+            rZone.addEventListener('touchmove', e => {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    let t = e.changedTouches[i];
+                    if (t.identifier === tId) {
+                        let dx = t.clientX - lx;
+                        let dy = t.clientY - ly;
+                        
+                        if (gameState === 3) {
+                            let sens = player.isADS ? 0.0016 : 0.0032;
+                            if (lockedTarget) sens *= 0.55;
+                            player.rotY -= dx * sens;
+                            player.rx -= dy * sens;
+                            player.rx = Math.max(-1.2, Math.min(1.2, player.rx));
+                        } else {
+                            player.rotY -= dx * 0.004;
+                        }
+                        lx = t.clientX; ly = t.clientY;
+                    }
+                }
+            });
+
+            rZone.addEventListener('touchend', e => {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === tId) tId = null;
+                }
+            });
+
+            // Botão SALTAR / ABRIR PARAQUEDAS
+            const jumpBtn = document.getElementById('btn-jump');
+            jumpBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (gameState === 0) {
+                    gameState = 1; // Queda livre
+                    jumpBtn.innerText = "ABRIR";
+                } else if (gameState === 1) {
+                    gameState = 2; // Paraquedas manual
+                    jumpBtn.style.display = 'none';
+                }
+            });
+
+            const adsBtn = document.getElementById('btn-ads');
+            adsBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (gameState === 3) {
+                    player.isADS = !player.isADS;
+                    camera.fov = player.isADS ? 48 : 75;
+                    camera.updateProjectionMatrix();
+                    adsBtn.style.borderColor = player.isADS ? '#ff3333' : '#ff6600';
+                }
+            });
+
+            let lZone = document.getElementById('zone-left');
+            let jBase = document.getElementById('joystick');
+            let jStick = document.getElementById('stick');
+            let mId = null, cx = 0, cy = 0;
+
+            lZone.addEventListener('touchstart', e => {
+                if (mId === null) {
+                    let t = e.changedTouches[0];
+                    mId = t.identifier;
+                    cx = t.clientX; cy = t.clientY;
+                    jBase.style.display = 'block';
+                    jBase.style.left = (cx - 50) + 'px';
+                    jBase.style.top = (cy - 50) + 'px';
+                    jStick.style.transform = `translate(0px, 0px)`;
+                }
+            });
+
+            lZone.addEventListener('touchmove', e => {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    let t = e.changedTouches[i];
+                    if (t.identifier === mId) {
+                        let dx = t.clientX - cx, dy = t.clientY - cy;
+                        let dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist > 35) { dx = (dx / dist) * 35; dy = (dy / dist) * 35; }
+                        jStick.style.transform = `translate(${dx}px, ${dy}px)`;
+                        moveDir.x = dx / 35; moveDir.z = dy / 35;
+                    }
+                }
+            });
+
+            lZone.addEventListener('touchend', e => {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === mId) {
+                        mId = null;
+                        jBase.style.display = 'none';
+                        moveDir.x = 0; moveDir.z = 0;
+                    }
+                }
+            });
+
+            document.getElementById('btn-fire').addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (gameState !== 3) return;
+                
+                if (playerArms) {
+                    playerArms.position.z = 0.07;
+                    setTimeout(() => { if (playerArms) playerArms.position.z = 0; }, 75);
+                }
+
+                let raycaster = new THREE.Raycaster();
+                raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+                let hits = raycaster.intersectObjects(bots.map(b => b.mesh), true);
+                
+                if (hits.length > 0) {
+                    let target = bots
+        
