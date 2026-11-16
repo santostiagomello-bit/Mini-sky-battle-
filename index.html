@@ -6,14 +6,14 @@
     <title>Tactical Desert - Shinobi vs Baraka</title>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: none; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #d4bc8e; font-family: sans-serif; color: #fff; }
-        #canvas-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #c2b280; font-family: sans-serif; color: #fff; }
+        #canvas-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; display: block; }
         
         /* HUD Superior */
         #hud { position: absolute; top: 0; left: 0; width: 100%; z-index: 5; pointer-events: none; display: flex; justify-content: space-between; padding: 15px; }
         .panel { background: rgba(45, 35, 25, 0.85); border: 2px solid #ff6600; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: bold; color: #ffdfba; }
 
-        /* Mira Dinâmica (Fica vermelha no alvo) */
+        /* Mira Dinâmica */
         #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 22px; height: 22px; z-index: 4; pointer-events: none; }
         .cross-line { position: absolute; background: #ffffff; box-shadow: 0 0 4px rgba(0,0,0,0.9); transition: background 0.1s; }
         #c-top { top: 0; left: 10px; width: 2px; height: 8px; }
@@ -71,51 +71,45 @@
         let playerArms, weaponMesh;
         let walkTime = 0;
 
-        window.onload = function() {
-            if (typeof THREE === 'undefined') {
-                alert('Erro ao carregar motor 3D. Verifique sua conexão.');
-                return;
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                initGame();
+            } catch (err) {
+                console.error("Erro ao iniciar jogo:", err);
             }
-            initGame();
-        };
+        });
 
         function initGame() {
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0xd4bc8e);
-            scene.fog = new THREE.FogExp2(0xd4bc8e, 0.015);
 
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             scene.add(camera);
 
-            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            document.getElementById('canvas-container').appendChild(renderer.domElement);
+            
+            const container = document.getElementById('canvas-container');
+            container.appendChild(renderer.domElement);
 
-            // Luzes Deserto
-            scene.add(new THREE.AmbientLight(0xffeedd, 0.75));
-            let sun = new THREE.DirectionalLight(0xfffaed, 0.9);
-            sun.position.set(30, 50, 30);
+            // Luzes básicas garantidas
+            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+            let sun = new THREE.DirectionalLight(0xffffff, 0.9);
+            sun.position.set(10, 30, 10);
             scene.add(sun);
 
             // Chão
             let floor = new THREE.Mesh(
-                new THREE.PlaneGeometry(100, 100),
-                new THREE.MeshStandardMaterial({ color: 0xc2a66b, roughness: 0.9 })
+                new THREE.PlaneGeometry(80, 80),
+                new THREE.MeshBasicMaterial({ color: 0xc2a66b })
             );
             floor.rotation.x = -Math.PI / 2;
             scene.add(floor);
 
-            // Muros estilo Dust
-            let wallMat = new THREE.MeshStandardMaterial({ color: 0xd6b885, roughness: 0.8 });
-            let walls = [
-                {x: 0, z: -20, w: 26, h: 8, d: 3},
-                {x: -18, z: 0, w: 3, h: 8, d: 26},
-                {x: 18, z: 0, w: 3, h: 8, d: 26},
-                {x: -8, z: -6, w: 5, h: 5, d: 5},
-                {x: 8, z: -10, w: 5, h: 6, d: 5}
-            ];
-            walls.forEach(wp => {
+            // Muros simples
+            let wallMat = new THREE.MeshBasicMaterial({ color: 0xd6b885 });
+            [{x: 0, z: -15, w: 20, h: 6, d: 2}, {x: -12, z: 0, w: 2, h: 6, d: 20}, {x: 12, z: 0, w: 2, h: 6, d: 20}].forEach(wp => {
                 let wall = new THREE.Mesh(new THREE.BoxGeometry(wp.w, wp.h, wp.d), wallMat);
                 wall.position.set(wp.x, wp.h / 2, wp.z);
                 scene.add(wall);
@@ -124,7 +118,7 @@
             initFirstPersonArms();
 
             for (let i = 0; i < 4; i++) {
-                spawnBarakaBot();
+                spawnBot();
             }
 
             setupControls();
@@ -136,115 +130,42 @@
             playerArms = new THREE.Group();
             camera.add(playerArms);
 
-            const sleeveMat = new THREE.MeshStandardMaterial({ color: 0xff5500, roughness: 0.5 });
-            const cuffMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.6 });
-            const weaponMat = new THREE.MeshStandardMaterial({ color: 0x2b2b2b, metalness: 0.7, roughness: 0.3 });
+            const sleeveMat = new THREE.MeshBasicMaterial({ color: 0xff5500 });
+            const weaponMat = new THREE.MeshBasicMaterial({ color: 0x2b2b2b });
 
-            const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.055, 0.65, 8), sleeveMat);
+            const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.055, 0.65, 6), sleeveMat);
             leftArm.rotation.set(Math.PI / 3, 0, Math.PI / 4);
             leftArm.position.set(-0.22, -0.28, -0.38);
             playerArms.add(leftArm);
 
-            const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.055, 0.65, 8), sleeveMat);
+            const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.055, 0.65, 6), sleeveMat);
             rightArm.rotation.set(Math.PI / 3, 0, -Math.PI / 5);
             rightArm.position.set(0.24, -0.32, -0.32);
             playerArms.add(rightArm);
 
-            const rightCuff = new THREE.Mesh(new THREE.CylinderGeometry(0.056, 0.056, 0.08, 8), cuffMat);
-            rightCuff.rotation.set(Math.PI / 3, 0, -Math.PI / 5);
-            rightCuff.position.set(0.19, -0.25, -0.45);
-            playerArms.add(rightCuff);
-
             weaponMesh = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.11, 0.75), weaponMat);
             weaponMesh.position.set(0.16, -0.22, -0.52);
             playerArms.add(weaponMesh);
-
-            const barrel = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.018, 0.018, 0.35, 8),
-                new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.9 })
-            );
-            barrel.rotation.x = Math.PI / 2;
-            barrel.position.set(0.16, -0.20, -0.88);
-            playerArms.add(barrel);
         }
 
-        function spawnBarakaBot() {
+        function spawnBot() {
             let group = new THREE.Group();
 
-            const skinMat = new THREE.MeshStandardMaterial({ color: 0xc2b59b, roughness: 0.6 });
-            const vestMat = new THREE.MeshStandardMaterial({ color: 0x1e1e24, roughness: 0.5 });
-            const redClothMat = new THREE.MeshStandardMaterial({ color: 0x8a1c1c, roughness: 0.7 });
-            const bladeMat = new THREE.MeshStandardMaterial({ color: 0xd9e2ec, metalness: 0.9, roughness: 0.15 });
-            const teethMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc });
-            const eyeMat = new THREE.MeshBasicMaterial({ color: 0xff2200 });
+            const skinMat = new THREE.MeshBasicMaterial({ color: 0xc2b59b });
+            const vestMat = new THREE.MeshBasicMaterial({ color: 0x1e1e24 });
+            const bladeMat = new THREE.MeshBasicMaterial({ color: 0xd9e2ec });
 
-            const leftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.75, 0.3), vestMat);
-            leftLeg.position.set(-0.18, 0.375, 0);
-            group.add(leftLeg);
-
-            const rightLeg = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.75, 0.3), vestMat);
-            rightLeg.position.set(0.18, 0.375, 0);
-            group.add(rightLeg);
-
-            const belt = new THREE.Mesh(new THREE.BoxGeometry(0.74, 0.14, 0.46), redClothMat);
-            belt.position.y = 0.78;
-            group.add(belt);
-
-            const torso = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.68, 0.44), skinMat);
-            torso.position.y = 1.15;
-            group.add(torso);
-
-            const strapLeft = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.72, 0.48), vestMat);
-            strapLeft.position.set(-0.22, 1.15, 0);
-            group.add(strapLeft);
-
-            const strapRight = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.72, 0.48), vestMat);
-            strapRight.position.set(0.22, 1.15, 0);
-            group.add(strapRight);
-
-            const head = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.46, 0.42), skinMat);
-            head.position.y = 1.72;
-            group.add(head);
-
-            const leftEye = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.05, 0.04), eyeMat);
-            leftEye.position.set(-0.1, 1.78, 0.21);
-            group.add(leftEye);
-
-            const rightEye = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.05, 0.04), eyeMat);
-            rightEye.position.set(0.1, 1.78, 0.21);
-            group.add(rightEye);
-
-            const mouthCavity = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.14, 0.04), new THREE.MeshBasicMaterial({ color: 0x3b0a0a }));
-            mouthCavity.position.set(0, 1.61, 0.21);
-            group.add(mouthCavity);
-
-            for (let t = -0.11; t <= 0.11; t += 0.055) {
-                const toothTop = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.06, 0.05), teethMat);
-                toothTop.position.set(t, 1.65, 0.22);
-                group.add(toothTop);
-
-                const toothBot = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.06, 0.05), teethMat);
-                toothBot.position.set(t + 0.02, 1.57, 0.22);
-                group.add(toothBot);
-            }
+            let body = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.3, 0.4), skinMat);
+            body.position.y = 0.65;
+            group.add(body);
 
             [-1, 1].forEach(side => {
-                const arm = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.55, 0.24), skinMat);
-                arm.position.set(side * 0.48, 1.25, 0.15);
-                arm.rotation.x = -Math.PI / 3;
-                group.add(arm);
-
-                const bracer = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.22, 0.26), vestMat);
-                bracer.position.set(side * 0.48, 1.12, 0.35);
-                bracer.rotation.x = -Math.PI / 3;
-                group.add(bracer);
-
-                const blade = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.11, 0.85), bladeMat);
-                blade.position.set(side * 0.48, 1.05, 0.72);
+                let blade = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.1, 0.7), bladeMat);
+                blade.position.set(side * 0.45, 1.0, 0.5);
                 group.add(blade);
             });
 
-            group.position.set((Math.random() - 0.5) * 28, 0, -10 - Math.random() * 18);
+            group.position.set((Math.random() - 0.5) * 24, 0, -10 - Math.random() * 15);
             scene.add(group);
             bots.push({ mesh: group, hp: 100 });
         }
@@ -288,13 +209,10 @@
             const adsBtn = document.getElementById('btn-ads');
             adsBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                e.stopPropagation();
                 player.isADS = !player.isADS;
                 camera.fov = player.isADS ? 48 : 75;
                 camera.updateProjectionMatrix();
                 adsBtn.style.borderColor = player.isADS ? '#ff3333' : '#ff6600';
-                playerArms.position.x = player.isADS ? -0.11 : 0;
-                playerArms.position.y = player.isADS ? 0.04 : 0;
             });
 
             let lZone = document.getElementById('zone-left');
@@ -339,13 +257,6 @@
 
             document.getElementById('btn-fire').addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                e.stopPropagation();
-                
-                if (playerArms) {
-                    playerArms.position.z = 0.07;
-                    setTimeout(() => { if (playerArms) playerArms.position.z = 0; }, 75);
-                }
-
                 let raycaster = new THREE.Raycaster();
                 raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
                 let hits = raycaster.intersectObjects(bots.map(b => b.mesh), true);
@@ -359,7 +270,7 @@
                             bots = bots.filter(b => b !== target);
                             player.kills++;
                             document.getElementById('kills').innerText = player.kills;
-                            setTimeout(spawnBarakaBot, 2000);
+                            setTimeout(spawnBot, 2000);
                         }
                     }
                 }
@@ -373,7 +284,7 @@
 
             bots.forEach(b => {
                 let targetPos = b.mesh.position.clone();
-                targetPos.y += 1.1;
+                targetPos.y += 0.8;
                 let screenPos = targetPos.clone().project(camera);
 
                 if (screenPos.z < 1) {
@@ -393,7 +304,7 @@
                 crosshairEl.classList.add('locked');
 
                 let targetWorldPos = closestBot.mesh.position.clone();
-                targetWorldPos.y += 1.1;
+                targetWorldPos.y += 0.8;
 
                 let currentDir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
                 let targetDir = targetWorldPos.clone().sub(camera.position).normalize();
@@ -444,4 +355,20 @@
                 b.mesh.lookAt(camera.position.x, b.mesh.position.y, camera.position.z);
                 b.mesh.translateZ(0.038);
 
-   
+                if (b.mesh.position.distanceTo(camera.position) < 5) {
+                    player.hp -= 0.5;
+                    document.getElementById('hp').innerText = Math.max(0, Math.ceil(player.hp));
+                    if (player.hp <= 0) {
+                        player.hp = 100;
+                        player.x = 0;
+                        player.z = 18;
+                        document.getElementById('hp').innerText = 100;
+                    }
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+    </script>
+</body>
+</html>
