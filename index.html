@@ -3,46 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tactical Ops - Aim Assist FF Style</title>
+    <title>Tactical Desert - Shinobi FPS</title>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: none; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #c2b280; font-family: sans-serif; color: #fff; }
         #canvas-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
         
-        #hud { position: absolute; top: 0; left: 0; width: 100%; z-index: 5; pointer-events: none; display: flex; justify-content: space-between; padding: 15px; }
-        .panel { background: rgba(50, 40, 30, 0.85); border: 2px solid #e0a96d; padding: 10px 15px; border-radius: 6px; font-size: 14px; font-weight: bold; color: #ffdfba; }
+        /* HUD Superior */
+        #hud { position: absolute; top: 0; left: 0; width: 100%; z-index: 5; pointer-events: none; display: none; justify-content: space-between; padding: 15px; }
+        .panel { background: rgba(45, 35, 25, 0.85); border: 2px solid #ff6600; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: bold; color: #ffdfba; }
 
-        /* Crosshair dinâmica (Muda de cor para Vermelho igual ao Free Fire) */
-        #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 22px; height: 22px; z-index: 4; pointer-events: none; transition: transform 0.1s; }
-        .cross-line { position: absolute; background: #ffdfba; box-shadow: 0 0 4px rgba(0,0,0,0.8); }
-        #c-top { top: 0; left: 10px; width: 2px; height: 9px; }
-        #c-bottom { bottom: 0; left: 10px; width: 2px; height: 9px; }
-        #c-left { top: 10px; left: 0; width: 9px; height: 2px; }
-        #c-right { top: 10px; right: 0; width: 9px; height: 2px; }
-        
-        /* Estado Vermelho Alinhado */
-        #crosshair.locked .cross-line { background: #ff2222; box-shadow: 0 0 8px #ff2222; }
+        /* Mira Dinâmica (Fica vermelha no alvo) */
+        #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 22px; height: 22px; z-index: 4; pointer-events: none; display: none; }
+        .cross-line { position: absolute; background: #ffffff; box-shadow: 0 0 4px rgba(0,0,0,0.9); transition: background 0.1s; }
+        #c-top { top: 0; left: 10px; width: 2px; height: 8px; }
+        #c-bottom { bottom: 0; left: 10px; width: 2px; height: 8px; }
+        #c-left { top: 10px; left: 0; width: 8px; height: 2px; }
+        #c-right { top: 10px; right: 0; width: 8px; height: 2px; }
+        #crosshair.locked .cross-line { background: #ff1e1e; box-shadow: 0 0 8px #ff1e1e; }
 
-        #controls { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
+        /* Camada de Controles Mobile */
+        #controls { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; display: none; }
         .zone-left { position: absolute; bottom: 0; left: 0; width: 50%; height: 100%; pointer-events: auto; }
         .zone-right { position: absolute; bottom: 0; right: 0; width: 50%; height: 100%; pointer-events: auto; }
 
-        #joystick { position: absolute; bottom: 40px; left: 40px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border: 2px solid #e0a96d; border-radius: 50%; display: none; }
-        #stick { position: absolute; top: 25px; left: 25px; width: 50px; height: 50px; background: #e0a96d; border-radius: 50%; }
+        #joystick { position: absolute; bottom: 40px; left: 40px; width: 100px; height: 100px; background: rgba(255,255,255,0.12); border: 2px solid #ff6600; border-radius: 50%; display: none; }
+        #stick { position: absolute; top: 25px; left: 25px; width: 50px; height: 50px; background: #ff6600; border-radius: 50%; }
 
-        .btn-action { position: absolute; bottom: 40px; width: 75px; height: 75px; border-radius: 50%; color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; pointer-events: auto; font-size: 13px; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
-        #btn-fire { right: 30px; background: rgba(255, 50, 50, 0.4); border: 3px solid #ff3333; }
-        #btn-ads { right: 120px; bottom: 50px; width: 60px; height: 60px; background: rgba(224, 169, 109, 0.4); border: 2px solid #e0a96d; font-size: 11px; }
+        .btn-action { position: absolute; border-radius: 50%; color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; pointer-events: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+        #btn-fire { right: 30px; bottom: 35px; width: 78px; height: 78px; background: rgba(255, 50, 50, 0.45); border: 3px solid #ff3333; font-size: 13px; }
+        #btn-fire:active { background: rgba(255, 50, 50, 0.8); transform: scale(0.95); }
+        #btn-ads { right: 120px; bottom: 45px; width: 58px; height: 58px; background: rgba(255, 102, 0, 0.4); border: 2px solid #ff6600; font-size: 11px; }
 
-        #menu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #2c221e; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        h1 { color: #e0a96d; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
-        .btn-play { background: #e0a96d; color: #2c221e; border: none; padding: 15px 40px; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        /* Tela Inicial */
+        #menu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #261d18; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+        h1 { color: #ff6600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 2px; font-size: 26px; }
+        p { color: #d6b885; margin-bottom: 25px; font-size: 13px; }
+        .btn-play { background: #ff6600; color: #fff; border: none; padding: 15px 42px; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 15px rgba(255, 102, 0, 0.4); }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
     <div id="canvas-container"></div>
+    
     <div id="crosshair">
         <div id="c-top" class="cross-line"></div>
         <div id="c-bottom" class="cross-line"></div>
@@ -52,7 +56,7 @@
 
     <div id="hud">
         <div class="panel">HP: <span id="hp">100</span></div>
-        <div class="panel">Abates: <span id="kills">0</span></div>
+        <div class="panel">ABATES: <span id="kills">0</span></div>
     </div>
 
     <div id="controls">
@@ -60,48 +64,61 @@
             <div id="joystick"><div id="stick"></div></div>
         </div>
         <div id="zone-right" class="zone-right">
-            <div id="btn-fire">ATIRAR</div>
-            <div id="btn-ads">MIRA</div>
+            <div id="btn-fire" class="btn-action">ATIRAR</div>
+            <div id="btn-ads" class="btn-action">MIRA</div>
         </div>
     </div>
 
     <div id="menu">
-        <h1>Tactical Desert - Aim Assist FF</h1>
+        <h1>Tactical Desert FPS</h1>
+        <p>Visual Deserto • Mangas Shinobi • Aim Assist</p>
         <button class="btn-play" id="play-btn">Jogar Agora</button>
     </div>
 
     <script>
         let scene, camera, renderer;
-        let player = { x: 0, y: 1.7, z: 15, rx: 0, ry: 0, hp: 100, kills: 0, isADS: false };
+        let player = { x: 0, y: 1.7, z: 18, rx: 0, ry: 0, hp: 100, kills: 0, isADS: false };
         let bots = [];
         let moveDir = { x: 0, z: 0 };
         let running = false;
         let lockedTarget = null;
+        let playerArms, weaponMesh;
+        let walkTime = 0;
 
-        document.getElementById('play-btn').addEventListener('click', start);
-        document.getElementById('play-btn').addEventListener('touchstart', start);
+        const playBtn = document.getElementById('play-btn');
+        playBtn.addEventListener('click', startGame);
+        playBtn.addEventListener('touchstart', startGame);
 
-        function start(e) {
+        function startGame(e) {
             e.preventDefault();
+            if (running) return;
+
             document.getElementById('menu').style.display = 'none';
+            document.getElementById('hud').style.display = 'flex';
+            document.getElementById('crosshair').style.display = 'block';
+            document.getElementById('controls').style.display = 'block';
             
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0xd4bc8e);
             scene.fog = new THREE.FogExp2(0xd4bc8e, 0.015);
 
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            scene.add(camera);
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-            scene.add(new THREE.AmbientLight(0xffeedd, 0.7));
+            // Iluminação estilo Deserto
+            scene.add(new THREE.AmbientLight(0xffeedd, 0.75));
             let sun = new THREE.DirectionalLight(0xfffaed, 0.9);
             sun.position.set(30, 50, 30);
             scene.add(sun);
 
+            // Chão de areia
             let floor = new THREE.Mesh(
-                new THREE.PlaneGeometry(90, 90),
+                new THREE.PlaneGeometry(100, 100),
                 new THREE.MeshStandardMaterial({ color: 0xc2a66b, roughness: 0.9 })
             );
             floor.rotation.x = -Math.PI / 2;
@@ -109,31 +126,91 @@
 
             // Muros estilo Dust
             let wallMat = new THREE.MeshStandardMaterial({ color: 0xd6b885, roughness: 0.8 });
-            [{x: 0, z: -15, w: 20, h: 8, d: 3}, {x: -15, z: 0, w: 3, h: 8, d: 20}, {x: 15, z: 0, w: 3, h: 8, d: 20}].forEach(wp => {
+            let walls = [
+                {x: 0, z: -20, w: 26, h: 8, d: 3},
+                {x: -18, z: 0, w: 3, h: 8, d: 26},
+                {x: 18, z: 0, w: 3, h: 8, d: 26},
+                {x: -8, z: -6, w: 5, h: 5, d: 5},
+                {x: 8, z: -10, w: 5, h: 6, d: 5}
+            ];
+            walls.forEach(wp => {
                 let wall = new THREE.Mesh(new THREE.BoxGeometry(wp.w, wp.h, wp.d), wallMat);
                 wall.position.set(wp.x, wp.h / 2, wp.z);
                 scene.add(wall);
             });
 
-            // Bots Inimigos
-            for(let i=0; i<4; i++) {
-                let group = new THREE.Group();
-                let body = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.4, 0.5), new THREE.MeshStandardMaterial({ color: 0x544333 }));
-                body.position.y = 0.7;
-                group.add(body);
+            // Braços em primeira pessoa (Mangas Laranjas + Arma)
+            initFirstPersonArms();
 
-                let visor = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.1, 0.1), new THREE.MeshBasicMaterial({ color: 0xffaa00 }));
-                visor.position.set(0, 1.4, 0.26);
-                group.add(visor);
-
-                group.position.set((Math.random() - 0.5) * 30, 0, -12 - Math.random() * 20);
-                scene.add(group);
-                bots.push({ mesh: group, hp: 100 });
+            // Criar 4 Bots Inimigos
+            for (let i = 0; i < 4; i++) {
+                spawnBot();
             }
 
             setupControls();
+            window.addEventListener('resize', onResize);
             running = true;
             animate();
+        }
+
+        function initFirstPersonArms() {
+            playerArms = new THREE.Group();
+            camera.add(playerArms);
+
+            const sleeveMat = new THREE.MeshStandardMaterial({ color: 0xff5500, roughness: 0.5 });
+            const cuffMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.6 });
+            const weaponMat = new THREE.MeshStandardMaterial({ color: 0x2b2b2b, metalness: 0.7, roughness: 0.3 });
+
+            // Braço Esquerdo
+            const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.055, 0.65, 8), sleeveMat);
+            leftArm.rotation.set(Math.PI / 3, 0, Math.PI / 4);
+            leftArm.position.set(-0.22, -0.28, -0.38);
+            playerArms.add(leftArm);
+
+            // Braço Direito
+            const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.055, 0.65, 8), sleeveMat);
+            rightArm.rotation.set(Math.PI / 3, 0, -Math.PI / 5);
+            rightArm.position.set(0.24, -0.32, -0.32);
+            playerArms.add(rightArm);
+
+            // Punho preto
+            const rightCuff = new THREE.Mesh(new THREE.CylinderGeometry(0.056, 0.056, 0.08, 8), cuffMat);
+            rightCuff.rotation.set(Math.PI / 3, 0, -Math.PI / 5);
+            rightCuff.position.set(0.19, -0.25, -0.45);
+            playerArms.add(rightCuff);
+
+            // Corpo do Fuzil
+            weaponMesh = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.11, 0.75), weaponMat);
+            weaponMesh.position.set(0.16, -0.22, -0.52);
+            playerArms.add(weaponMesh);
+
+            // Cano
+            const barrel = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.018, 0.018, 0.35, 8),
+                new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.9 })
+            );
+            barrel.rotation.x = Math.PI / 2;
+            barrel.position.set(0.16, -0.20, -0.88);
+            playerArms.add(barrel);
+        }
+
+        function spawnBot() {
+            let group = new THREE.Group();
+            let body = new THREE.Mesh(new THREE.BoxGeometry(0.75, 1.45, 0.5), new THREE.MeshStandardMaterial({ color: 0x3b322c }));
+            body.position.y = 0.725;
+            group.add(body);
+
+            let head = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.45, 0.45), new THREE.MeshStandardMaterial({ color: 0x26201c }));
+            head.position.y = 1.65;
+            group.add(head);
+
+            let visor = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.1, 0.08), new THREE.MeshBasicMaterial({ color: 0xff3300 }));
+            visor.position.set(0, 1.66, 0.24);
+            group.add(visor);
+
+            group.position.set((Math.random() - 0.5) * 28, 0, -10 - Math.random() * 18);
+            scene.add(group);
+            bots.push({ mesh: group, hp: 100 });
         }
 
         function setupControls() {
@@ -141,53 +218,59 @@
             let tId = null, lx = 0, ly = 0;
 
             rZone.addEventListener('touchstart', e => {
-                if(tId === null) {
+                if (tId === null) {
                     let t = e.changedTouches[0];
                     tId = t.identifier;
                     lx = t.clientX; ly = t.clientY;
                 }
             });
+
             rZone.addEventListener('touchmove', e => {
-                for(let i=0; i<e.changedTouches.length; i++) {
+                for (let i = 0; i < e.changedTouches.length; i++) {
                     let t = e.changedTouches[i];
-                    if(t.identifier === tId) {
+                    if (t.identifier === tId) {
                         let dx = t.clientX - lx;
                         let dy = t.clientY - ly;
                         
-                        // Aim Slowdown (Reduz sensibilidade levemente quando o alvo está travado/vermelho)
-                        let sensitivity = (player.isADS ? 0.0015 : 0.003);
-                        if(lockedTarget) sensitivity *= 0.5; // Slowdown magnético característico do Free Fire
+                        let sens = player.isADS ? 0.0016 : 0.0032;
+                        if (lockedTarget) sens *= 0.55; // Redução de velocidade sobre o alvo
 
-                        player.ry -= dx * sensitivity;
-                        player.rx -= dy * sensitivity;
+                        player.ry -= dx * sens;
+                        player.rx -= dy * sens;
                         player.rx = Math.max(-1.2, Math.min(1.2, player.rx));
                         lx = t.clientX; ly = t.clientY;
                     }
                 }
             });
+
             rZone.addEventListener('touchend', e => {
-                for(let i=0; i<e.changedTouches.length; i++) {
-                    if(e.changedTouches[i].identifier === tId) tId = null;
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === tId) tId = null;
                 }
             });
 
-            // Botão ADS (Mira)
-            document.getElementById('btn-ads').addEventListener('touchstart', (e) => {
+            // Botão ADS (Zoom)
+            const adsBtn = document.getElementById('btn-ads');
+            adsBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 player.isADS = !player.isADS;
-                camera.fov = player.isADS ? 45 : 75;
+                camera.fov = player.isADS ? 48 : 75;
                 camera.updateProjectionMatrix();
-                document.getElementById('btn-ads.style.borderColor') = player.isADS ? '#ff3333' : '#e0a96d';
+                adsBtn.style.borderColor = player.isADS ? '#ff3333' : '#ff6600';
+                // Centraliza levemente a arma ao mirar
+                playerArms.position.x = player.isADS ? -0.11 : 0;
+                playerArms.position.y = player.isADS ? 0.04 : 0;
             });
 
-            // Joystick esquerdo
+            // Joystick Esquerdo
             let lZone = document.getElementById('zone-left');
             let jBase = document.getElementById('joystick');
             let jStick = document.getElementById('stick');
             let mId = null, cx = 0, cy = 0;
 
             lZone.addEventListener('touchstart', e => {
-                if(mId === null) {
+                if (mId === null) {
                     let t = e.changedTouches[0];
                     mId = t.identifier;
                     cx = t.clientX; cy = t.clientY;
@@ -197,21 +280,23 @@
                     jStick.style.transform = `translate(0px, 0px)`;
                 }
             });
+
             lZone.addEventListener('touchmove', e => {
-                for(let i=0; i<e.changedTouches.length; i++) {
+                for (let i = 0; i < e.changedTouches.length; i++) {
                     let t = e.changedTouches[i];
-                    if(t.identifier === mId) {
+                    if (t.identifier === mId) {
                         let dx = t.clientX - cx, dy = t.clientY - cy;
-                        let dist = Math.sqrt(dx*dx + dy*dy);
-                        if(dist > 35) { dx = (dx/dist)*35; dy = (dy/dist)*35; }
+                        let dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist > 35) { dx = (dx / dist) * 35; dy = (dy / dist) * 35; }
                         jStick.style.transform = `translate(${dx}px, ${dy}px)`;
                         moveDir.x = dx / 35; moveDir.z = dy / 35;
                     }
                 }
             });
+
             lZone.addEventListener('touchend', e => {
-                for(let i=0; i<e.changedTouches.length; i++) {
-                    if(e.changedTouches[i].identifier === mId) {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === mId) {
                         mId = null;
                         jBase.style.display = 'none';
                         moveDir.x = 0; moveDir.z = 0;
@@ -222,31 +307,28 @@
             // Botão Atirar
             document.getElementById('btn-fire').addEventListener('touchstart', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
+                
+                // Recuo visual nos braços
+                if (playerArms) {
+                    playerArms.position.z = 0.07;
+                    setTimeout(() => { if (playerArms) playerArms.position.z = 0; }, 75);
+                }
+
                 let raycaster = new THREE.Raycaster();
                 raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
                 let hits = raycaster.intersectObjects(bots.map(b => b.mesh), true);
-                if(hits.length > 0) {
+                
+                if (hits.length > 0) {
                     let target = bots.find(b => b.mesh === hits[0].object || b.mesh.children.includes(hits[0].object));
-                    if(target) {
+                    if (target) {
                         target.hp -= 50;
-                        if(target.hp <= 0) {
+                        if (target.hp <= 0) {
                             scene.remove(target.mesh);
                             bots = bots.filter(b => b !== target);
                             player.kills++;
                             document.getElementById('kills').innerText = player.kills;
-
-                            setTimeout(() => {
-                                let g = new THREE.Group();
-                                let bMesh = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.4, 0.5), new THREE.MeshStandardMaterial({ color: 0x544333 }));
-                                bMesh.position.y = 0.7;
-                                g.add(bMesh);
-                                let vMesh = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.1, 0.1), new THREE.MeshBasicMaterial({ color: 0xffaa00 }));
-                                vMesh.position.set(0, 1.4, 0.26);
-                                g.add(vMesh);
-                                g.position.set((Math.random() - 0.5) * 30, 0, -12 - Math.random() * 20);
-                                scene.add(g);
-                                bots.push({ mesh: g, hp: 100 });
-                            }, 2000);
+                            setTimeout(spawnBot, 2000);
                         }
                     }
                 }
@@ -256,23 +338,17 @@
         function updateAimAssist() {
             let closestBot = null;
             let minScreenDist = 999;
-            let crosshairCenter = new THREE.Vector2(0, 0);
+            let center = new THREE.Vector2(0, 0);
 
-            // 1. Rastreamento e Priorização de Inimigos (Target Tracking)
             bots.forEach(b => {
-                let botPos = b.mesh.position.clone();
-                botPos.y += 0.8; // Altura do peito/cabeça
-                
-                // Projeta a posição 3D do bot para a tela 2D
-                let screenPos = botPos.clone().project(camera);
-                
-                // Verifica se está na frente da câmera e dentro do campo de visão
-                if(screenPos.z < 1) {
-                    let dist = new THREE.Vector2(screenPos.x, screenPos.y).distanceTo(crosshairCenter);
-                    // Raio de detecção magnética da assistência
-                    let detectionRadius = player.isADS ? 0.35 : 0.20; 
+                let targetPos = b.mesh.position.clone();
+                targetPos.y += 1.0;
+                let screenPos = targetPos.clone().project(camera);
 
-                    if(dist < detectionRadius && dist < minScreenDist) {
+                if (screenPos.z < 1) {
+                    let dist = new THREE.Vector2(screenPos.x, screenPos.y).distanceTo(center);
+                    let radius = player.isADS ? 0.32 : 0.18;
+                    if (dist < radius && dist < minScreenDist) {
                         minScreenDist = dist;
                         closestBot = b;
                     }
@@ -281,45 +357,54 @@
 
             const crosshairEl = document.getElementById('crosshair');
 
-            if(closestBot) {
+            if (closestBot) {
                 lockedTarget = closestBot;
-                crosshairEl.classList.add('locked'); // Muda a cor da mira para VERMELHO (Estilo Free Fire)
+                crosshairEl.classList.add('locked');
 
-                // 2. Mira Magnética (Aim Magnetism / Atração Suave)
                 let targetWorldPos = closestBot.mesh.position.clone();
-                targetWorldPos.y += 0.8;
+                targetWorldPos.y += 1.0;
 
-                // Cria uma matriz temporária para guiar a rotação suavemente até o alvo
                 let currentDir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
                 let targetDir = targetWorldPos.clone().sub(camera.position).normalize();
 
-                // Fator de suavização magnética (quanto menor, mais suave)
-                let magnetismStrength = player.isADS ? 0.12 : 0.06;
-                currentDir.lerp(targetDir, magnetismStrength);
+                let strength = player.isADS ? 0.11 : 0.055;
+                currentDir.lerp(targetDir, strength);
 
-                // Atualiza os ângulos da câmera gradualmente em direção ao inimigo
                 let targetRotY = Math.atan2(-currentDir.x, -currentDir.z);
                 let targetRotX = Math.asin(currentDir.y);
 
                 player.ry = player.ry * 0.9 + targetRotY * 0.1;
                 player.rx = player.rx * 0.9 + targetRotX * 0.1;
-
             } else {
                 lockedTarget = null;
-                crosshairEl.classList.remove('locked'); // Retorna a cor original da mira
+                crosshairEl.classList.remove('locked');
             }
         }
 
+        function onResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
         function animate() {
-            if(!running) return;
+            if (!running) return;
             requestAnimationFrame(animate);
 
-            // Atualiza a assistência de mira inteligente a cada frame
             updateAimAssist();
 
-            let cos = Math.cos(player.ry), sin = Math.sin(player.ry);
-            player.x += (sin * moveDir.z + cos * moveDir.x) * 0.12;
-            player.z += (cos * moveDir.z - sin * moveDir.x) * 0.12;
+            let isMoving = Math.abs(moveDir.x) > 0.05 || Math.abs(moveDir.z) > 0.05;
+            if (isMoving) {
+                let cos = Math.cos(player.ry), sin = Math.sin(player.ry);
+                player.x += (sin * moveDir.z + cos * moveDir.x) * 0.12;
+                player.z += (cos * moveDir.z - sin * moveDir.x) * 0.12;
+
+                // Oscilação suave dos braços ao andar
+                walkTime += 0.15;
+                if (playerArms) {
+                    playerArms.position.y = (player.isADS ? 0.04 : 0) + Math.sin(walkTime) * 0.015;
+                }
+            }
 
             camera.position.set(player.x, player.y, player.z);
             camera.rotation.order = 'YXZ';
@@ -330,12 +415,14 @@
                 b.mesh.lookAt(camera.position.x, b.mesh.position.y, camera.position.z);
                 b.mesh.translateZ(0.035);
 
-                if(b.mesh.position.distanceTo(camera.position) < 6) {
-                    player.hp -= 1;
-                    document.getElementById('hp').innerText = Math.max(0, player.hp);
-                    if(player.hp <= 0) {
-                        alert('Você foi eliminado!');
-                        player.hp = 100; player.x = 0; player.z = 15;
+                if (b.mesh.position.distanceTo(camera.position) < 5.5) {
+                    player.hp -= 0.5;
+                    document.getElementById('hp').innerText = Math.max(0, Math.ceil(player.hp));
+                    if (player.hp <= 0) {
+                        player.hp = 100;
+                        player.x = 0;
+                        player.z = 18;
+                        document.getElementById('hp').innerText = 100;
                     }
                 }
             });
