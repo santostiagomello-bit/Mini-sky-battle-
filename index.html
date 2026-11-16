@@ -37,8 +37,108 @@ canvas{display:block}
 #jump{display:none;right:22px;bottom:27%;width:74px;height:74px;font-size:13px;background:#1d70b8;border-color:#83caff}
 
 #mapButton{position:absolute;right:14px;top:68px;pointer-events:auto;border:3px solid #ff9100;background:#14232a;border-radius:10px;padding:9px 12px;font-weight:900;color:white;box-shadow:0 4px 0 #000}
-#mapPanel{display:none;position:fixed;z-
-          <div id="game"></div>
+#mapPanel{display:none;position:fixed;z-index:20;inset:8% 5%;background:#14232ae8;border:3px solid #ff9100;border-radius:16px;padding:12px;pointer-events:auto;box-shadow:0 15px 40px #000}
+#mapPanel h3{margin:0 0 8px;text-align:center;color:#ffc15c}
+#mapCanvas{width:100%;height:calc(100% - 40px);background:#6eaa68;border-radius:10px;border:2px solid #35533f}
+#mapClose{position:absolute;right:12px;top:10px;background:#e63946;color:white;border:2px solid #ff8177;border-radius:8px;padding:7px 12px;font-weight:900}
+#message{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);padding:12px 18px;background:#14232af8;border:3px solid #ff9100;border-radius:12px;display:none;text-align:center;font-weight:900;font-size:16px;box-shadow:0 6px 0 #000}
+
+/* Lobby Estilizado Cartoon */
+#lobby{position:fixed;inset:0;z-index:30;overflow:hidden;color:#fff;background:radial-gradient(circle at 50% 40%,#1d3557 0%,#0b131e 100%);font-family:Arial,sans-serif}
+.lobby-wrap{width:100%;height:100%;max-width:1500px;margin:auto;padding:12px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:10px}
+.lobby-header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;background:#0f1e2de8;border:3px solid #2e4a68;border-radius:14px}
+.brand{font-weight:1000;letter-spacing:2px;color:#ffb34d;font-size:clamp(16px,2.2vw,26px);text-shadow:0 3px 0 #000}
+.header-right{display:flex;align-items:center;gap:6px}
+.currency,.head-btn,.level{background:#1a2b40;border:2px solid #3b506a;border-radius:10px;padding:6px 10px;font-weight:900;font-size:clamp(10px,1.1vw,13px)}
+.currency b{color:#ffc15c}
+.head-btn{color:#fff;cursor:pointer;background:#243b55}
+.level{min-width:100px}.level small{display:block;color:#aebdd0;margin-bottom:2px;font-size:9px}
+.level-bar{height:6px;background:#101924;border-radius:6px;overflow:hidden;border:1px solid #3b506a}.level-bar i{display:block;width:62%;height:100%;background:#ff9100}
+.lobby-layout{display:grid;grid-template-columns:150px minmax(0,1fr) 220px;gap:10px;min-height:0}
+.lobby-nav,.lobby-character,.weapon-card,.lobby-content{background:#0f1e2de8;border:3px solid #2e4a68;border-radius:14px;box-shadow:0 8px 0 #0005}
+.lobby-nav{padding:8px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.nav-btn{width:100%;padding:11px 8px;border:2px solid transparent;border-radius:10px;text-align:left;color:#c6d4e5;background:#172538;font-weight:900;font-size:11px;cursor:pointer}
+.nav-btn.active{color:#fff;background:#ff8400;border-color:#ffd06c;box-shadow:0 3px 0 #000}
+.lobby-center{display:grid;grid-template-rows:auto minmax(0,1fr);gap:8px;min-width:0;min-height:0}
+.lobby-content{padding:10px 14px;max-height:115px;overflow:auto}
+.lobby-content h2{margin:0 0 4px;color:#ffc16a;font-size:16px;text-shadow:0 2px 0 #000}
+.lobby-content p{margin:0;color:#b8c7d8;font-size:12px}
+.lobby-character{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 70%,#264653 0%,#101e2b 70%)}
+.character-glow{position:absolute;width:200px;height:200px;border-radius:50%;background:#ff910025;filter:blur(20px);bottom:10px}
+.character-placeholder{position:relative;width:110px;height:205px}
+.char-head{position:absolute;top:15px;left:36px;width:38px;height:42px;border-radius:42%;background:#e0a96d;border:3px solid #111}
+.char-hood{position:absolute;top:4px;left:26px;width:58px;height:62px;border:7px solid #111;border-radius:48%;box-shadow:inset 0 0 0 2px #ff9100}
+.char-body{position:absolute;top:60px;left:20px;width:70px;height:85px;background:#3a86ff;border-radius:12px;border:3px solid #111}
+.char-arm{position:absolute;top:68px;width:21px;height:78px;background:#2a69cb;border:3px solid #111;border-radius:10px}.char-arm.left{left:6px}.char-arm.right{right:6px}
+.char-leg{position:absolute;top:138px;width:27px;height:64px;background:#1d3557;border:3px solid #111;border-radius:8px}.char-leg.left{left:24px}.char-leg.right{right:24px}
+.character-label{position:absolute;bottom:10px;left:8px;right:8px;text-align:center;font-size:10px;color:#ffc15c;font-weight:900;text-shadow:0 1px 0 #000}
+.weapon-card{padding:10px;display:flex;flex-direction:column;justify-content:center;gap:8px}
+.weapon-card h3{margin:0;color:#ffc16a;font-size:13px}
+.weapon-visual{height:75px;border-radius:10px;background:#1a2b40;border:2px solid #3b506a;display:flex;align-items:center;justify-content:center;font-size:32px}
+.weapon-name{font-weight:1000;font-size:13px}.weapon-skin{font-size:10px;color:#aebed0}
+.stat{font-size:10px;color:#c6d4e5;font-weight:900}.stat-line{height:5px;background:#111;border-radius:4px;margin-top:3px;overflow:hidden;border:1px solid #3b506a}.stat-line i{display:block;height:100%;background:#ff9100}
+.lobby-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;background:#0f1e2de8;border:3px solid #2e4a68;border-radius:14px}
+.mode-area{display:flex;align-items:center;gap:10px}.mode-label{font-size:10px;color:#9fb0c4;font-weight:900}#modeName{font-size:13px;font-weight:1000;color:#fff}
+.mode-change,.start-match{border:3px solid #000;border-radius:10px;padding:11px 16px;font-weight:1000;cursor:pointer;white-space:nowrap;font-size:12px;box-shadow:0 4px 0 rgba(0,0,0,.5)}
+.mode-change{background:#24364c;color:#fff}
+.start-match{color:#201407;background:#ff9100;border-color:#ffe0a0;font-size:15px;animation:lobbyPulse 1.8s infinite}
+@keyframes lobbyPulse{50%{transform:scale(1.03);box-shadow:0 6px 0 rgba(0,0,0,.5)}}
+.lobby-toast{position:fixed;z-index:50;left:50%;bottom:16%;transform:translate(-50%,12px);padding:10px 16px;border-radius:10px;background:#102b25;border:3px solid #39c78a;color:#bfffe1;font-weight:1000;font-size:12px;opacity:0;pointer-events:none;transition:.2s;box-shadow:0 4px 0 #000}
+.lobby-toast.show{opacity:1;transform:translate(-50%,0)}
+.arsenal-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:7px}
+.arsenal-item{padding:8px;border:2px solid #344a62;border-radius:8px;background:#142235;min-width:0}
+.arsenal-item strong{display:block;font-size:10px;margin-bottom:4px}.arsenal-item span{display:block;color:#aebed0;font-size:8px;margin-bottom:6px}
+.arsenal-item button{width:100%;padding:6px;border:2px solid #000;border-radius:6px;background:#ff9100;color:#1b1209;font-weight:1000;font-size:9px;cursor:pointer}
+#lobbyPortraitHint{display:none}
+@media (orientation:portrait){
+ #lobbyPortraitHint{display:flex;position:absolute;inset:0;z-index:99;background:#080e18;color:#fff;align-items:center;justify-content:center;text-align:center;padding:24px;font-weight:1000;font-size:18px}
+ .lobby-wrap{visibility:hidden}
+}
+</style>
+</head>
+<body>
+
+<div id="lobby">
+ <div class="lobby-wrap">
+  <header class="lobby-header">
+   <div class="brand">MINI ROYALE — CARTOON</div>
+   <div class="header-right">
+    <div class="currency">🪙 <b>12.500</b></div><div class="currency">💎 <b>850</b></div>
+    <div class="level"><small>NÍVEL 18 • 62%</small><div class="level-bar"><i></i></div></div>
+    <button class="head-btn" id="pingBtn">PING 32ms</button><button class="head-btn" id="settingsBtn">⚙</button><button class="head-btn" id="noticeBtn">🔔</button>
+   </div>
+  </header>
+  <div class="lobby-layout">
+   <nav class="lobby-nav">
+    <button class="nav-btn active" data-tab="home">⌂ INÍCIO</button><button class="nav-btn" data-tab="shop">▣ LOJA</button>
+    <button class="nav-btn" data-tab="character">♟ PERSONAGEM</button><button class="nav-btn" data-tab="arsenal">⚔ ARSENAL</button>
+    <button class="nav-btn" data-tab="missions">☷ MISSÕES</button><button class="nav-btn" data-tab="events">✦ EVENTOS</button>
+   </nav>
+   <main class="lobby-center">
+    <section class="lobby-content" id="tabContent"><h2>PRONTO PARA O COMBATE?</h2><p>Estilo Cartoon Vibrante Ativado.</p></section>
+    <section class="lobby-character" id="characterStage">
+     <div class="character-glow"></div>
+     <div class="character-placeholder"><div class="char-hood"></div><div class="char-head"></div><div class="char-body"></div><div class="char-arm left"></div><div class="char-arm right"></div><div class="char-leg left"></div><div class="char-leg right"></div></div>
+     <div class="character-label">OPERADOR • PADRÃO</div>
+    </section>
+   </main>
+   <aside class="weapon-card">
+    <h3>ARMA EQUIPADA</h3><div class="weapon-visual" id="weaponIcon">🔫</div>
+    <div><div class="weapon-name" id="equippedName">CARABINA TOON</div><div class="weapon-skin" id="equippedSkin">Visual Lendário</div></div>
+    <div class="stat">DANO<div class="stat-line"><i style="width:75%"></i></div></div>
+    <div class="stat">ALCANCE<div class="stat-line"><i style="width:70%"></i></div></div>
+    <div class="stat">PRECISÃO<div class="stat-line"><i style="width:85%"></i></div></div>
+   </aside>
+  </div>
+  <footer class="lobby-footer">
+   <div class="mode-area"><div><div class="mode-label">MODO DE JOGO</div><div id="modeName">BATTLE ROYALE CARTOON</div></div><button class="mode-change" id="modeChange">TROCAR MODO</button></div>
+   <button class="start-match" id="startMatch">▶ INICIAR PARTIDA</button>
+  </footer>
+ </div>
+ <div id="lobbyPortraitHint">GIRE O CELULAR PARA A POSIÇÃO HORIZONTAL.</div>
+ <div class="lobby-toast" id="lobbyToast">Ação realizada com sucesso!</div>
+</div>
+<div id="game"></div>
 <div id="hud">
   <div id="topbar" style="display:none">
     <div class="panel">HP: <span id="hp" style="color:#39c78a">100</span></div>
@@ -72,44 +172,8 @@ canvas{display:block}
 </div>
 
 <div id="mapPanel"><h3>MAPA DO ARQUIPÉLAGO</h3><button id="mapClose">FECHAR</button><canvas id="mapCanvas"></canvas></div>
-<div id="inventoryPanel" style="display:none;position:fixed;z-index:22;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,500px);max-height:80vh;overflow:auto;background:#101c2bee;border:3px solid #ff9100;border-radius:14px;padding:14px;color:#fff;box-shadow:0 15px 40px #000"><button class="panel-close" id="inventoryClose" style="float:right;background:#e63946;color:#fff;border:0;border-radius:6px;padding:6px 10px;font-weight:900">X</button><h3 style="margin:0 0 10px;color:#ffc15c">MOCHILA</h3><p id="inventorySummary" style="font-size:12px">0/8 slots</p><div id="inventoryList" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px"></div></div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
-(() => {
-'use strict';
-const $=id=>document.getElementById(id);
-let scene,camera,renderer,clock;
-let activeSkinKey='detective';
-try{activeSkinKey=localStorage.getItem('miniRoyaleEquippedSkin')||'detective';}catch(e){}
-let state='plane', player={x:-540,y:150,z:-500,yaw:0,pitch:0,hp:100,kills:0,ads:false,vy:0,grounded:false};
-let move={x:0,z:0},bots=[],airAvatar=null,airplane=null,flightPath=null,mapOpen=false;
-const MAP=1200, HALF=MAP/2;
-const FLIGHT_START={x:-540,z:-500},FLIGHT_END={x:540,z:500};let flightProgress=0;
-const worldColliders=[];
-const lootDrops=[];
-
-function mat(color){return new THREE.MeshLambertMaterial({color,roughness:1});}
-function addBoxCollider(x,z,w,d){worldColliders.push({x,z,halfW:w/2,halfD:d/2});}
-function resolveWorldCollision(x,z,radius=0.85){
-  let px=x,pz=z;
-  for(let pass=0;pass<3;pass++){
-    for(const c of worldColliders){
-      const dx=px-c.x,dz=pz-c.z;
-      const qx=Math.max(-c.halfW,Math.min(c.halfW,dx));
-      const qz=Math.max(-c.halfD,Math.min(c.halfD,dz));
-      let ox=dx-qx,oz=dz-qz,dist=Math.hypot(ox,oz);
-      if(dist<radius){
-        if(dist<0.0001){ox=1;oz=0;dist=1;}
-        const push=radius-dist;
-        px+=(ox/dist)*push;pz+=(oz/dist)*push;
-      }
-    }
-  }
-  return {x:px,z:pz};
-}
-function terrainHeight(x,z){ return Math.sin(x*.01)*3+Math.cos(z*.012)*2.5; }
-  <script>
+<div id="inventoryPanel" style="display:none;position:fixed;z-index:22;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,500px);max-height:80vh;overflow:auto;background:#101c2bee;border
+          <script>
 function box(w,h,d,material,x,y,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);m.position.set(x,y,z);scene.add(m);return m;}
 
 function spawnLoot(x,z){
@@ -195,142 +259,13 @@ function init(){
 
 function setupControls(){
   $('startMatch').onclick=()=>{
-    $('lobby').style.display='none';
-    $('topbar').style.display='flex';
-    $('crosshair').style.display='block';
-    $('bagButton').style.display='block';
-    $('matchInfo').style.display='flex';
-    $('action').style.display='flex';
+    $('lobby').style.display='none';$('topbar').style.display='flex';
+    $('crosshair').style.display='block';$('bagButton').style.display='block';
+    $('matchInfo').style.display='flex';$('action').style.display='flex';
     state='plane';
   };
   $('mapButton').onclick=()=>{ mapOpen=true;$('mapPanel').style.display='block'; };
   $('mapClose').onclick=()=>{ mapOpen=false;$('mapPanel').style.display='none'; };
 
   $('action').onclick=()=>{
-    if(state==='plane'){
-      state='freefall';
-      player.x=airplane.position.x;player.y=110;player.z=airplane.position.z;
-      $('jumpInfo').textContent='QUEDA LIVRE';
-      $('action').textContent='PARAQUEDAS';
-    }else if(state==='freefall'){
-      state='parachute';
-      $('jumpInfo').textContent='PLANEIO';
-      $('action').style.display='none';
-      $('joystick').style.display='block';
-      $('fire').style.display='flex';
-      $('aim').style.display='flex';
-      $('jump').style.display='flex';
-    }
-  };
-
-  $('fire').onclick=()=>{
-    let hitBot=null,minDist=Infinity;
-    for(const b of bots){
-      const d=Math.hypot(player.x-b.mesh.position.x,player.z-b.mesh.position.z);
-      if(d<40&&d<minDist){minDist=d;hitBot=b;}
-    }
-    if(hitBot){
-      hitBot.hp-=50;
-      if(hitBot.hp<=0){
-        hitBot.mesh.position.set(0,-100,0);
-        player.kills++;$('kills').textContent=player.kills;
-        $('message').textContent='INIMIGO ELIMINADO!';$('message').style.display='block';setTimeout(()=>$('message').style.display='none',1200);
-      }
-    }
-  };
-
-  $('aim').onclick=()=>{
-    player.ads=!player.ads;
-    $('aim').style.background=player.ads?'#3a86ff':'#ff8400';
-  };
-
-  let lookTouch=null,moveTouch=null,lastLook={x:0,y:0};
-  const lookZone=$('lookZone'),moveZone=$('moveZone'),joystick=$('joystick'),stick=$('stick');
-  
-  lookZone.ontouchstart=e=>{const t=e.changedTouches[0];lookTouch=t.identifier;lastLook.x=t.clientX;lastLook.y=t.clientY;};
-  lookZone.ontouchmove=e=>{
-    for(const t of e.changedTouches){
-      if(t.identifier===lookTouch){
-        const dx=t.clientX-lastLook.x,dy=t.clientY-lastLook.y;
-        lastLook.x=t.clientX;lastLook.y=t.clientY;
-        player.yaw-=dx*0.005;
-        player.pitch=Math.max(-1.1,Math.min(1.1,player.pitch+dy*0.005));
-      }
-    }
-  };
-  lookZone.ontouchend=e=>{for(const t of e.changedTouches){if(t.identifier===lookTouch)lookTouch=null;}};
-
-  moveZone.ontouchstart=e=>{
-    const t=e.changedTouches[0];moveTouch=t.identifier;
-    const rect=moveZone.getBoundingClientRect();
-    joystick.style.display='block';joystick.style.left=(t.clientX-rect.left-60)+'px';joystick.style.top=(t.clientY-rect.top-60)+'px';
-    stick.style.left='34px';stick.style.top='34px';
-    move.x=0;move.z=0;
-  };
-  moveZone.ontouchmove=e=>{
-    for(const t of e.changedTouches){
-      if(t.identifier===moveTouch){
-        const rect=moveZone.getBoundingClientRect();
-        const jx=parseFloat(joystick.style.left)+60,jy=parseFloat(joystick.style.top)+60;
-        let dx=t.clientX-rect.left-jx,dy=t.clientY-rect.top-jy,dist=Math.hypot(dx,dy),maxR=45;
-        if(dist>maxR){dx=(dx/dist)*maxR;dy=(dy/dist)*maxR;}
-        stick.style.left=(34+dx)+'px';stick.style.top=(34+dy)+'px';
-        move.x=dx/maxR;move.z=dy/maxR;
-      }
-    }
-  };
-  moveZone.ontouchend=e=>{for(const t of e.changedTouches){if(t.identifier===moveTouch){moveTouch=null;joystick.style.display='none';move.x=0;move.z=0;}}};
-}
-
-function animate(){
-  requestAnimationFrame(animate);
-  const dt=Math.min(.1,clock.getDelta());
-
-  if(state==='plane'){
-    flightProgress+=dt*.05;if(flightProgress>1)flightProgress=0;
-    airplane.position.lerpVectors(new THREE.Vector3(FLIGHT_START.x,120,FLIGHT_START.z),new THREE.Vector3(FLIGHT_END.x,120,FLIGHT_END.z),flightProgress);
-    player.x=airplane.position.x;player.y=airplane.position.y;player.z=airplane.position.z;
-    placeOrbitCamera(20,10);
-  }else if(state==='freefall'||state==='parachute'){
-    const spd=state==='freefall'?120:35;
-    player.x+=Math.sin(player.yaw)*spd*dt;
-    player.z+=Math.cos(player.yaw)*spd*dt;
-    player.y-= (state==='freefall'?20:6)*dt;
-    $('jumpInfo').textContent='ALTITUDE: '+Math.round(player.y)+'m';
-    placeOrbitCamera(22,player.y);
-    if(player.y<=0){player.y=0;state='ground';$('jumpInfo').style.display='none';$('speed').style.display='none';}
-  }else if(state==='ground'){
-    const spd=player.ads?4:7;
-    const fwd=new THREE.Vector3(Math.sin(player.yaw),0,Math.cos(player.yaw));
-    const right=new THREE.Vector3(Math.cos(player.yaw),0,-Math.sin(player.yaw));
-    const dx=(-move.x*right.x+move.z*fwd.x)*spd*dt;
-    const dz=(-move.x*right.z+move.z*fwd.z)*spd*dt;
-    const resolved=resolveWorldCollision(player.x+dx,player.z+dz,0.8);
-    player.x=resolved.x;player.z=resolved.z;
-    player.y=0;
-
-    placeOrbitCamera(player.ads?3.5:6.5,player.ads?2.0:2.5);
-
-    let aimedAtEnemy=false;
-    for(const b of bots){
-      if(Math.hypot(player.x-b.mesh.position.x,player.z-b.mesh.position.z)<35){aimedAtEnemy=true;break;}
-    }
-    const cross=$('crosshair');
-    if(aimedAtEnemy)cross.classList.add('locked');else cross.classList.remove('locked');
-  }
-
-  if(airAvatar){
-    airAvatar.visible=(state!=='ground');
-    airAvatar.position.set(player.x,player.y,player.z);
-    airAvatar.rotation.y=player.yaw;
-  }
-
-  renderer.render(scene,camera);
-}
-
-window.onload=init;
-})();
-</script>
-</body>
-</html>
-  
+          
