@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tactical Desert - Skydiving</title>
+    <title>MINI ROYALE - Open World Battle Royale</title>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: none; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #c2b280; font-family: sans-serif; color: #fff; }
         #canvas-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; display: block; }
         
-        /* HUD Geral */
+        /* HUD Superior */
         #hud { position: absolute; top: 0; left: 0; width: 100%; z-index: 5; pointer-events: none; display: none; justify-content: space-between; padding: 15px; }
         .panel { background: rgba(45, 35, 25, 0.85); border: 2px solid #ff6600; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: bold; color: #ffdfba; }
 
-        /* HUD do Salto */
+        /* HUD do Salto de Paraquedas */
         #skydive-hud { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 8; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 25px; }
-        .skydive-info { background: rgba(0,0,0,0.75); border: 2px solid #ff6600; padding: 10px 18px; border-radius: 8px; font-size: 15px; font-weight: bold; text-align: center; width: 240px; margin: 0 auto; color: #fff; }
+        .skydive-info { background: rgba(0,0,0,0.75); border: 2px solid #ff6600; padding: 10px 18px; border-radius: 8px; font-size: 15px; font-weight: bold; text-align: center; width: 260px; margin: 0 auto; color: #fff; }
         
-        /* Mira Estilo FF */
+        /* Mira Dinâmica (Fica vermelha no alvo) */
         #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 22px; height: 22px; z-index: 4; pointer-events: none; display: none; }
         .cross-line { position: absolute; background: #ffffff; box-shadow: 0 0 4px rgba(0,0,0,0.9); transition: background 0.1s; }
         #c-top { top: 0; left: 10px; width: 2px; height: 8px; }
@@ -58,9 +58,9 @@
         <div class="panel">ABATES: <span id="kills">0</span></div>
     </div>
 
-    <!-- HUD do Salto -->
+    <!-- HUD do Salto de Paraquedas -->
     <div id="skydive-hud">
-        <div class="skydive-info" id="altitude-display">ALTITUDE: 120m</div>
+        <div class="skydive-info" id="altitude-display">ALTITUDE: 150m</div>
         <div style="text-align: center; width: 100%;">
             <div id="speed-display" style="font-size: 15px; color: #ffffff; font-weight: bold; background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 6px; display: inline-block; text-shadow: 1px 1px 2px #000;">VELOCIDADE: 190 km/h</div>
         </div>
@@ -85,18 +85,28 @@
         let playerArms, weaponMesh;
         let walkTime = 0;
 
-        // Estados: 0 = Pronto para Saltar | 1 = Queda Livre | 2 = Paraquedas | 3 = Combate Solo
+        // Estados: 0 = Salto/Avião | 1 = Queda Livre | 2 = Paraquedas | 3 = Combate Solo FPS
         let gameState = 0; 
         
         let player = {
-            x: 0, y: 120, z: 0,
-            horizontalSpeed: 0.5,
+            x: 0, y: 150, z: 0,
+            horizontalSpeed: 0.6,
             rotY: 0,
             rx: 0,
             hp: 100,
             kills: 0,
             isADS: false
         };
+
+        // Sistema de Zona Segura (Gás Letal)
+        let safeZone = {
+            x: 0, z: 0,
+            radius: 120,
+            targetRadius: 40,
+            shrinkSpeed: 0.02,
+            damagePerSec: 15
+        };
+        let zoneBarrierMesh;
 
         window.addEventListener('DOMContentLoaded', () => {
             try {
@@ -109,6 +119,7 @@
         function initGame() {
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0xd4bc8e);
+            scene.fog = new THREE.FogExp2(0xd4bc8e, 0.01);
 
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             scene.add(camera);
@@ -119,36 +130,66 @@
             
             document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-            // Luzes
-            scene.add(new THREE.AmbientLight(0xffffff, 0.85));
-            let sun = new THREE.DirectionalLight(0xffffff, 0.9);
-            sun.position.set(20, 40, 20);
+            // Iluminação
+            scene.add(new THREE.AmbientLight(0xffeedd, 0.8));
+            let sun = new THREE.DirectionalLight(0xfffaed, 0.9);
+            sun.position.set(50, 80, 50);
             scene.add(sun);
 
-            // Chão de areia
+            // Chão de Mundo Aberto ($300\times300$)
             let floor = new THREE.Mesh(
-                new THREE.PlaneGeometry(200, 200),
+                new THREE.PlaneGeometry(300, 300),
                 new THREE.MeshBasicMaterial({ color: 0xc2a66b })
             );
             floor.rotation.x = -Math.PI / 2;
             scene.add(floor);
 
-            // Muros e estruturas no mapa
-            let wallMat = new THREE.MeshBasicMaterial({ color: 0xd6b885 });
-            for (let i = -60; i <= 60; i += 30) {
-                let wall = new THREE.Mesh(new THREE.BoxGeometry(20, 6, 2), wallMat);
-                wall.position.set(i, 3, i);
-                scene.add(wall);
-            }
+            // Criação das Regiões do Mapa (Cidade, Base Militar, Zona Industrial, Vilas)
+            createOpenWorldMap();
 
-            // Inimigos Baraka no solo
-            for (let i = 0; i < 5; i++) {
+            // Criar Inimigos Baraka espalhados pelo mapa
+            for (let i = 0; i < 8; i++) {
                 spawnBarakaBot();
             }
+
+            // Criar barreira visual da Zona Segura (Gás)
+            createZoneBarrier();
 
             setupControls();
             window.addEventListener('resize', onResize);
             animate();
+        }
+
+        function createOpenWorldMap() {
+            let buildingMat = new THREE.MeshBasicMaterial({ color: 0xd6b885 });
+            let industrialMat = new THREE.MeshBasicMaterial({ color: 0x4a4a52 });
+
+            // Prédios da Cidade Central e Regiões
+            let regions = [
+                {x: 0, z: -30, w: 25, h: 14, d: 25}, // Cidade Central
+                {x: -60, z: -60, w: 20, h: 8, d: 20}, // Base Militar
+                {x: 60, z: 60, w: 30, h: 10, d: 15},   // Zona Industrial
+                {x: -50, z: 40, w: 15, h: 6, d: 15},   // Vila Abandonada
+                {x: 50, z: -50, w: 18, h: 12, d: 18}   // Porto / Armazém
+            ];
+
+            regions.forEach(r => {
+                let b = new THREE.Mesh(new THREE.BoxGeometry(r.w, r.h, r.d), r.h > 10 ? industrialMat : buildingMat);
+                b.position.set(r.x, r.h / 2, r.z);
+                scene.add(b);
+            });
+        }
+
+        function createZoneBarrier() {
+            const geometry = new THREE.CylinderGeometry(1, 1, 60, 32, 1, true);
+            const material = new THREE.MeshBasicMaterial({
+                color: 0xff0055,
+                transparent: true,
+                opacity: 0.25,
+                side: THREE.DoubleSide
+            });
+            zoneBarrierMesh = new THREE.Mesh(geometry, material);
+            scene.add(zoneBarrierMesh);
         }
 
         function spawnBarakaBot() {
@@ -167,7 +208,7 @@
                 group.add(blade);
             });
 
-            group.position.set((Math.random() - 0.5) * 80, 0, (Math.random() - 0.5) * 80);
+            group.position.set((Math.random() - 0.5) * 140, 0, (Math.random() - 0.5) * 140);
             scene.add(group);
             bots.push({ mesh: group, hp: 100 });
         }
@@ -289,5 +330,119 @@
                 let hits = raycaster.intersectObjects(bots.map(b => b.mesh), true);
                 
                 if (hits.length > 0) {
-                    let target = bots
-        
+                    let target = bots.find(b => b.mesh === hits[0].object || b.mesh.children.includes(hits[0].object));
+                    if (target) {
+                        target.hp -= 50;
+                        if (target.hp <= 0) {
+                            scene.remove(target.mesh);
+                            bots = bots.filter(b => b !== target);
+                            player.kills++;
+                            document.getElementById('kills').innerText = player.kills;
+                        }
+                    }
+                }
+            });
+        }
+
+        function initFirstPersonArms() {
+            playerArms = new THREE.Group();
+            camera.add(playerArms);
+
+            const sleeveMat = new THREE.MeshBasicMaterial({ color: 0xff5500 });
+            const weaponMat = new THREE.MeshBasicMaterial({ color: 0x2b2b2b });
+
+            const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.055, 0.65, 6), sleeveMat);
+            leftArm.rotation.set(Math.PI / 3, 0, Math.PI / 4);
+            leftArm.position.set(-0.22, -0.28, -0.38);
+            playerArms.add(leftArm);
+
+            const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.055, 0.65, 8), sleeveMat);
+            rightArm.rotation.set(Math.PI / 3, 0, -Math.PI / 5);
+            rightArm.position.set(0.24, -0.32, -0.32);
+            playerArms.add(rightArm);
+
+            weaponMesh = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.11, 0.75), weaponMat);
+            weaponMesh.position.set(0.16, -0.22, -0.52);
+            playerArms.add(weaponMesh);
+        }
+
+        function updateAimAssist() {
+            if (gameState !== 3) return;
+            let closestBot = null;
+            let minScreenDist = 999;
+            let center = new THREE.Vector2(0, 0);
+
+            bots.forEach(b => {
+                let targetPos = b.mesh.position.clone();
+                targetPos.y += 0.8;
+                let screenPos = targetPos.clone().project(camera);
+
+                if (screenPos.z < 1) {
+                    let dist = new THREE.Vector2(screenPos.x, screenPos.y).distanceTo(center);
+                    let radius = player.isADS ? 0.32 : 0.18;
+                    if (dist < radius && dist < minScreenDist) {
+                        minScreenDist = dist;
+                        closestBot = b;
+                    }
+                }
+            });
+
+            const crosshairEl = document.getElementById('crosshair');
+
+            if (closestBot) {
+                lockedTarget = closestBot;
+                crosshairEl.classList.add('locked');
+
+                let targetWorldPos = closestBot.mesh.position.clone();
+                targetWorldPos.y += 0.8;
+
+                let currentDir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+                let targetDir = targetWorldPos.clone().sub(camera.position).normalize();
+
+                let strength = player.isADS ? 0.11 : 0.055;
+                currentDir.lerp(targetDir, strength);
+
+                let targetRotY = Math.atan2(-currentDir.x, -currentDir.z);
+                let targetRotX = Math.asin(currentDir.y);
+
+                player.rotY = player.rotY * 0.9 + targetRotY * 0.1;
+                player.rx = player.rx * 0.9 + targetRotX * 0.1;
+            } else {
+                lockedTarget = null;
+                crosshairEl.classList.remove('locked');
+            }
+        }
+
+        function onResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Fechamento Progressivo da Zona Segura (Gás Letal)
+            if (safeZone.radius > safeZone.targetRadius) {
+                safeZone.radius -= 0.015; // Fecha gradualmente
+            }
+            if (zoneBarrierMesh) {
+                zoneBarrierMesh.position.set(safeZone.x, 30, safeZone.z);
+                zoneBarrierMesh.scale.set(safeZone.radius, 1, safeZone.radius);
+            }
+
+            // 0: Aguardando Salto
+            if (gameState === 0) {
+                camera.position.set(0, 150, -40);
+                camera.lookAt(0, 150, 0);
+                document.getElementById('altitude-display').innerText = `ALTITUDE: 150m`;
+                document.getElementById('speed-display').innerText = `VELOCIDADE: 0 km/h`;
+            } 
+            // 1: Queda Livre
+            else if (gameState === 1) {
+                player.y -= 1.2;
+                let cos = Math.cos(player.rotY), sin = Math.sin(player.rotY);
+                player.x += (sin * moveDir.z + cos * moveDir.x) * player.horizontalSpeed;
+                player.z += (cos * moveDir.z - sin * moveDir.x) * player.horizontalSpeed;
+
+                camera.position.set(player.x, player.y + 6, 
