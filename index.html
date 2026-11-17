@@ -1,1 +1,983 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>MINI ROYALE 3.0</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #172b35;
+  font-family: Arial, sans-serif;
+  color: white;
+  touch-action: none;
+}
+
+#game {
+  position: fixed;
+  inset: 0;
+}
+
+canvas {
+  display: block;
+}
+
+#lobby {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background:
+    radial-gradient(ellipse at center, #34516b, #101a29 75%);
+}
+
+.logo {
+  font-size: clamp(25px, 5vw, 48px);
+  font-weight: 1000;
+  letter-spacing: 4px;
+  color: #ffbd55;
+  text-shadow: 0 4px 15px #ff8a0055;
+}
+
+.subtitle {
+  color: #c5d8e9;
+  font-size: 13px;
+  letter-spacing: 2px;
+}
+
+.character {
+  width: 110px;
+  height: 190px;
+  position: relative;
+  animation: idle 2s infinite ease-in-out;
+}
+
+@keyframes idle {
+  50% { transform: translateY(-7px); }
+}
+
+.head {
+  position: absolute;
+  top: 15px;
+  left: 36px;
+  width: 40px;
+  height: 42px;
+  border-radius: 45%;
+  background: linear-gradient(135deg,#c7d2df,#526274);
+  border: 3px solid #111923;
+}
+
+.hood {
+  position: absolute;
+  top: 3px;
+  left: 24px;
+  width: 64px;
+  height: 65px;
+  border: 7px solid #10131d;
+  border-radius: 50% 50% 35% 35%;
+  box-shadow: inset 0 0 0 2px #a35cff;
+}
+
+.body {
+  position: absolute;
+  top: 60px;
+  left: 18px;
+  width: 74px;
+  height: 78px;
+  background: linear-gradient(110deg,#10131d,#34344d);
+  clip-path: polygon(20% 0,80% 0,100% 100%,0 100%);
+  border-bottom: 4px solid #a35cff;
+}
+
+.arm {
+  position: absolute;
+  top: 67px;
+  width: 20px;
+  height: 70px;
+  background: #20283a;
+  border-radius: 12px;
+}
+
+.arm.left { left: 7px; transform: rotate(8deg); }
+.arm.right { right: 7px; transform: rotate(-8deg); }
+
+.leg {
+  position: absolute;
+  top: 132px;
+  width: 27px;
+  height: 57px;
+  background: #20283a;
+  border-radius: 8px;
+}
+
+.leg.left { left: 25px; }
+.leg.right { right: 25px; }
+
+#play {
+  border: 0;
+  border-radius: 12px;
+  padding: 15px 45px;
+  background: linear-gradient(110deg,#ff8a26,#ffd16c);
+  color: #241606;
+  font-size: 17px;
+  font-weight: 1000;
+  box-shadow: 0 5px 0 #8c4c12;
+}
+
+#controls {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: none;
+  pointer-events: none;
+}
+
+#moveZone {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 48%;
+  height: 55%;
+  pointer-events: auto;
+}
+
+#lookZone {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 55%;
+  height: 100%;
+  pointer-events: auto;
+}
+
+#joystick {
+  display: none;
+  position: absolute;
+  width: 115px;
+  height: 115px;
+  border: 3px solid #ffffffaa;
+  border-radius: 50%;
+  background: #ffffff22;
+}
+
+#stick {
+  position: absolute;
+  left: 30px;
+  top: 30px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(145deg,#ffc44f,#ff7b00);
+  border: 3px solid white;
+}
+
+#action {
+  position: absolute;
+  right: 25px;
+  bottom: 8%;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  border: 3px solid #a8e5ff;
+  background: #238bc9;
+  color: white;
+  font-weight: bold;
+  pointer-events: auto;
+}
+
+#message {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 8;
+  padding: 9px 14px;
+  border-radius: 9px;
+  background: #102538dd;
+  border: 1px solid #ffbd55;
+  font-size: 12px;
+}
+
+#portrait {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #101a29;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 25px;
+  font-weight: bold;
+}
+
+@media (orientation: portrait) {
+  #portrait { display: flex; }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game"></div>
+
+<div id="lobby">
+  <div>
+    <div class="logo">MINI ROYALE</div>
+    <div class="subtitle">UMA PEQUENA IDEIA, UM GRANDE MUNDO</div>
+  </div>
+
+  <div class="character">
+    <div class="hood"></div>
+    <div class="head"></div>
+    <div class="body"></div>
+    <div class="arm left"></div>
+    <div class="arm right"></div>
+    <div class="leg left"></div>
+    <div class="leg right"></div>
+  </div>
+
+  <button id="play">ENTRAR NO MAPA</button>
+</div>
+
+<div id="controls">
+  <div id="moveZone"></div>
+  <div id="lookZone"></div>
+  <div id="joystick"><div id="stick"></div></div>
+  <button id="action">PULAR</button>
+</div>
+
+<div id="message">Explore a ilha livremente!</div>
+<div id="portrait">Gire o celular para a horizontal para jogar.</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+  
+// ======================================
+// MINI ROYALE 3.0
+// PARTE 2 — CENÁRIO 3D
+// ======================================
+
+let scene, camera, renderer;
+let clock;
+let player;
+let terrain;
+let trees = [];
+let buildings = [];
+
+const MAP_SIZE = 1200;
+
+const keys = {};
+const movement = {
+  x: 0,
+  z: 0
+};
+
+let yaw = 0;
+let pitch = 0;
+let verticalSpeed = 0;
+let grounded = true;
+let jumping = false;
+let gameStarted = false;
+
+function terrainHeight(x, z) {
+  let hills =
+    Math.sin(x * 0.008) * 8 +
+    Math.cos(z * 0.009) * 7 +
+    Math.sin((x + z) * 0.015) * 3;
+
+  return hills;
+}
+
+function createMaterial(color, roughness = 1) {
+  return new THREE.MeshStandardMaterial({
+    color,
+    roughness
+  });
+}
+
+function initGame() {
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x8bc5e8);
+  scene.fog = new THREE.Fog(0x8bc5e8, 180, 950);
+
+  camera = new THREE.PerspectiveCamera(
+    70,
+    innerWidth / innerHeight,
+    0.1,
+    1200
+  );
+
+  renderer = new THREE.WebGLRenderer({
+    antialias: false,
+    powerPreference: "high-performance"
+  });
+
+  renderer.setPixelRatio(
+    Math.min(devicePixelRatio, 1.5)
+  );
+
+  renderer.setSize(innerWidth, innerHeight);
+
+  renderer.shadowMap.enabled = false;
+
+  document.getElementById("game").appendChild(
+    renderer.domElement
+  );
+
+  clock = new THREE.Clock();
+
+  // ILUMINAÇÃO
+
+  const hemisphere = new THREE.HemisphereLight(
+    0xdff4ff,
+    0x425b35,
+    2
+  );
+
+  scene.add(hemisphere);
+
+  const sunlight = new THREE.DirectionalLight(
+    0xfff1d0,
+    2
+  );
+
+  sunlight.position.set(200, 350, 100);
+  scene.add(sunlight);
+
+  // TERRENO
+
+  createTerrain();
+
+  // VEGETAÇÃO
+
+  createTrees();
+
+  // CONSTRUÇÕES
+
+  createBuildings();
+
+  // PERSONAGEM
+
+  createPlayer();
+
+  // CÂMERA
+
+  updateCamera();
+
+  window.addEventListener("resize", resizeGame);
+
+  animateGame();
+}
+
+// ======================================
+// TERRENO
+// ======================================
+
+function createTerrain() {
+  const geometry = new THREE.PlaneGeometry(
+    MAP_SIZE,
+    MAP_SIZE,
+    100,
+    100
+  );
+
+  const positions = geometry.attributes.position;
+
+  const colors = [];
+
+  const low = new THREE.Color(0x3c873e);
+  const middle = new THREE.Color(0x65a947);
+  const high = new THREE.Color(0x9a956d);
+
+  for (let i = 0; i < positions.count; i++) {
+    const x = positions.getX(i);
+    const z = positions.getY(i);
+
+    const height = terrainHeight(x, z);
+
+    positions.setZ(i, height);
+
+    const color = low.clone();
+
+    const blend = Math.max(
+      0,
+      Math.min(1, (height + 8) / 22)
+    );
+
+    color.lerp(middle, blend);
+
+    if (height > 9) {
+      color.lerp(high, 0.45);
+    }
+
+    colors.push(
+      color.r,
+      color.g,
+      color.b
+    );
+  }
+
+  geometry.setAttribute(
+    "color",
+    new THREE.Float32BufferAttribute(colors, 3)
+  );
+
+  geometry.computeVertexNormals();
+
+  const material = new THREE.MeshStandardMaterial({
+    vertexColors: true,
+    roughness: 1
+  });
+
+  terrain = new THREE.Mesh(
+    geometry,
+    material
+  );
+
+  terrain.rotation.x = -Math.PI / 2;
+  terrain.position.y = 0;
+  terrain.receiveShadow = true;
+
+  scene.add(terrain);
+}
+
+// ======================================
+// ÁRVORES
+// ======================================
+
+function createTrees() {
+  const trunkMaterial = createMaterial(0x76502e);
+  const leavesMaterial = createMaterial(0x25843b);
+  const leavesLight = createMaterial(0x48a83e);
+
+  const trunkGeometry = new THREE.CylinderGeometry(
+    0.6,
+    0.9,
+    6,
+    6
+  );
+
+  const crownGeometry = new THREE.ConeGeometry(
+    4,
+    9,
+    7
+  );
+
+  for (let i = 0; i < 180; i++) {
+    const x = (Math.random() - 0.5) * 1050;
+    const z = (Math.random() - 0.5) * 1050;
+
+    // Espaço livre ao redor do centro do mapa
+    if (Math.abs(x) < 65 && Math.abs(z) < 65) {
+      continue;
+    }
+
+    const group = new THREE.Group();
+
+    const trunk = new THREE.Mesh(
+      trunkGeometry,
+      trunkMaterial
+    );
+
+    trunk.position.y = 3;
+
+    const crown = new THREE.Mesh(
+      crownGeometry,
+      Math.random() > 0.5
+        ? leavesMaterial
+        : leavesLight
+    );
+
+    crown.position.y = 9;
+
+    group.add(trunk);
+    group.add(crown);
+
+    const scale = 0.7 + Math.random() * 1.1;
+
+    group.scale.setScalar(scale);
+
+    group.position.set(
+      x,
+      terrainHeight(x, z),
+      z
+    );
+
+    group.rotation.y = Math.random() * Math.PI * 2;
+
+    scene.add(group);
+
+    trees.push(group);
+  }
+}
+
+// ======================================
+// CONSTRUÇÕES
+// ======================================
+
+function createBuilding(x, z, width, depth, height, color) {
+  const group = new THREE.Group();
+
+  const wallMaterial = createMaterial(color);
+  const roofMaterial = createMaterial(0x394957);
+
+  const walls = new THREE.Mesh(
+    new THREE.BoxGeometry(width, height, depth),
+    wallMaterial
+  );
+
+  walls.position.y = height / 2;
+
+  const roof = new THREE.Mesh(
+    new THREE.BoxGeometry(
+      width + 2,
+      1.2,
+      depth + 2
+    ),
+    roofMaterial
+  );
+
+  roof.position.y = height + 0.6;
+
+  group.add(walls);
+  group.add(roof);
+
+  group.position.set(
+    x,
+    terrainHeight(x, z),
+    z
+  );
+
+  scene.add(group);
+
+  buildings.push(group);
+}
+
+function createBuildings() {
+  const locations = [
+    [-150, -130],
+    [150, -150],
+    [-180, 170],
+    [180, 150],
+    [0, 280],
+    [330, 0],
+    [-330, 0],
+    [0, -350],
+    [400, 300],
+    [-400, -300]
+  ];
+
+  for (let i = 0; i < locations.length; i++) {
+    const [x, z] = locations[i];
+
+    const width = 18 + Math.random() * 12;
+    const depth = 18 + Math.random() * 12;
+    const height = 9 + Math.random() * 7;
+
+    const colors = [
+      0xd5a66e,
+      0xc8794e,
+      0xd4d0bd,
+      0x8cabb3,
+      0xb9a27c
+    ];
+
+    createBuilding(
+      x,
+      z,
+      width,
+      depth,
+      height,
+      colors[i % colors.length]
+    );
+  }
+}
+
+// ======================================
+// PERSONAGEM 3D
+// ======================================
+
+function createPlayer() {
+  player = new THREE.Group();
+
+  const darkMaterial = createMaterial(0x171923);
+  const purpleMaterial = createMaterial(0x9d50ff);
+  const faceMaterial = createMaterial(0xc4ccd6);
+
+  const body = new THREE.Mesh(
+    new THREE.BoxGeometry(2.2, 3, 1.4),
+    darkMaterial
+  );
+
+  body.position.y = 3.4;
+
+  const head = new THREE.Mesh(
+    new THREE.SphereGeometry(0.9, 12, 10),
+    faceMaterial
+  );
+
+  head.position.y = 5.7;
+
+  const hood = new THREE.Mesh(
+    new THREE.TorusGeometry(1, 0.16, 6, 12),
+    purpleMaterial
+  );
+
+  hood.position.y = 5.8;
+  hood.rotation.x = Math.PI / 2;
+
+  const leftLeg = new THREE.Mesh(
+    new THREE.BoxGeometry(0.75, 2.2, 0.9),
+    darkMaterial
+  );
+
+  leftLeg.position.set(-0.6, 1.1, 0);
+
+  const rightLeg = leftLeg.clone();
+  rightLeg.position.x = 0.6;
+
+  const leftArm = new THREE.Mesh(
+    new THREE.BoxGeometry(0.65, 2.3, 0.8),
+    darkMaterial
+  );
+
+  leftArm.position.set(-1.4, 3.4, 0);
+
+  const rightArm = leftArm.clone();
+  rightArm.position.x = 1.4;
+
+  player.add(
+    body,
+    head,
+    hood,
+    leftLeg,
+    rightLeg,
+    leftArm,
+    rightArm
+  );
+
+  player.position.set(
+    0,
+    terrainHeight(0, 0),
+    0
+  );
+
+  scene.add(player);
+}
+
+// ======================================
+// CÂMERA
+// ======================================
+
+function updateCamera() {
+  if (!player) return;
+
+  const distance = 12;
+  const height = 5;
+
+  const targetX =
+    player.position.x - Math.sin(yaw) * distance;
+
+  const targetZ =
+    player.position.z - Math.cos(yaw) * distance;
+
+  camera.position.set(
+    targetX,
+    player.position.y + height,
+    targetZ
+  );
+
+  camera.lookAt(
+    player.position.x,
+    player.position.y + 3.5 + pitch,
+    player.position.z
+  );
+}
+
+// ======================================
+// REDIMENSIONAMENTO
+// ======================================
+
+function resizeGame() {
+  if (!camera || !renderer) return;
+
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(innerWidth, innerHeight);
+  }
+  
+// ===== CONTROLES E MOVIMENTAÇÃO =====
+
+let movePointer = null;
+let lookPointer = null;
+
+let moveOriginX = 0;
+let moveOriginY = 0;
+let lookLastX = 0;
+let lookLastY = 0;
+
+let moveX = 0;
+let moveY = 0;
+
+const joystick = document.getElementById("joystick");
+const stick = document.getElementById("stick");
+const moveZone = document.getElementById("moveZone");
+const lookZone = document.getElementById("lookZone");
+const actionButton = document.getElementById("action");
+const playButton = document.getElementById("play");
+
+function updateJoystick(x, y) {
+  const dx = x - moveOriginX;
+  const dy = y - moveOriginY;
+
+  const distance = Math.sqrt(dx * dx + dy * dy);
+  const maxDistance = 42;
+  const scale = distance > maxDistance ? maxDistance / distance : 1;
+
+  const finalX = dx * scale;
+  const finalY = dy * scale;
+
+  moveX = finalX / maxDistance;
+  moveY = finalY / maxDistance;
+
+  stick.style.transform =
+    `translate(${finalX}px, ${finalY}px)`;
+}
+
+moveZone.addEventListener("pointerdown", (event) => {
+  if (!gameStarted || movePointer !== null) return;
+
+  movePointer = event.pointerId;
+
+  const rect = moveZone.getBoundingClientRect();
+
+  moveOriginX = event.clientX;
+  moveOriginY = event.clientY;
+
+  joystick.style.left =
+    `${event.clientX - rect.left}px`;
+
+  joystick.style.top =
+    `${event.clientY - rect.top}px`;
+
+  joystick.style.display = "block";
+
+  updateJoystick(event.clientX, event.clientY);
+});
+
+window.addEventListener("pointermove", (event) => {
+  if (event.pointerId === movePointer) {
+    updateJoystick(event.clientX, event.clientY);
+  }
+
+  if (event.pointerId === lookPointer) {
+    const dx = event.clientX - lookLastX;
+    const dy = event.clientY - lookLastY;
+
+    lookLastX = event.clientX;
+    lookLastY = event.clientY;
+
+    yaw -= dx * 0.004;
+    pitch -= dy * 0.003;
+
+    pitch = Math.max(-0.25, Math.min(0.45, pitch));
+  }
+});
+
+function releaseMove(event) {
+  if (event.pointerId !== movePointer) return;
+
+  movePointer = null;
+  moveX = 0;
+  moveY = 0;
+
+  joystick.style.display = "none";
+  stick.style.transform = "translate(0px, 0px)";
+}
+
+window.addEventListener("pointerup", releaseMove);
+window.addEventListener("pointercancel", releaseMove);
+
+lookZone.addEventListener("pointerdown", (event) => {
+  if (!gameStarted || lookPointer !== null) return;
+
+  lookPointer = event.pointerId;
+  lookLastX = event.clientX;
+  lookLastY = event.clientY;
+});
+
+function releaseLook(event) {
+  if (event.pointerId === lookPointer) {
+    lookPointer = null;
+  }
+}
+
+window.addEventListener("pointerup", releaseLook);
+window.addEventListener("pointercancel", releaseLook);
+
+// ===== PULO =====
+
+actionButton.addEventListener("pointerdown", (event) => {
+  event.preventDefault();
+
+  if (!gameStarted || !grounded) return;
+
+  verticalSpeed = 7;
+  grounded = false;
+});
+
+// ===== MOVIMENTAÇÃO DO PERSONAGEM =====
+
+function updatePlayer(delta) {
+  if (!player) return;
+
+  const forward = -moveY;
+  const sideways = moveX;
+
+  const moving = Math.abs(forward) + Math.abs(sideways) > 0.08;
+
+  if (moving) {
+    const speed = 9;
+
+    const directionX =
+      Math.sin(yaw) * forward +
+      Math.cos(yaw) * sideways;
+
+    const directionZ =
+      Math.cos(yaw) * forward -
+      Math.sin(yaw) * sideways;
+
+    player.position.x += directionX * speed * delta;
+    player.position.z += directionZ * speed * delta;
+
+    player.rotation.y = yaw;
+  }
+
+  const limit = MAP_SIZE / 2 - 15;
+
+  player.position.x = Math.max(
+    -limit,
+    Math.min(limit, player.position.x)
+  );
+
+  player.position.z = Math.max(
+    -limit,
+    Math.min(limit, player.position.z)
+  );
+
+  // Gravidade e pulo
+  verticalSpeed -= 18 * delta;
+  player.position.y += verticalSpeed * delta;
+
+  const ground = terrainHeight(
+    player.position.x,
+    player.position.z
+  );
+
+  if (player.position.y <= ground) {
+    player.position.y = ground;
+    verticalSpeed = 0;
+    grounded = true;
+  }
+}
+
+// ===== CÂMERA EM TERCEIRA PESSOA =====
+
+function followCamera(delta) {
+  if (!player) return;
+
+  const distance = 8;
+  const height = 4;
+
+  const targetX =
+    player.position.x - Math.sin(yaw) * distance;
+
+  const targetZ =
+    player.position.z - Math.cos(yaw) * distance;
+
+  const targetY =
+    player.position.y + height + pitch * 5;
+
+  camera.position.x +=
+    (targetX - camera.position.x) * Math.min(1, delta * 7);
+
+  camera.position.y +=
+    (targetY - camera.position.y) * Math.min(1, delta * 7);
+
+  camera.position.z +=
+    (targetZ - camera.position.z) * Math.min(1, delta * 7);
+
+  camera.lookAt(
+    player.position.x,
+    player.position.y + 1.5,
+    player.position.z
+  );
+}
+
+// ===== LOOP DO JOGO =====
+
+const gameClock = new THREE.Clock();
+
+function animateGame() {
+  requestAnimationFrame(animateGame);
+
+  const delta = Math.min(gameClock.getDelta(), 0.05);
+
+  if (gameStarted) {
+    updatePlayer(delta);
+    followCamera(delta);
+  }
+
+  renderer.render(scene, camera);
+}
+
+// ===== INICIAR PARTIDA =====
+
+function startGame() {
+  if (gameStarted) return;
+
+  document.getElementById("lobby").style.display = "none";
+  document.getElementById("controls").style.display = "block";
+
+  gameStarted = true;
+
+  initGame();
+
+  const message = document.getElementById("message");
+
+  if (message) {
+    message.textContent = "Explore o mapa!";
+  }
+}
+
+playButton.addEventListener("click", startGame);
+
+// ===== FINALIZAÇÃO =====
+
+window.addEventListener("resize", () => {
+  if (renderer && camera) {
+    resizeGame();
+  }
+});
+
+</script>
+</body>
+</html>
+
