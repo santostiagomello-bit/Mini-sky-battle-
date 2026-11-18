@@ -41,13 +41,27 @@ jobs:
 
       - name: Corrigir compatibilidade Java e Kotlin
         run: |
-          cat >> android-app/MINI_ROYALE_ANDROID/app/build.gradle <<'EOF'
+          python3 - <<'PY'
+          from pathlib import Path
 
-          tasks.withType(org.gradle.api.tasks.compile.JavaCompile).configureEach {
-              sourceCompatibility = '17'
-              targetCompatibility = '17'
+          p = Path("android-app/MINI_ROYALE_ANDROID/app/build.gradle")
+          s = p.read_text()
+
+          s += """
+
+          android {
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
+              }
+              kotlinOptions {
+                  jvmTarget = '17'
+              }
           }
-          EOF
+          """
+
+          p.write_text(s)
+          PY
       - name: Gerar APK
         run: gradle -p android-app/MINI_ROYALE_ANDROID assembleDebug
 
