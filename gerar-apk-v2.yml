@@ -1,7 +1,12 @@
-name: Gerar APK MINI ROYALE - CORRIGIDO
+
+name: Gerar APK MINI ROYALE
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - 'MINI_ROYALE_4_18_PROJETO_ANDROID.zip'
+      - '.github/workflows/main.yml'
 
 jobs:
   build:
@@ -16,7 +21,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-          
+
       - name: Preparar Android SDK
         run: |
           SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
@@ -41,3 +46,4 @@ jobs:
         with:
           name: MINI-ROYALE-APK
           path: android-app/app/build/outputs/apk/debug/app-debug.apk
+          
