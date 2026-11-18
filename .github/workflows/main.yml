@@ -39,6 +39,10 @@ jobs:
           mkdir android-app
           unzip MINI_ROYALE_4_18_PROJETO_ANDROID.zip -d android-app
 
+      - name: Corrigir compatibilidade Java e Kotlin
+        run: |
+          sed -i 's/VERSION_1_8/VERSION_17/g' android-app/MINI_ROYALE_ANDROID/app/build.gradle
+
       - name: Gerar APK
         run: gradle -p android-app/MINI_ROYALE_ANDROID assembleDebug
 
@@ -47,3 +51,4 @@ jobs:
         with:
           name: MINI-ROYALE-APK
           path: android-app/MINI_ROYALE_ANDROID/app/build/outputs/apk/debug/app-debug.apk
+          
