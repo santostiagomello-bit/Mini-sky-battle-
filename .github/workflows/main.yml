@@ -39,7 +39,7 @@ jobs:
           mkdir android-app
           unzip MINI_ROYALE_4_18_PROJETO_ANDROID.zip -d android-app
 
-            - name: Corrigir compatibilidade Java e Kotlin
+      - name: Corrigir compatibilidade Java e Kotlin
         run: |
           cat >> android-app/MINI_ROYALE_ANDROID/app/build.gradle <<'EOF'
 
