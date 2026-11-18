@@ -39,16 +39,12 @@ jobs:
           mkdir android-app
           unzip MINI_ROYALE_4_18_PROJETO_ANDROID.zip -d android-app
 
-      - name: Corrigir compatibilidade Java e Kotlin
+            - name: Corrigir compatibilidade Java e Kotlin
         run: |
-          sed -i 's/VERSION_1_8/VERSION_17/g' android-app/MINI_ROYALE_ANDROID/app/build.gradle
+          cat >> android-app/MINI_ROYALE_ANDROID/app/build.gradle <<'EOF'
 
-      - name: Gerar APK
-        run: gradle -p android-app/MINI_ROYALE_ANDROID assembleDebug
-
-      - name: Disponibilizar APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: MINI-ROYALE-APK
-          path: android-app/MINI_ROYALE_ANDROID/app/build/outputs/apk/debug/app-debug.apk
-          
+          tasks.withType(org.gradle.api.tasks.compile.JavaCompile).configureEach {
+              sourceCompatibility = '17'
+              targetCompatibility = '17'
+          }
+          EOF
