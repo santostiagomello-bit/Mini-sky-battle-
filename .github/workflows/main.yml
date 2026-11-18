@@ -1,0 +1,44 @@
+name: Gerar APK MINI ROYALE
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'MINI_ROYALE_4_18_PROJETO_ANDROID.zip'
+      - '.github/workflows/main.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar arquivos
+        uses: actions/checkout@v4
+
+      - name: Preparar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Preparar Android
+        uses: android-actions/setup-android@v3
+
+      - name: Instalar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Extrair projeto Android
+        run: |
+          mkdir android-app
+          unzip MINI_ROYALE_4_18_PROJETO_ANDROID.zip -d android-app
+
+      - name: Gerar APK
+        run: gradle -p android-app assembleDebug
+
+      - name: Disponibilizar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MINI-ROYALE-APK
+          path: android-app/app/build/outputs/apk/debug/app-debug.apk
