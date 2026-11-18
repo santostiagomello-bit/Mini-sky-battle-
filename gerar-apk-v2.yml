@@ -22,7 +22,7 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Preparar Android SDK
+            - name: Preparar Android SDK
         run: |
           SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
           yes | "$SDKMANAGER" --sdk_root="$ANDROID_HOME" --licenses
